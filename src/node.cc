@@ -1261,7 +1261,21 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
 
     // Ensure CSPRNG is properly seeded.
     CHECK(ncrypto::CSPRNG(nullptr, 0));
+#endif  // !defined(OPENSSL_IS_BORINGSSL)
+#endif  // HAVE_OPENSSL
+  }
 
+  if (!(flags & ProcessInitializationFlags::kNoInitializeV8)) {
+    // Disable absl deadlock detection in V8 as it reports false-positive cases.
+    // Set the policy before entropy/platform/cppgc setup allocates the graph.
+    // TODO(legendecas): Replace this global disablement with case suppressions.
+    // https://github.com/nodejs/node-v8/issues/301
+    absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kIgnore);
+  }
+
+#if HAVE_OPENSSL
+  if (!(flags & ProcessInitializationFlags::kNoInitOpenSSL)) {
+#ifndef OPENSSL_IS_BORINGSSL
     V8::SetEntropySource([](unsigned char* buffer, size_t length) {
       // V8 falls back to very weak entropy when this function fails
       // and /dev/urandom isn't available. That wouldn't be so bad if
@@ -1276,8 +1290,8 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
       if (credentials::SafeGetenv("NODE_EXTRA_CA_CERTS", &extra_ca_certs))
         crypto::UseExtraCaCerts(extra_ca_certs);
     }
-#endif  // HAVE_OPENSSL
   }
+#endif  // HAVE_OPENSSL
 
   if (!(flags & ProcessInitializationFlags::kNoInitializeNodeV8Platform)) {
     uv_thread_setname("node-MainThread");
@@ -1300,11 +1314,6 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
 
   if (!(flags & ProcessInitializationFlags::kNoInitializeV8)) {
     V8::Initialize();
-
-    // Disable absl deadlock detection in V8 as it reports false-positive cases.
-    // TODO(legendecas): Replace this global disablement with case suppressions.
-    // https://github.com/nodejs/node-v8/issues/301
-    absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kIgnore);
   }
 
 #if NODE_USE_V8_WASM_TRAP_HANDLER
