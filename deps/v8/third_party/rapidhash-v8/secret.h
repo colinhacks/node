@@ -148,6 +148,12 @@ static unsigned sprp(unsigned long long n, unsigned long long a) {
 static unsigned is_prime(unsigned long long n) {
   if (n < 2 || !(n & 1)) return 0;
   if (n < 4) return 1;
+  if (n >= 2047 &&
+      (n % 3 == 0 || n % 5 == 0 || n % 7 == 0 || n % 11 == 0 ||
+       n % 13 == 0 || n % 17 == 0 || n % 19 == 0 || n % 23 == 0 ||
+       n % 29 == 0 || n % 31 == 0 || n % 37 == 0)) {
+    return 0;
+  }
   if (!sprp(n, 2)) return 0;
   if (n < 2047) return 1;
   if (!sprp(n, 3)) return 0;
