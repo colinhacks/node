@@ -208,7 +208,7 @@ parser.add_argument("--enable-pgo-generate",
     dest="enable_pgo_generate",
     default=None,
     help="Enable profiling with pgo of a binary. This feature is only available "
-         "on linux with gcc and g++ 5.4.1 or newer, on macOS with Clang and Ninja, "
+         "on Linux with GCC 5.4.1+ or Clang 20.1.0+, on macOS with Clang and Ninja, "
          "and on windows.")
 
 parser.add_argument("--enable-pgo-use",
@@ -216,12 +216,12 @@ parser.add_argument("--enable-pgo-use",
     dest="enable_pgo_use",
     default=None,
     help="Enable use of the profile generated with --enable-pgo-generate. This "
-         "feature is available on linux with gcc and g++ 5.4.1 or newer, "
+         "feature is available on Linux with GCC 5.4.1+ or Clang 20.1.0+, "
          "on macOS with Clang and Ninja, and on windows.")
 
 parser.add_argument("--pgo-profile",
-    help="Path to the merged LLVM profile for macOS --enable-pgo-use "
-         "(default: node.profdata in the source directory).")
+    help="Path to the merged LLVM profile for macOS or Linux Clang "
+         "--enable-pgo-use (default: node.profdata on macOS).")
 
 parser.add_argument("--enable-lto",
     action="store_true",
@@ -2026,8 +2026,13 @@ def configure_node(o):
     raise Exception(
       'The pgo option is supported only on linux, macOS, and windows.')
 
-  if options.pgo_profile and (flavor != 'mac' or not options.enable_pgo_use):
-    raise Exception('--pgo-profile requires macOS --enable-pgo-use.')
+  linux_uses_clang = flavor == 'linux' and all(
+    try_check_compiler(compiler, language)[1]
+    for compiler, language in ((CC, 'c'), (CXX, 'c++')))
+
+  if options.pgo_profile and not (options.enable_pgo_use and
+                                  (flavor == 'mac' or linux_uses_clang)):
+    raise Exception('--pgo-profile requires macOS or Linux --enable-pgo-use.')
 
   if flavor == 'mac' and (options.enable_pgo_generate or options.enable_pgo_use):
     if not options.use_ninja:
@@ -2036,8 +2041,15 @@ def configure_node(o):
       if not try_check_compiler(compiler, language)[1]:
         raise Exception('The macOS pgo options require Clang for both CC and CXX.')
 
+  if flavor == 'linux' and linux_uses_clang and (options.enable_pgo_generate or options.enable_pgo_use):
+    if not options.use_ninja:
+      raise Exception('Linux LLVM PGO requires --ninja.')
+
   o['variables']['node_pgo_profile'] = ''
-  if flavor == 'mac' and options.enable_pgo_use:
+  if ((flavor == 'mac' and options.enable_pgo_use) or
+      (flavor == 'linux' and linux_uses_clang and options.enable_pgo_use)):
+    if flavor == 'linux' and not options.pgo_profile:
+      raise Exception('Linux LLVM PGO use requires --pgo-profile=<merged-profile>.')
     profile = Path(options.pgo_profile or 'node.profdata').resolve()
     if not profile.is_file():
       raise Exception(f'PGO profile not found: {profile}')
@@ -2071,12 +2083,16 @@ def configure_node(o):
 
   if flavor == 'linux':
     if options.enable_pgo_generate or options.enable_pgo_use:
-      version_checked = (5, 4, 1)
-      if not gcc_version_ge(version_checked):
-        version_checked_str = ".".join(map(str, version_checked))
-        raise Exception(
-          'The options --enable-pgo-generate and --enable-pgo-use '
-          f'are supported for gcc and gxx {version_checked_str} or newer only.')
+      if linux_uses_clang:
+        if not linux_clang_20_or_newer():
+          raise Exception('Linux LLVM PGO requires Clang 20.1.0 or newer for both CC and CXX.')
+      else:
+        version_checked = (5, 4, 1)
+        if not gcc_version_ge(version_checked):
+          version_checked_str = ".".join(map(str, version_checked))
+          raise Exception(
+            'The options --enable-pgo-generate and --enable-pgo-use '
+            f'are supported for gcc and gxx {version_checked_str} or newer only.')
 
   if options.enable_pgo_generate and options.enable_pgo_use:
     raise Exception(

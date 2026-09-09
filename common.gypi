@@ -248,6 +248,17 @@
               'OTHER_CFLAGS': ['-fprofile-use=<(node_pgo_profile)'],
             },
           }],
+          ['OS=="linux" and clang==1 and configuring_node==1 and enable_pgo_generate=="true"', {
+            'cflags': ['-fprofile-generate', '-fprofile-update=atomic'],
+            'target_conditions': [
+              ['_type!="static_library"', {
+                'ldflags': ['-fprofile-generate'],
+              }],
+            ],
+          }],
+          ['OS=="linux" and clang==1 and configuring_node==1 and enable_pgo_use=="true"', {
+            'cflags': ['-fprofile-use=<(node_pgo_profile)'],
+          }],
           ['OS=="linux" or OS=="openharmony"', {
             'conditions': [
               ['node_section_ordering_info!=""', {
@@ -276,7 +287,7 @@
             # frames otherwise, even with --call-graph dwarf.
             'cflags': [ '-fno-omit-frame-pointer' ],
           }],
-          ['OS=="linux" or OS=="openharmony"', {
+          ['(OS=="linux" and clang!=1) or OS=="openharmony"', {
             'conditions': [
               ['enable_pgo_generate=="true"', {
                 'cflags': ['<(pgo_generate)'],
