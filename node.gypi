@@ -265,10 +265,6 @@
     }],
 
     [ 'OS=="mac"', {
-      # linking Corefoundation is needed since certain macOS debugging tools
-      # like Instruments require it for some features. Security is needed for
-      # --use-system-ca.
-      'libraries': [ '-framework CoreFoundation -framework Security' ],
       'defines!': [
         'NODE_PLATFORM="mac"',
       ],

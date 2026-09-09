@@ -445,6 +445,8 @@
       'src/crypto/crypto_x509.h',
       'src/node_crypto.cc',
       'src/node_crypto.h',
+      'src/node_darwin_frameworks.cc',
+      'src/node_darwin_frameworks.h',
     ],
     'node_tracing_perfetto_sources': [
       'src/tracing/agent_perfetto.cc',
@@ -1656,9 +1658,6 @@
         'src/builtin_info.cc',
       ],
       'conditions': [
-        [ 'OS=="mac"', {
-          'libraries': [ '-framework CoreFoundation -framework Security' ],
-        }],
         [ 'node_shared_simdutf=="false" and node_use_bundled_v8!="false"', {
           'dependencies': [ 'tools/v8_gypfiles/v8.gyp:simdutf#host' ],
         }],
