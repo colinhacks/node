@@ -12,6 +12,7 @@
     'msvs_multi_core_compile': '0',   # we do enable multicore compiles, but not using the V8 way
     'enable_pgo_generate%': '0',
     'enable_pgo_use%': '0',
+    'node_pgo_profile%': '',
     'clang_profile_lib%': '',
     'python%': 'python',
     'emulator%': [],
@@ -206,6 +207,28 @@
             'ldflags': ['<(lto)'],
             'xcode_settings': {
               'LLVM_LTO': 'YES',
+            },
+          }],
+          ['OS=="mac" and configuring_node==1 and enable_thin_lto=="true"', {
+            'xcode_settings': {
+              'OTHER_CFLAGS': ['-flto=thin'],
+            },
+          }],
+          ['OS=="mac" and configuring_node==1 and enable_pgo_generate=="true"', {
+            'xcode_settings': {
+              'OTHER_CFLAGS': ['-fprofile-generate', '-fprofile-update=atomic'],
+            },
+            'target_conditions': [
+              ['_type!="static_library"', {
+                'xcode_settings': {
+                  'OTHER_LDFLAGS': ['-fprofile-generate'],
+                },
+              }],
+            ],
+          }],
+          ['OS=="mac" and configuring_node==1 and enable_pgo_use=="true"', {
+            'xcode_settings': {
+              'OTHER_CFLAGS': ['-fprofile-use=<(node_pgo_profile)'],
             },
           }],
           ['OS=="linux" or OS=="openharmony"', {

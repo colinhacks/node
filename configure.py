@@ -208,14 +208,20 @@ parser.add_argument("--enable-pgo-generate",
     dest="enable_pgo_generate",
     default=None,
     help="Enable profiling with pgo of a binary. This feature is only available "
-         "on linux with gcc and g++ 5.4.1 or newer and on windows.")
+         "on linux with gcc and g++ 5.4.1 or newer, on macOS with Clang and Ninja, "
+         "and on windows.")
 
 parser.add_argument("--enable-pgo-use",
     action="store_true",
     dest="enable_pgo_use",
     default=None,
     help="Enable use of the profile generated with --enable-pgo-generate. This "
-         "feature is only available on linux with gcc and g++ 5.4.1 or newer and on windows.")
+         "feature is available on linux with gcc and g++ 5.4.1 or newer, "
+         "on macOS with Clang and Ninja, and on windows.")
+
+parser.add_argument("--pgo-profile",
+    help="Path to the merged LLVM profile for macOS --enable-pgo-use "
+         "(default: node.profdata in the source directory).")
 
 parser.add_argument("--enable-lto",
     action="store_true",
@@ -229,7 +235,7 @@ parser.add_argument("--enable-thin-lto",
     dest="enable_thin_lto",
     default=None,
     help="Enable compiling with thin lto of a binary. This feature is only available "
-         "on windows.")
+         "on Windows and macOS.")
 
 parser.add_argument("--lto-jobs",
     action="store",
@@ -237,7 +243,8 @@ parser.add_argument("--lto-jobs",
     default=None,
     help="Set the number of parallel LTO code generation jobs during linking. "
          "Defaults to the number of CPU cores. Lower values reduce peak memory "
-         "usage at the cost of longer link times. Only effective with LTO enabled.")
+         "usage at the cost of longer link times. Only supported on Windows "
+         "with LTO enabled.")
 
 parser.add_argument("--link-module",
     action="append",
@@ -1974,9 +1981,30 @@ def configure_node(o):
   else:
     o['variables']['node_enable_v8_vtunejit'] = 'false'
 
-  if (flavor != 'linux' and flavor != 'win') and (options.enable_pgo_generate or options.enable_pgo_use):
+  if flavor not in ('linux', 'win', 'mac') and (options.enable_pgo_generate or options.enable_pgo_use):
     raise Exception(
-      'The pgo option is supported only on linux and windows.')
+      'The pgo option is supported only on linux, macOS, and windows.')
+
+  if options.pgo_profile and (flavor != 'mac' or not options.enable_pgo_use):
+    raise Exception('--pgo-profile requires macOS --enable-pgo-use.')
+
+  if flavor == 'mac' and (options.enable_pgo_generate or options.enable_pgo_use):
+    if not options.use_ninja:
+      raise Exception('The macOS pgo options require --ninja.')
+    for compiler, language in ((CC, 'c'), (CXX, 'c++')):
+      if not try_check_compiler(compiler, language)[1]:
+        raise Exception('The macOS pgo options require Clang for both CC and CXX.')
+
+  o['variables']['node_pgo_profile'] = ''
+  if flavor == 'mac' and options.enable_pgo_use:
+    profile = Path(options.pgo_profile or 'node.profdata').resolve()
+    if not profile.is_file():
+      raise Exception(f'PGO profile not found: {profile}')
+    if '\n' in str(profile) or '\r' in str(profile):
+      raise Exception('PGO profile paths must not contain newlines.')
+    # Ninja expands dollar signs before the shell parses the compiler flags.
+    o['variables']['node_pgo_profile'] = shlex.quote(str(profile)).replace('$', '$$')
+
 
   if flavor == 'linux':
     if options.enable_pgo_generate or options.enable_pgo_use:
@@ -2026,12 +2054,15 @@ def configure_node(o):
         '\n  '.join(candidates) +
         '\nEnsure the ClangCL toolset is installed.')
 
-  if flavor != 'win' and options.enable_thin_lto:
+  if flavor not in ('win', 'mac') and options.enable_thin_lto:
     raise Exception(
       'Use --enable-lto instead.')
 
+  if flavor == 'mac' and options.lto_jobs is not None:
+    raise Exception('--lto-jobs is only supported on Windows.')
+
   # LTO mutual exclusion
-  if flavor == 'win':
+  if flavor in ('win', 'mac'):
     lto_options = []
     if options.enable_lto:
       lto_options.append('--enable-lto')
