@@ -25,6 +25,7 @@
         '../../deps/uv/include',
       ],
       'sources': [
+        '../../test/cctest/test_snapshot_dictionary_rehash.cc',
         '../../test/cctest/test_source_position_collection.cc',
         '../../test/cctest/test_source_positions_advanced.cc',
       ],
@@ -58,6 +59,7 @@
             '../../deps/googletest/googletest.gyp:gtest',
           ],
           'sources!': [
+            '../../test/cctest/test_snapshot_dictionary_rehash.cc',
             '../../test/cctest/test_source_position_collection.cc',
             '../../test/cctest/test_source_positions_advanced.cc',
           ],

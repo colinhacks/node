@@ -16,6 +16,7 @@
 #include "src/base/bits.h"
 #include "src/base/logging.h"
 #include "src/base/overflowing-math.h"
+#include "src/base/small-vector.h"
 #include "src/builtins/accessors.h"
 #include "src/builtins/builtins.h"
 #include "src/codegen/source-position-table.h"
@@ -2252,10 +2253,10 @@ void HeapObject::RehashBasedOnMap(IsolateT* isolate) {
       Cast<ObjectHashTable>(*this)->Rehash(isolate);
       break;
     case NAME_DICTIONARY_TYPE:
-      Cast<NameDictionary>(*this)->Rehash(isolate);
+      Cast<NameDictionary>(*this)->RehashForSnapshotWithBoundedScratch(isolate);
       break;
     case NAME_TO_INDEX_HASH_TABLE_TYPE:
-      Cast<NameToIndexHashTable>(*this)->Rehash(isolate);
+      Cast<NameToIndexHashTable>(*this)->RehashForSnapshotWithBoundedScratch(isolate);
       break;
     case REGISTERED_SYMBOL_TABLE_TYPE:
       Cast<RegisteredSymbolTable>(*this)->Rehash(isolate);
@@ -5135,6 +5136,61 @@ void HashTable<Derived, Shape>::Rehash(PtrComprCageBase cage_base) {
                     SKIP_WRITE_BARRIER);
     }
   }
+  SetNumberOfDeletedElements(0);
+}
+
+template <typename Derived, typename Shape>
+void HashTable<Derived, Shape>::RehashForSnapshotWithBoundedScratch(
+    PtrComprCageBase cage_base) {
+  constexpr uint32_t kMinimumScratchCapacity = 32;
+  constexpr uint32_t kMaximumScratchCapacity = 2048;
+  constexpr size_t kInlineScratchSlots = 128;
+  const uint32_t capacity = Capacity();
+  if (capacity < kMinimumScratchCapacity || capacity > kMaximumScratchCapacity) {
+    return Rehash(cage_base);
+  }
+
+  DisallowGarbageCollection no_gc;
+  // SmallVector rounds capacity up: at most 64 KiB for three-slot entries
+  // on 64-bit builds. Reserve while the table is protected from GC moves.
+  base::SmallVector<Tagged<Object>, kInlineScratchSlots> scratch;
+  scratch.reserve(static_cast<size_t>(capacity) * kEntrySize);
+  WriteBarrierModeScope mode = GetWriteBarrierMode(no_gc);
+  EarlyReadOnlyRoots roots = EarlyGetReadOnlyRoots();
+  uint32_t entries = 0;
+  for (InternalIndex current : InternalIndex::Range(capacity)) {
+    const uint32_t from_index = EntryToIndex(current);
+    Tagged<Object> key = get(from_index);
+    if (!IsKey(roots, key)) continue;
+    for (int field = 0; field < kEntrySize; ++field) {
+      scratch.push_back(get(from_index + field));
+    }
+    ++entries;
+  }
+  DCHECK_EQ(entries, NumberOfElements());
+
+  Tagged<HeapObject> undefined = roots.undefined_value();
+  Derived* self = static_cast<Derived*>(this);
+  for (InternalIndex current : InternalIndex::Range(capacity)) {
+    const uint32_t index = EntryToIndex(current);
+    self->set_key(index + kEntryKeyIndex, undefined, SKIP_WRITE_BARRIER);
+    for (int field = 1; field < kEntrySize; ++field) {
+      self->set(index + field, undefined, SKIP_WRITE_BARRIER);
+    }
+  }
+
+  for (uint32_t entry = 0; entry < entries; ++entry) {
+    const uint32_t scratch_index = entry * kEntrySize;
+    Tagged<Object> key = scratch[scratch_index + kEntryKeyIndex];
+    const uint32_t hash = TodoShape::HashForObject(roots, key);
+    const uint32_t insertion_index =
+        EntryToIndex(FindInsertionEntry(cage_base, roots, hash));
+    self->set_key(insertion_index + kEntryKeyIndex, key, *mode);
+    for (int field = 1; field < kEntrySize; ++field) {
+      self->set(insertion_index + field, scratch[scratch_index + field], *mode);
+    }
+  }
+  SetNumberOfElements(entries);
   SetNumberOfDeletedElements(0);
 }
 

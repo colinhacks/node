@@ -1900,6 +1900,7 @@ def configure_node_lib_files(o):
 
 def configure_node_cctest_sources(o):
   v8_private_cctest_sources = {
+      'test/cctest/test_snapshot_dictionary_rehash.cc',
       'test/cctest/test_source_position_collection.cc',
       'test/cctest/test_source_positions_advanced.cc',
   }

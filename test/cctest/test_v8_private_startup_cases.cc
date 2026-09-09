@@ -55,6 +55,7 @@ node::MultiIsolatePlatform* NodeStartupV8PrivatePlatform() {
 
 void NodeStartupSourcePositionTestsAnchor();
 void NodeStartupAdvancedSourcePositionTestsAnchor();
+void NodeStartupDictionaryRehashTestsAnchor();
 
 namespace {
 
@@ -65,6 +66,7 @@ class V8PrivateCctestAnchors {
   V8PrivateCctestAnchors() {
     NodeStartupSourcePositionTestsAnchor();
     NodeStartupAdvancedSourcePositionTestsAnchor();
+    NodeStartupDictionaryRehashTestsAnchor();
   }
 };
 

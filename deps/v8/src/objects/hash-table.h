@@ -177,6 +177,9 @@ class EXPORT_TEMPLATE_DECLARE(V8_EXPORT_PRIVATE) HashTable
   // Rehashes the table in-place.
   void Rehash(PtrComprCageBase cage_base);
 
+  // Rehashes snapshot-restored dictionary tables with bounded native scratch.
+  void RehashForSnapshotWithBoundedScratch(PtrComprCageBase cage_base);
+
   // Returns whether k is a real key.  The hole and undefined are not allowed as
   // keys and can be used to indicate missing or deleted elements.
   static inline bool IsKey(ReadOnlyRoots roots, Tagged<Object> k);
