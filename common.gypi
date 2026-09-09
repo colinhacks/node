@@ -213,6 +213,10 @@
               'LLVM_LTO': 'YES',
             },
           }],
+          ['OS=="linux" and clang==1 and configuring_node==1 and enable_thin_lto=="true"', {
+            'cflags': ['-flto=thin'],
+            'ldflags': ['-flto=thin', '-fuse-ld=lld'],
+          }],
           ['OS=="mac" and configuring_node==1 and enable_thin_lto=="true"', {
             'xcode_settings': {
               'OTHER_CFLAGS': ['-flto=thin'],
