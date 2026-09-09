@@ -286,7 +286,7 @@
           },],
           ['OS=="win"', {
             'conditions': [
-              ['enable_lto=="true"', {
+              ['configuring_node==1 and enable_lto=="true"', {
                 'msvs_settings': {
                   'VCCLCompilerTool': {
                     'AdditionalOptions': ['-flto=full'],
@@ -299,7 +299,7 @@
                   },
                 },
               },],
-              ['enable_thin_lto=="true"', {
+              ['configuring_node==1 and enable_thin_lto=="true"', {
                 'msvs_settings': {
                   'VCCLCompilerTool': {
                     'AdditionalOptions': ['-flto=thin'],
@@ -312,7 +312,7 @@
                   },
                 },
               },],
-              ['(enable_thin_lto=="true" or enable_lto=="true") and lto_jobs!=""', {
+              ['configuring_node==1 and (enable_thin_lto=="true" or enable_lto=="true") and lto_jobs!=""', {
                 'msvs_settings': {
                   'VCLinkerTool': {
                     'AdditionalOptions': ['/opt:lldltojobs=<(lto_jobs)'],
