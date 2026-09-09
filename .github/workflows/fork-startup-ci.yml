@@ -312,6 +312,15 @@ jobs:
             Add-Content -Path $env:GITHUB_ENV -Value 'JAVASCRIPT_EXIT_CODE=1'
             exit 0
           }
+          $shellPaths = Join-Path $env:LOG_DIR 'bash-paths.txt'
+          'Before WindowsApps filtering:' | Out-File $shellPaths
+          where.exe bash *>&1 | Out-File $shellPaths -Append
+          $windowsApps = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps'
+          $env:PATH = (($env:PATH -split ';' | Where-Object {
+            $_ -and $_.TrimEnd('\') -ne $windowsApps
+          }) -join ';')
+          'After WindowsApps filtering:' | Out-File $shellPaths -Append
+          where.exe bash *>&1 | Out-File $shellPaths -Append
           .\vcbuild.bat release clang-cl noprojgen nobuild test-ci-js *>&1 | Tee-Object -FilePath $javascriptLog
           $javascriptExit = $LASTEXITCODE
           Add-Content -Path $env:GITHUB_ENV -Value "JAVASCRIPT_EXIT_CODE=$javascriptExit"
