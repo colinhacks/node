@@ -488,7 +488,7 @@ struct IsolateSettings {
 // Snapshots are an *experimental* feature. In particular, the embedder API
 // exposed through this class is subject to change or removal between Node.js
 // versions, including possible API and ABI breakage.
-class EmbedderSnapshotData {
+class NODE_EXTERN EmbedderSnapshotData {
  public:
   struct DeleteSnapshotData {
     void operator()(const EmbedderSnapshotData*) const;
@@ -1289,7 +1289,7 @@ NODE_EXTERN v8::Local<v8::Value> WinapiErrnoException(
     const char* path = nullptr);
 #endif
 
-const char* signo_string(int errorno);
+NODE_EXTERN const char* signo_string(int errorno);
 
 
 typedef void (*addon_register_func)(

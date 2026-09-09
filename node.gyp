@@ -544,13 +544,12 @@
       ['clang==0 and OS!="win"', {
         'cflags': [ '-Wno-restrict', ],
       }],
-      # TODO(joyeecheung): investigate if it breaks addons.
-      # ['OS=="mac"', {
-      #   'xcode_settings': {
-      #     'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
-      #     'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'  # -fvisibility-inlines-hidden
-      #   },
-      # }],
+      ['OS=="mac" and node_shared=="false"', {
+        'xcode_settings': {
+          'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
+          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'  # -fvisibility-inlines-hidden
+        },
+      }],
       # ['OS!="win" or clang==1', {
       #   'cflags': [
       #     '-fvisibility=hidden',
@@ -633,6 +632,13 @@
       'msvs_disabled_warnings!': [4244],
 
       'conditions': [
+        ['OS=="mac" and node_shared=="false"', {
+          'xcode_settings': {
+            'DEAD_CODE_STRIPPING': 'YES',
+            # Preserve public symbols that native addons resolve at runtime.
+            'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
+          },
+        }],
         [ 'node_shared_hdr_histogram=="false"', {
           'dependencies': [
             'deps/histogram/histogram.gyp:histogram',
@@ -1362,6 +1368,12 @@
       'sources': [ '<@(node_cctest_sources)' ],
 
       'conditions': [
+        ['OS=="mac"', {
+          'xcode_settings': {
+            # Match the executable's dynamic exports for symbol-visibility tests.
+            'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
+          },
+        }],
         [ 'node_shared_gtest=="false"', {
           'dependencies': [
             'deps/googletest/googletest.gyp:gtest',

@@ -371,6 +371,12 @@
         '<(ABSEIL_ROOT)/absl/utility/utility.h',
       ],
       'conditions': [
+        ['OS=="mac" and node_shared=="false"', {
+          'xcode_settings': {
+            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
+            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
+          },
+        }],
         ['OS=="win"', {
           'sources': [
             '<(ABSEIL_ROOT)/absl/time/internal/cctz/src/time_zone_name_win.h',

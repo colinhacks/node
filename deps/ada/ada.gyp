@@ -19,7 +19,15 @@
       'dependencies': [
         '../../tools/v8_gypfiles/v8.gyp:simdutf',
       ],
-      'sources': [ '<@(ada_sources)' ]
+      'sources': [ '<@(ada_sources)' ],
+      'conditions': [
+        ['OS=="mac" and node_shared=="false"', {
+          'xcode_settings': {
+            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
+            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
+          },
+        }],
+      ],
     },
   ]
 }
