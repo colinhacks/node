@@ -21,6 +21,9 @@
 
 #if defined(__APPLE__)
 #include <CoreFoundation/CFTimeZone.h>
+#include <TargetConditionals.h>
+
+#include <dlfcn.h>
 
 #include <vector>
 #endif
@@ -49,6 +52,68 @@ namespace absl {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
+
+#if defined(__APPLE__)
+class CoreFoundationTimeZoneApi {
+ private:
+  // Retain the image while any resolved pointer can be called.
+  void* handle_;
+
+ public:
+  static const CoreFoundationTimeZoneApi& Get() {
+    static const CoreFoundationTimeZoneApi api;
+    return api;
+  }
+
+  decltype(&::CFRelease) CFRelease;
+  decltype(&::CFStringGetCString) CFStringGetCString;
+  decltype(&::CFStringGetLength) CFStringGetLength;
+  decltype(&::CFStringGetMaximumSizeForEncoding)
+      CFStringGetMaximumSizeForEncoding;
+  decltype(&::CFTimeZoneCopyDefault) CFTimeZoneCopyDefault;
+  decltype(&::CFTimeZoneGetName) CFTimeZoneGetName;
+
+ private:
+  static void* OpenFramework() {
+    void* handle = dlopen(
+#if TARGET_OS_OSX
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/"
+        "CoreFoundation",
+#else
+        "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+#endif
+        RTLD_LAZY | RTLD_LOCAL);
+    if (handle == nullptr) std::abort();
+    return handle;
+  }
+
+  template <typename T>
+  static T LoadFunction(void* handle, const char* name) {
+    void* symbol = dlsym(handle, name);
+    if (symbol == nullptr) std::abort();
+    static_assert(sizeof(T) == sizeof(symbol));
+    T result;
+    std::memcpy(&result, &symbol, sizeof(result));
+    return result;
+  }
+
+  CoreFoundationTimeZoneApi()
+      : handle_(OpenFramework()),
+        CFRelease(LoadFunction<decltype(CFRelease)>(handle_, "CFRelease")),
+        CFStringGetCString(LoadFunction<decltype(CFStringGetCString)>(
+            handle_, "CFStringGetCString")),
+        CFStringGetLength(LoadFunction<decltype(CFStringGetLength)>(
+            handle_, "CFStringGetLength")),
+        CFStringGetMaximumSizeForEncoding(
+            LoadFunction<decltype(CFStringGetMaximumSizeForEncoding)>(
+                handle_, "CFStringGetMaximumSizeForEncoding")),
+        CFTimeZoneCopyDefault(LoadFunction<decltype(CFTimeZoneCopyDefault)>(
+            handle_, "CFTimeZoneCopyDefault")),
+        CFTimeZoneGetName(LoadFunction<decltype(CFTimeZoneGetName)>(
+            handle_, "CFTimeZoneGetName")) {}
+
+};
+#endif
 
 std::string time_zone::name() const { return effective_impl().Name(); }
 
@@ -110,17 +175,19 @@ time_zone local_time_zone() {
 #endif
 #if defined(__APPLE__)
   std::vector<char> buffer;
-  CFTimeZoneRef tz_default = CFTimeZoneCopyDefault();
-  if (CFStringRef tz_name = CFTimeZoneGetName(tz_default)) {
+  const CoreFoundationTimeZoneApi& cf = CoreFoundationTimeZoneApi::Get();
+  CFTimeZoneRef tz_default = cf.CFTimeZoneCopyDefault();
+  if (CFStringRef tz_name = cf.CFTimeZoneGetName(tz_default)) {
     CFStringEncoding encoding = kCFStringEncodingUTF8;
-    CFIndex length = CFStringGetLength(tz_name);
-    CFIndex max_size = CFStringGetMaximumSizeForEncoding(length, encoding) + 1;
+    CFIndex length = cf.CFStringGetLength(tz_name);
+    CFIndex max_size =
+        cf.CFStringGetMaximumSizeForEncoding(length, encoding) + 1;
     buffer.resize(static_cast<size_t>(max_size));
-    if (CFStringGetCString(tz_name, &buffer[0], max_size, encoding)) {
+    if (cf.CFStringGetCString(tz_name, &buffer[0], max_size, encoding)) {
       zone = &buffer[0];
     }
   }
-  CFRelease(tz_default);
+  cf.CFRelease(tz_default);
 #endif
 #if defined(__Fuchsia__)
   std::string primary_tz;

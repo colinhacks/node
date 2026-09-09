@@ -12,9 +12,6 @@
         'include_dirs': [
           '<(ABSEIL_ROOT)',
         ],
-        'xcode_settings': {
-          'OTHER_LDFLAGS': ['-framework CoreFoundation'],
-        },
       },
       'include_dirs': [
         '<(ABSEIL_ROOT)',
