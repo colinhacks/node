@@ -115,6 +115,71 @@ static inline unsigned long long pow_mod(unsigned long long a,
   return r;
 }
 
+#if defined(__SIZEOF_INT128__)
+class MontgomeryMod {
+ public:
+  explicit MontgomeryMod(uint64_t modulus)
+      : modulus_(modulus),
+        negative_inverse_(NegativeInverse(modulus)),
+        one_(static_cast<uint64_t>((static_cast<__uint128_t>(1) << 64) %
+                                   modulus)),
+        r_squared_(static_cast<uint64_t>(
+            (static_cast<__uint128_t>(one_) * one_) % modulus)) {}
+
+  uint64_t one() const { return one_; }
+
+  uint64_t ToMontgomery(uint64_t value) const {
+    return Multiply(value % modulus_, r_squared_);
+  }
+
+  uint64_t FromMontgomery(uint64_t value) const { return Multiply(value, 1); }
+
+  uint64_t Multiply(uint64_t a, uint64_t b) const {
+    const __uint128_t product = static_cast<__uint128_t>(a) * b;
+    const uint64_t product_low = static_cast<uint64_t>(product);
+    const uint64_t product_high = static_cast<uint64_t>(product >> 64);
+    const uint64_t multiplier = product_low * negative_inverse_;
+    const __uint128_t adjustment =
+        static_cast<__uint128_t>(multiplier) * modulus_;
+    const uint64_t sum_low = product_low + static_cast<uint64_t>(adjustment);
+    const uint64_t carry = sum_low < product_low;
+    const uint64_t sum_high = product_high +
+                              static_cast<uint64_t>(adjustment >> 64);
+    const bool overflow = sum_high < product_high;
+    const uint64_t result = sum_high + carry;
+    if (overflow || result < sum_high || result >= modulus_) {
+      return result - modulus_;
+    }
+    return result;
+  }
+
+  uint64_t Power(uint64_t base, uint64_t exponent) const {
+    uint64_t result = one_;
+    base = ToMontgomery(base);
+    while (exponent) {
+      if (exponent & 1) result = Multiply(result, base);
+      exponent >>= 1;
+      if (exponent) base = Multiply(base, base);
+    }
+    return result;
+  }
+
+ private:
+  static uint64_t NegativeInverse(uint64_t modulus) {
+    uint64_t inverse = modulus;
+    for (int i = 0; i < 6; ++i) {
+      inverse *= 2 - modulus * inverse;
+    }
+    return 0 - inverse;
+  }
+
+  uint64_t modulus_;
+  uint64_t negative_inverse_;
+  uint64_t one_;
+  uint64_t r_squared_;
+};
+#endif
+
 static unsigned sprp(unsigned long long n, unsigned long long a) {
   unsigned long long d = n - 1;
   unsigned char s = 0;
@@ -134,13 +199,27 @@ static unsigned sprp(unsigned long long n, unsigned long long a) {
     d >>= 1;
     s += 1;
   }
+#if defined(__SIZEOF_INT128__)
+  // is_prime only reaches sprp with an odd n, as required by Montgomery form.
+  const MontgomeryMod modulus(n);
+  unsigned long long b = modulus.Power(a, d);
+  const unsigned long long negative_one = n - modulus.one();
+  if ((b == modulus.one()) || (b == negative_one)) return 1;
+#else
   unsigned long long b = pow_mod(a, d, n);
   if ((b == 1) || (b == (n - 1))) return 1;
+#endif
   unsigned char r;
   for (r = 1; r < s; r++) {
+#if defined(__SIZEOF_INT128__)
+    b = modulus.Multiply(b, b);
+    if (b == 0 || b == modulus.one()) return 0;
+    if (b == negative_one) return 1;
+#else
     b = mul_mod(b, b, n);
     if (b <= 1) return 0;
     if (b == (n - 1)) return 1;
+#endif
   }
   return 0;
 }
