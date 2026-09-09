@@ -641,6 +641,19 @@
             'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
           },
         }],
+        ['OS=="mac" and node_shared=="false" and node_use_darwin_order_file=="true"', {
+          'dependencies': [
+            'node_darwin_order_file',
+          ],
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [
+              '-Xlinker',
+              '-order_file',
+              '-Xlinker',
+              '<(node_darwin_order_file)',
+            ],
+          },
+        }],
         [ 'node_shared_hdr_histogram=="false"', {
           'dependencies': [
             'deps/histogram/histogram.gyp:histogram',
@@ -1779,6 +1792,26 @@
   ], # end targets
 
   'conditions': [
+    ['OS=="mac" and node_shared=="false" and node_use_darwin_order_file=="true"', {
+     'targets': [
+       {
+         'target_name': 'node_darwin_order_file',
+         'type': 'none',
+         'actions': [
+           {
+             'action_name': 'stamp_darwin_order_file',
+             'inputs': [ '<(node_darwin_order_file_input)', ],
+             'outputs': [ '<(SHARED_INTERMEDIATE_DIR)/node_darwin_order_file.stamp', ],
+             'action': [
+               '<(python)', '-c',
+               'from pathlib import Path; Path(__import__("sys").argv[1]).touch()',
+               '<@(_outputs)',
+             ],
+           },
+         ],
+       },
+     ],
+   }],
     ['OS=="win" and node_shared=="true"', {
      'targets': [
        {

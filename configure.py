@@ -945,6 +945,12 @@ parser.add_argument('--use-section-ordering-file',
          'Node.js be linked using the gold linker. The gold linker must have ' +
          'version 1.2 or greater.')
 
+parser.add_argument('--use-darwin-order-file',
+    action='store',
+    dest='node_darwin_order_file',
+    default='',
+    help='Pass an order file to the static macOS Node.js CLI linker.')
+
 intl_optgroup.add_argument('--with-intl',
     action='store',
     dest='with_intl',
@@ -2005,6 +2011,28 @@ def configure_node(o):
     # Ninja expands dollar signs before the shell parses the compiler flags.
     o['variables']['node_pgo_profile'] = shlex.quote(str(profile)).replace('$', '$$')
 
+  o['variables']['node_darwin_order_file'] = ''
+  o['variables']['node_darwin_order_file_input'] = ''
+  o['variables']['node_use_darwin_order_file'] = 'false'
+  if options.node_darwin_order_file:
+    if flavor != 'mac':
+      raise Exception('--use-darwin-order-file is only supported on macOS.')
+    if options.shared:
+      raise Exception('--use-darwin-order-file does not support --shared.')
+    if not options.use_ninja:
+      raise Exception('--use-darwin-order-file requires --ninja.')
+    order_file = Path(options.node_darwin_order_file).resolve()
+    if not order_file.is_file():
+      raise Exception(f'Darwin order file not found: {order_file}')
+    if '\n' in str(order_file) or '\r' in str(order_file):
+      raise Exception('Darwin order file paths must not contain newlines.')
+    # Ninja expands dollar signs before the shell parses the linker flags.
+    o['variables']['node_darwin_order_file'] = \
+      shlex.quote(str(order_file)).replace('$', '$$')
+    # $!PRODUCT_DIR lets GYP pass an absolute Ninja input containing '$'.
+    o['variables']['node_darwin_order_file_input'] = \
+      '$!PRODUCT_DIR/' + str(order_file).replace('$', '$$')
+    o['variables']['node_use_darwin_order_file'] = 'true'
 
   if flavor == 'linux':
     if options.enable_pgo_generate or options.enable_pgo_use:
