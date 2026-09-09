@@ -295,7 +295,7 @@ jobs:
         shell: pwsh
         run: |
           $nativeLog = Join-Path $env:LOG_DIR 'native.txt'
-          .\vcbuild.bat release vs2022 clang-cl v8temporal test-ci-native *>&1 | Tee-Object -FilePath $nativeLog
+          .\vcbuild.bat release clang-cl v8temporal test-ci-native *>&1 | Tee-Object -FilePath $nativeLog
           $nativeExit = $LASTEXITCODE
           Add-Content -Path $env:GITHUB_ENV -Value "NATIVE_EXIT_CODE=$nativeExit"
           if (Test-Path test.tap) { Copy-Item test.tap (Join-Path $env:LOG_DIR 'native.tap') }
@@ -312,7 +312,7 @@ jobs:
             Add-Content -Path $env:GITHUB_ENV -Value 'JAVASCRIPT_EXIT_CODE=1'
             exit 0
           }
-          .\vcbuild.bat release vs2022 clang-cl noprojgen nobuild test-ci-js *>&1 | Tee-Object -FilePath $javascriptLog
+          .\vcbuild.bat release clang-cl noprojgen nobuild test-ci-js *>&1 | Tee-Object -FilePath $javascriptLog
           $javascriptExit = $LASTEXITCODE
           Add-Content -Path $env:GITHUB_ENV -Value "JAVASCRIPT_EXIT_CODE=$javascriptExit"
           if (Test-Path test.tap) { Copy-Item test.tap (Join-Path $env:LOG_DIR 'javascript.tap') }
