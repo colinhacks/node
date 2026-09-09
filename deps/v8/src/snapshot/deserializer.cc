@@ -346,7 +346,21 @@ Deserializer<IsolateT>::Deserializer(IsolateT* isolate,
   static_assert(kEmptyBackingStoreRefSentinel == 0);
   backing_stores_.push_back({});
 
-  back_refs_.reserve(2048);
+  // A back-reference is recorded for every deserialized object. Use payload
+  // size as a bounded estimate so the built-in/context snapshots do not keep
+  // relocating the handle vector while recursive object reads are active.
+  constexpr size_t kMinimumBackRefCapacity = 2048;
+  constexpr size_t kMaximumBackRefCapacity = 32768;
+  constexpr size_t kEstimatedBytesPerBackRef = 32;
+  const size_t estimated_back_ref_capacity =
+      static_cast<size_t>(source_.length()) / kEstimatedBytesPerBackRef;
+  const size_t initial_back_ref_capacity =
+      estimated_back_ref_capacity < kMinimumBackRefCapacity
+          ? kMinimumBackRefCapacity
+      : estimated_back_ref_capacity > kMaximumBackRefCapacity
+          ? kMaximumBackRefCapacity
+          : estimated_back_ref_capacity;
+  back_refs_.reserve(initial_back_ref_capacity);
   js_dispatch_entries_.reserve(512);
 
 #ifdef DEBUG
