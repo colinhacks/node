@@ -1,0 +1,13 @@
+{
+  "all_removed_defined_by_icu_archives": true,
+  "all_removed_names_icu_versioned": true,
+  "binary_sha256": "5f504ba912240089ff1d5e0f5f20a8aad9517782ffb3459fdacc6e7886a2d08c",
+  "candidate_bytes": 116736664,
+  "control_bytes": 117901368,
+  "nm_dyld_agree": true,
+  "no_added_exports": true,
+  "parser_correction": "Initial last-column parser mistook 171 weak/thread-local symbols for attributes; actual symbol-column parsing reconciles both complete export sets.",
+  "remaining_export_attributes_unchanged": true,
+  "removed_exports": 9313,
+  "scope": "Private bundled ICU exports intentionally removed. Installed Node/V8/N-API/libuv/OpenSSL exports unchanged; arbitrary undocumented ICU imports are not preserved."
+}

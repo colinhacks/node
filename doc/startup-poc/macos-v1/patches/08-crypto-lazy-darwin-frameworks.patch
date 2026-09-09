@@ -1,0 +1,607 @@
+diff --git a/node.gyp b/node.gyp
+index 9b11e46b..bd58ddf7 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -445,6 +445,8 @@
+       'src/crypto/crypto_x509.h',
+       'src/node_crypto.cc',
+       'src/node_crypto.h',
++      'src/node_darwin_frameworks.cc',
++      'src/node_darwin_frameworks.h',
+     ],
+     'node_tracing_perfetto_sources': [
+       'src/tracing/agent_perfetto.cc',
+@@ -1656,9 +1658,6 @@
+         'src/builtin_info.cc',
+       ],
+       'conditions': [
+-        [ 'OS=="mac"', {
+-          'libraries': [ '-framework CoreFoundation -framework Security' ],
+-        }],
+         [ 'node_shared_simdutf=="false" and node_use_bundled_v8!="false"', {
+           'dependencies': [ 'tools/v8_gypfiles/v8.gyp:simdutf#host' ],
+         }],
+diff --git a/node.gypi b/node.gypi
+index 104e884e..73a7fc7c 100644
+--- a/node.gypi
++++ b/node.gypi
+@@ -265,10 +265,6 @@
+     }],
+ 
+     [ 'OS=="mac"', {
+-      # linking Corefoundation is needed since certain macOS debugging tools
+-      # like Instruments require it for some features. Security is needed for
+-      # --use-system-ca.
+-      'libraries': [ '-framework CoreFoundation -framework Security' ],
+       'defines!': [
+         'NODE_PLATFORM="mac"',
+       ],
+diff --git a/src/crypto/crypto_context.cc b/src/crypto/crypto_context.cc
+index 9dc68f4d..e91f0c9b 100644
+--- a/src/crypto/crypto_context.cc
++++ b/src/crypto/crypto_context.cc
+@@ -9,6 +9,9 @@
+ #include "ncrypto.h"
+ #include "node.h"
+ #include "node_buffer.h"
++#ifdef __APPLE__
++#include "node_darwin_frameworks.h"
++#endif
+ #include "node_options.h"
+ #include "util.h"
+ #include "v8.h"
+@@ -19,10 +22,6 @@
+ #include <openssl/pkcs12.h>
+ #include <openssl/rand.h>
+ #include <openssl/x509.h>
+-#ifdef __APPLE__
+-#include <Security/Security.h>
+-#endif
+-
+ #ifdef _WIN32
+ #include <Windows.h>
+ #include <wincrypt.h>
+@@ -325,11 +324,15 @@ bool isSelfIssued(X509* cert) {
+ // See https://chromium.googlesource.com/chromium/src/+/HEAD/LICENSE for
+ // details.
+ #ifdef __APPLE__
+-TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+-                                              bool is_self_issued) {
++TrustStatus IsTrustDictionaryTrustedForPolicy(
++    const darwin::CoreFoundationApi& cf,
++    const darwin::SecurityApi& security,
++    CFDictionaryRef trust_dict,
++    bool is_self_issued) {
+   // Trust settings may be scoped to a single application
+   // skip as this is not supported
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsApplication)) {
++  if (cf.CFDictionaryContainsKey(trust_dict,
++                                 security.trust_settings_application)) {
+     return TrustStatus::UNSPECIFIED;
+   }
+ 
+@@ -338,7 +341,8 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+   // settings specific to a particular WiFi network.
+   // As this is not presently supported, skip any policy-specific trust
+   // settings.
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsPolicyString)) {
++  if (cf.CFDictionaryContainsKey(trust_dict,
++                                 security.trust_settings_policy_string)) {
+     return TrustStatus::UNSPECIFIED;
+   }
+ 
+@@ -346,22 +350,22 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+   // kSecTrustSettingsPolicy), ensure that the policy is the same policy as
+   // |kSecPolicyAppleSSL|. If there is no kSecTrustSettingsPolicy key, it's
+   // considered a match for all policies.
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsPolicy)) {
++  if (cf.CFDictionaryContainsKey(trust_dict, security.trust_settings_policy)) {
+     SecPolicyRef policy_ref = reinterpret_cast<SecPolicyRef>(const_cast<void*>(
+-        CFDictionaryGetValue(trust_dict, kSecTrustSettingsPolicy)));
++        cf.CFDictionaryGetValue(trust_dict, security.trust_settings_policy)));
+ 
+     if (!policy_ref) {
+       return TrustStatus::UNSPECIFIED;
+     }
+ 
+-    CFDictionaryRef policy_dict(SecPolicyCopyProperties(policy_ref));
++    CFDictionaryRef policy_dict(security.SecPolicyCopyProperties(policy_ref));
+ 
+     // kSecPolicyOid is guaranteed to be present in the policy dictionary.
+-    CFStringRef policy_oid = reinterpret_cast<CFStringRef>(
+-        const_cast<void*>(CFDictionaryGetValue(policy_dict, kSecPolicyOid)));
++    CFStringRef policy_oid = reinterpret_cast<CFStringRef>(const_cast<void*>(
++        cf.CFDictionaryGetValue(policy_dict, security.kSecPolicyOid)));
+ 
+-    bool matches_ssl = CFEqual(policy_oid, kSecPolicyAppleSSL);
+-    CFRelease(policy_dict);
++    bool matches_ssl = cf.CFEqual(policy_oid, security.kSecPolicyAppleSSL);
++    cf.CFRelease(policy_dict);
+ 
+     if (!matches_ssl) {
+       return TrustStatus::UNSPECIFIED;
+@@ -369,15 +373,15 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+   }
+ 
+   int trust_settings_result = kSecTrustSettingsResultTrustRoot;
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsResult)) {
++  if (cf.CFDictionaryContainsKey(trust_dict, security.trust_settings_result)) {
+     CFNumberRef trust_settings_result_ref =
+-        reinterpret_cast<CFNumberRef>(const_cast<void*>(
+-            CFDictionaryGetValue(trust_dict, kSecTrustSettingsResult)));
++        reinterpret_cast<CFNumberRef>(const_cast<void*>(cf.CFDictionaryGetValue(
++            trust_dict, security.trust_settings_result)));
+ 
+     if (!trust_settings_result_ref ||
+-        !CFNumberGetValue(trust_settings_result_ref,
+-                          kCFNumberIntType,
+-                          &trust_settings_result)) {
++        !cf.CFNumberGetValue(trust_settings_result_ref,
++                             kCFNumberIntType,
++                             &trust_settings_result)) {
+       return TrustStatus::UNSPECIFIED;
+     }
+   }
+@@ -420,22 +424,24 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+              : TrustStatus::UNSPECIFIED;
+ }
+ 
+-TrustStatus IsTrustSettingsTrustedForPolicy(CFArrayRef trust_settings,
++TrustStatus IsTrustSettingsTrustedForPolicy(const darwin::CoreFoundationApi& cf,
++                                            const darwin::SecurityApi& security,
++                                            CFArrayRef trust_settings,
+                                             bool is_self_issued) {
+   // The trust_settings parameter can return a valid but empty CFArrayRef.
+   // This empty trust-settings array means “always trust this certificate”
+   // with an overall trust setting for the certificate of
+   // kSecTrustSettingsResultTrustRoot
+-  if (CFArrayGetCount(trust_settings) == 0) {
++  if (cf.CFArrayGetCount(trust_settings) == 0) {
+     return is_self_issued ? TrustStatus::TRUSTED : TrustStatus::UNSPECIFIED;
+   }
+ 
+-  for (CFIndex i = 0; i < CFArrayGetCount(trust_settings); ++i) {
++  for (CFIndex i = 0; i < cf.CFArrayGetCount(trust_settings); ++i) {
+     CFDictionaryRef trust_dict = reinterpret_cast<CFDictionaryRef>(
+-        const_cast<void*>(CFArrayGetValueAtIndex(trust_settings, i)));
++        const_cast<void*>(cf.CFArrayGetValueAtIndex(trust_settings, i)));
+ 
+-    TrustStatus trust =
+-        IsTrustDictionaryTrustedForPolicy(trust_dict, is_self_issued);
++    TrustStatus trust = IsTrustDictionaryTrustedForPolicy(
++        cf, security, trust_dict, is_self_issued);
+ 
+     if (trust == TrustStatus::DISTRUSTED || trust == TrustStatus::TRUSTED) {
+       return trust;
+@@ -444,11 +450,13 @@ TrustStatus IsTrustSettingsTrustedForPolicy(CFArrayRef trust_settings,
+   return TrustStatus::UNSPECIFIED;
+ }
+ 
+-bool IsCertificateTrustValid(SecCertificateRef ref) {
++bool IsCertificateTrustValid(const darwin::CoreFoundationApi& cf,
++                             const darwin::SecurityApi& security,
++                             SecCertificateRef ref) {
+   SecTrustRef sec_trust = nullptr;
+   CFMutableArrayRef subj_certs =
+-      CFArrayCreateMutable(nullptr, 1, &kCFTypeArrayCallBacks);
+-  CFArraySetValueAtIndex(subj_certs, 0, ref);
++      cf.CFArrayCreateMutable(nullptr, 1, cf.kCFTypeArrayCallBacks);
++  cf.CFArraySetValueAtIndex(subj_certs, 0, ref);
+ 
+   // SecTrustEvaluateWithError is used to check whether an individual
+   // certificate is trusted by the system — not to validate it for a
+@@ -461,29 +469,32 @@ bool IsCertificateTrustValid(SecCertificateRef ref) {
+   // SecPolicyCreateSSL (both mark EKU optional):
+   //   server=true  -> BasicX509 + serverAuth + anyExtendedKeyUsage + SGC
+   //   server=false -> BasicX509 + clientAuth + anyExtendedKeyUsage
+-  SecPolicyRef policy = SecPolicyCreateSSL(false, nullptr);
++  SecPolicyRef policy = security.SecPolicyCreateSSL(false, nullptr);
+   OSStatus ortn =
+-      SecTrustCreateWithCertificates(subj_certs, policy, &sec_trust);
++      security.SecTrustCreateWithCertificates(subj_certs, policy, &sec_trust);
+   bool result = false;
+   if (ortn) {
+     /* should never happen */
+   } else {
+-    result = SecTrustEvaluateWithError(sec_trust, nullptr);
++    result = security.SecTrustEvaluateWithError(sec_trust, nullptr);
+   }
+ 
+   if (policy) {
+-    CFRelease(policy);
++    cf.CFRelease(policy);
+   }
+   if (sec_trust) {
+-    CFRelease(sec_trust);
++    cf.CFRelease(sec_trust);
+   }
+   if (subj_certs) {
+-    CFRelease(subj_certs);
++    cf.CFRelease(subj_certs);
+   }
+   return result;
+ }
+ 
+-bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
++bool IsCertificateTrustedForPolicy(const darwin::CoreFoundationApi& cf,
++                                   const darwin::SecurityApi& security,
++                                   X509* cert,
++                                   SecCertificateRef ref) {
+   OSStatus err;
+ 
+   bool trust_evaluated = false;
+@@ -494,7 +505,8 @@ bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
+   for (const auto& trust_domain :
+        {kSecTrustSettingsDomainUser, kSecTrustSettingsDomainAdmin}) {
+     CFArrayRef trust_settings = nullptr;
+-    err = SecTrustSettingsCopyTrustSettings(ref, trust_domain, &trust_settings);
++    err = security.SecTrustSettingsCopyTrustSettings(
++        ref, trust_domain, &trust_settings);
+ 
+     if (err != errSecSuccess && err != errSecItemNotFound) {
+       fprintf(stderr,
+@@ -504,10 +516,10 @@ bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
+     }
+ 
+     if (err == errSecSuccess && trust_settings != nullptr) {
+-      TrustStatus result =
+-          IsTrustSettingsTrustedForPolicy(trust_settings, is_self_issued);
++      TrustStatus result = IsTrustSettingsTrustedForPolicy(
++          cf, security, trust_settings, is_self_issued);
+       if (result != TrustStatus::UNSPECIFIED) {
+-        CFRelease(trust_settings);
++        cf.CFRelease(trust_settings);
+         return result == TrustStatus::TRUSTED;
+       }
+     }
+@@ -517,14 +529,14 @@ bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
+     // No trust-settings array means
+     // “this certificate must be verifiable using a known trusted certificate”.
+     if (trust_settings == nullptr && !trust_evaluated) {
+-      bool result = IsCertificateTrustValid(ref);
++      bool result = IsCertificateTrustValid(cf, security, ref);
+       if (result) {
+         return true;
+       }
+       // no point re-evaluating this in the admin domain
+       trust_evaluated = true;
+     } else if (trust_settings) {
+-      CFRelease(trust_settings);
++      cf.CFRelease(trust_settings);
+     }
+   }
+   return false;
+@@ -547,20 +559,25 @@ static bool IsCertificateExpired(X509* cert) {
+ 
+ void ReadMacOSKeychainCertificates(
+     std::vector<ncrypto::X509Pointer>* system_root_certificates_X509) {
+-  CFTypeRef search_keys[] = {kSecClass, kSecMatchLimit, kSecReturnRef};
+-  CFTypeRef search_values[] = {
+-      kSecClassCertificate, kSecMatchLimitAll, kCFBooleanTrue};
+-  CFDictionaryRef search = CFDictionaryCreate(kCFAllocatorDefault,
+-                                              search_keys,
+-                                              search_values,
+-                                              3,
+-                                              &kCFTypeDictionaryKeyCallBacks,
+-                                              &kCFTypeDictionaryValueCallBacks);
++  const darwin::CoreFoundationApi& cf = darwin::CoreFoundationApi::Get();
++  const darwin::SecurityApi& security = darwin::SecurityApi::Get();
++  CFTypeRef search_keys[] = {
++      security.kSecClass, security.kSecMatchLimit, security.kSecReturnRef};
++  CFTypeRef search_values[] = {security.kSecClassCertificate,
++                               security.kSecMatchLimitAll,
++                               cf.kCFBooleanTrue};
++  CFDictionaryRef search =
++      cf.CFDictionaryCreate(cf.kCFAllocatorDefault,
++                            search_keys,
++                            search_values,
++                            3,
++                            cf.kCFTypeDictionaryKeyCallBacks,
++                            cf.kCFTypeDictionaryValueCallBacks);
+ 
+   CFArrayRef curr_anchors = nullptr;
+-  OSStatus ortn =
+-      SecItemCopyMatching(search, reinterpret_cast<CFTypeRef*>(&curr_anchors));
+-  CFRelease(search);
++  OSStatus ortn = security.SecItemCopyMatching(
++      search, reinterpret_cast<CFTypeRef*>(&curr_anchors));
++  cf.CFRelease(search);
+ 
+   if (ortn) {
+     per_process::Debug(DebugCategory::CRYPTO,
+@@ -570,7 +587,7 @@ void ReadMacOSKeychainCertificates(
+     return;
+   }
+ 
+-  CFIndex count = CFArrayGetCount(curr_anchors);
++  CFIndex count = cf.CFArrayGetCount(curr_anchors);
+ 
+   // Track seen certificates to detect duplicates (same cert in multiple
+   // keychains). Non-owning set -- the vector owns the certs.
+@@ -581,20 +598,20 @@ void ReadMacOSKeychainCertificates(
+ 
+   for (int i = 0; i < count; ++i) {
+     SecCertificateRef cert_ref = reinterpret_cast<SecCertificateRef>(
+-        const_cast<void*>(CFArrayGetValueAtIndex(curr_anchors, i)));
++        const_cast<void*>(cf.CFArrayGetValueAtIndex(curr_anchors, i)));
+ 
+-    CFDataRef der_data = SecCertificateCopyData(cert_ref);
++    CFDataRef der_data = security.SecCertificateCopyData(cert_ref);
+     if (!der_data) {
+       per_process::Debug(DebugCategory::CRYPTO,
+                          "Skipping read of a system certificate "
+                          "because SecCertificateCopyData failed\n");
+       continue;
+     }
+-    auto data_buffer_pointer = CFDataGetBytePtr(der_data);
++    auto data_buffer_pointer = cf.CFDataGetBytePtr(der_data);
+ 
+     ncrypto::X509Pointer cert(
+-        d2i_X509(nullptr, &data_buffer_pointer, CFDataGetLength(der_data)));
+-    CFRelease(der_data);
++        d2i_X509(nullptr, &data_buffer_pointer, cf.CFDataGetLength(der_data)));
++    cf.CFRelease(der_data);
+ 
+     if (!cert) {
+       per_process::Debug(DebugCategory::CRYPTO,
+@@ -603,7 +620,8 @@ void ReadMacOSKeychainCertificates(
+       continue;
+     }
+ 
+-    bool is_valid = IsCertificateTrustedForPolicy(cert.get(), cert_ref);
++    bool is_valid =
++        IsCertificateTrustedForPolicy(cf, security, cert.get(), cert_ref);
+     if (!is_valid) {
+       continue;
+     }
+@@ -624,7 +642,7 @@ void ReadMacOSKeychainCertificates(
+ 
+     system_root_certificates_X509->emplace_back(std::move(cert));
+   }
+-  CFRelease(curr_anchors);
++  cf.CFRelease(curr_anchors);
+ }
+ #endif  // __APPLE__
+ 
+diff --git a/src/node_darwin_frameworks.cc b/src/node_darwin_frameworks.cc
+new file mode 100644
+index 00000000..dc132c46
+--- /dev/null
++++ b/src/node_darwin_frameworks.cc
+@@ -0,0 +1,151 @@
++#include "node_darwin_frameworks.h"
++
++#ifdef __APPLE__
++#include "util-inl.h"
++
++#include <dlfcn.h>
++
++#include <cstring>
++
++namespace node {
++namespace darwin {
++namespace {
++
++template <typename T>
++T LoadFunction(void* handle, const char* name) {
++  void* symbol = dlsym(handle, name);
++  CHECK_NOT_NULL(symbol);
++  static_assert(sizeof(T) == sizeof(symbol));
++  T result;
++  std::memcpy(&result, &symbol, sizeof(result));
++  return result;
++}
++
++template <typename T>
++T LoadData(void* handle, const char* name) {
++  void* symbol = dlsym(handle, name);
++  CHECK_NOT_NULL(symbol);
++  return *reinterpret_cast<const T*>(symbol);
++}
++
++template <typename T>
++const T* LoadStruct(void* handle, const char* name) {
++  void* symbol = dlsym(handle, name);
++  CHECK_NOT_NULL(symbol);
++  return static_cast<const T*>(symbol);
++}
++
++#if TARGET_OS_OSX
++constexpr char kCoreFoundationPath[] =
++    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/"
++    "CoreFoundation";
++constexpr char kSecurityPath[] =
++    "/System/Library/Frameworks/Security.framework/Versions/A/Security";
++#else
++constexpr char kCoreFoundationPath[] =
++    "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
++constexpr char kSecurityPath[] =
++    "/System/Library/Frameworks/Security.framework/Security";
++#endif
++
++void* OpenFramework(const char* path) {
++  void* handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
++  CHECK_NOT_NULL(handle);
++  return handle;
++}
++
++CFStringRef CreateTrustSettingsKey(const char* key) {
++  const CoreFoundationApi& cf = CoreFoundationApi::Get();
++  CFStringRef result = cf.CFStringCreateWithCString(
++      cf.kCFAllocatorDefault, key, kCFStringEncodingUTF8);
++  CHECK_NOT_NULL(result);
++  return result;
++}
++
++}  // namespace
++
++const CoreFoundationApi& CoreFoundationApi::Get() {
++  static const CoreFoundationApi api;
++  return api;
++}
++
++CoreFoundationApi::CoreFoundationApi()
++    : handle_(OpenFramework(kCoreFoundationPath)),
++      CFArrayCreateMutable(LoadFunction<decltype(CFArrayCreateMutable)>(
++          handle_, "CFArrayCreateMutable")),
++      CFArrayGetCount(
++          LoadFunction<decltype(CFArrayGetCount)>(handle_, "CFArrayGetCount")),
++      CFArrayGetValueAtIndex(LoadFunction<decltype(CFArrayGetValueAtIndex)>(
++          handle_, "CFArrayGetValueAtIndex")),
++      CFArraySetValueAtIndex(LoadFunction<decltype(CFArraySetValueAtIndex)>(
++          handle_, "CFArraySetValueAtIndex")),
++      CFDataGetBytePtr(LoadFunction<decltype(CFDataGetBytePtr)>(
++          handle_, "CFDataGetBytePtr")),
++      CFDataGetLength(
++          LoadFunction<decltype(CFDataGetLength)>(handle_, "CFDataGetLength")),
++      CFDictionaryContainsKey(LoadFunction<decltype(CFDictionaryContainsKey)>(
++          handle_, "CFDictionaryContainsKey")),
++      CFDictionaryCreate(LoadFunction<decltype(CFDictionaryCreate)>(
++          handle_, "CFDictionaryCreate")),
++      CFDictionaryGetValue(LoadFunction<decltype(CFDictionaryGetValue)>(
++          handle_, "CFDictionaryGetValue")),
++      CFEqual(LoadFunction<decltype(CFEqual)>(handle_, "CFEqual")),
++      CFNumberGetValue(LoadFunction<decltype(CFNumberGetValue)>(
++          handle_, "CFNumberGetValue")),
++      CFRelease(LoadFunction<decltype(CFRelease)>(handle_, "CFRelease")),
++      CFStringCreateWithCString(
++          LoadFunction<decltype(CFStringCreateWithCString)>(
++              handle_, "CFStringCreateWithCString")),
++      kCFAllocatorDefault(
++          LoadData<CFAllocatorRef>(handle_, "kCFAllocatorDefault")),
++      kCFBooleanTrue(LoadData<CFBooleanRef>(handle_, "kCFBooleanTrue")),
++      kCFTypeArrayCallBacks(
++          LoadStruct<CFArrayCallBacks>(handle_, "kCFTypeArrayCallBacks")),
++      kCFTypeDictionaryKeyCallBacks(LoadStruct<CFDictionaryKeyCallBacks>(
++          handle_, "kCFTypeDictionaryKeyCallBacks")),
++      kCFTypeDictionaryValueCallBacks(LoadStruct<CFDictionaryValueCallBacks>(
++          handle_, "kCFTypeDictionaryValueCallBacks")) {}
++
++const SecurityApi& SecurityApi::Get() {
++  static const SecurityApi api;
++  return api;
++}
++
++SecurityApi::SecurityApi()
++    : handle_(OpenFramework(kSecurityPath)),
++      SecCertificateCopyData(LoadFunction<decltype(SecCertificateCopyData)>(
++          handle_, "SecCertificateCopyData")),
++      SecItemCopyMatching(LoadFunction<decltype(SecItemCopyMatching)>(
++          handle_, "SecItemCopyMatching")),
++      SecPolicyCopyProperties(LoadFunction<decltype(SecPolicyCopyProperties)>(
++          handle_, "SecPolicyCopyProperties")),
++      SecPolicyCreateSSL(LoadFunction<decltype(SecPolicyCreateSSL)>(
++          handle_, "SecPolicyCreateSSL")),
++      SecTrustCreateWithCertificates(
++          LoadFunction<decltype(SecTrustCreateWithCertificates)>(
++              handle_, "SecTrustCreateWithCertificates")),
++      SecTrustEvaluateWithError(
++          LoadFunction<decltype(SecTrustEvaluateWithError)>(
++              handle_, "SecTrustEvaluateWithError")),
++      SecTrustSettingsCopyTrustSettings(
++          LoadFunction<decltype(SecTrustSettingsCopyTrustSettings)>(
++              handle_, "SecTrustSettingsCopyTrustSettings")),
++      kSecClass(LoadData<CFStringRef>(handle_, "kSecClass")),
++      kSecClassCertificate(
++          LoadData<CFStringRef>(handle_, "kSecClassCertificate")),
++      kSecMatchLimit(LoadData<CFStringRef>(handle_, "kSecMatchLimit")),
++      kSecMatchLimitAll(LoadData<CFStringRef>(handle_, "kSecMatchLimitAll")),
++      kSecPolicyAppleSSL(LoadData<CFStringRef>(handle_, "kSecPolicyAppleSSL")),
++      kSecPolicyOid(LoadData<CFStringRef>(handle_, "kSecPolicyOid")),
++      kSecReturnRef(LoadData<CFStringRef>(handle_, "kSecReturnRef")),
++      trust_settings_application(
++          CreateTrustSettingsKey("kSecTrustSettingsApplication")),
++      trust_settings_policy(CreateTrustSettingsKey("kSecTrustSettingsPolicy")),
++      trust_settings_policy_string(
++          CreateTrustSettingsKey("kSecTrustSettingsPolicyString")),
++      trust_settings_result(CreateTrustSettingsKey("kSecTrustSettingsResult")) {
++}
++
++}  // namespace darwin
++}  // namespace node
++#endif  // __APPLE__
+diff --git a/src/node_darwin_frameworks.h b/src/node_darwin_frameworks.h
+new file mode 100644
+index 00000000..ec2f7ef8
+--- /dev/null
++++ b/src/node_darwin_frameworks.h
+@@ -0,0 +1,79 @@
++#ifndef SRC_NODE_DARWIN_FRAMEWORKS_H_
++#define SRC_NODE_DARWIN_FRAMEWORKS_H_
++
++#ifdef __APPLE__
++#include <CoreFoundation/CoreFoundation.h>
++#include <Security/Security.h>
++#include <TargetConditionals.h>
++
++namespace node {
++namespace darwin {
++
++class CoreFoundationApi {
++ private:
++  void* handle_;
++
++ public:
++  static const CoreFoundationApi& Get();
++
++  decltype(&::CFArrayCreateMutable) CFArrayCreateMutable;
++  decltype(&::CFArrayGetCount) CFArrayGetCount;
++  decltype(&::CFArrayGetValueAtIndex) CFArrayGetValueAtIndex;
++  decltype(&::CFArraySetValueAtIndex) CFArraySetValueAtIndex;
++  decltype(&::CFDataGetBytePtr) CFDataGetBytePtr;
++  decltype(&::CFDataGetLength) CFDataGetLength;
++  decltype(&::CFDictionaryContainsKey) CFDictionaryContainsKey;
++  decltype(&::CFDictionaryCreate) CFDictionaryCreate;
++  decltype(&::CFDictionaryGetValue) CFDictionaryGetValue;
++  decltype(&::CFEqual) CFEqual;
++  decltype(&::CFNumberGetValue) CFNumberGetValue;
++  decltype(&::CFRelease) CFRelease;
++  decltype(&::CFStringCreateWithCString) CFStringCreateWithCString;
++
++  CFAllocatorRef kCFAllocatorDefault;
++  CFBooleanRef kCFBooleanTrue;
++  const CFArrayCallBacks* kCFTypeArrayCallBacks;
++  const CFDictionaryKeyCallBacks* kCFTypeDictionaryKeyCallBacks;
++  const CFDictionaryValueCallBacks* kCFTypeDictionaryValueCallBacks;
++
++ private:
++  CoreFoundationApi();
++};
++
++class SecurityApi {
++ private:
++  void* handle_;
++
++ public:
++  static const SecurityApi& Get();
++
++  decltype(&::SecCertificateCopyData) SecCertificateCopyData;
++  decltype(&::SecItemCopyMatching) SecItemCopyMatching;
++  decltype(&::SecPolicyCopyProperties) SecPolicyCopyProperties;
++  decltype(&::SecPolicyCreateSSL) SecPolicyCreateSSL;
++  decltype(&::SecTrustCreateWithCertificates) SecTrustCreateWithCertificates;
++  decltype(&::SecTrustEvaluateWithError) SecTrustEvaluateWithError;
++  decltype(&::SecTrustSettingsCopyTrustSettings)
++      SecTrustSettingsCopyTrustSettings;
++
++  CFStringRef kSecClass;
++  CFStringRef kSecClassCertificate;
++  CFStringRef kSecMatchLimit;
++  CFStringRef kSecMatchLimitAll;
++  CFStringRef kSecPolicyAppleSSL;
++  CFStringRef kSecPolicyOid;
++  CFStringRef kSecReturnRef;
++  CFStringRef trust_settings_application;
++  CFStringRef trust_settings_policy;
++  CFStringRef trust_settings_policy_string;
++  CFStringRef trust_settings_result;
++
++ private:
++  SecurityApi();
++};
++
++}  // namespace darwin
++}  // namespace node
++#endif  // __APPLE__
++
++#endif  // SRC_NODE_DARWIN_FRAMEWORKS_H_

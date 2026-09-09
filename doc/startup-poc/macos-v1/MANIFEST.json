@@ -1,0 +1,3402 @@
+{
+  "schema": 1,
+  "base_revision": "8af75451e9041cd6058080ad3d4a65546797b418",
+  "source_tree": "3caaff2173e0fde07da451409d5979ed17a62dbb",
+  "redaction_policy": {
+    "paths": "Local workspace and home prefixes become <workspace> and <home>; private temporary directories become <temporary>; internal coordination paths become <internal-path>. System and toolchain paths are retained.",
+    "notes": "Free-form notes fields are omitted from copied JSON. Numeric values, hashes, sample order and measurement fields are unchanged.",
+    "scope": "Only selected historical macOS evidence is included. No binaries, profile data, cloud records or unfinished platform results."
+  },
+  "files": [
+    {
+      "path": "tools/startup_lab.py",
+      "source": "startup-lab/startup_lab.py",
+      "source_sha256": "343ac370e77bec4e64b1641863374353f7520d8f34f1f0e21c19cf60046a3a1f",
+      "published_sha256": "343ac370e77bec4e64b1641863374353f7520d8f34f1f0e21c19cf60046a3a1f",
+      "published_bytes": 29143,
+      "decoded_sha256": "343ac370e77bec4e64b1641863374353f7520d8f34f1f0e21c19cf60046a3a1f",
+      "decoded_bytes": 29143,
+      "transformations": []
+    },
+    {
+      "path": "tools/pgo_train.py",
+      "source": "startup-lab/pgo_train.py",
+      "source_sha256": "bd479c4332bbaad3fc31fb22c2a85f10cd5037bff813d876e7068b598dfa40a1",
+      "published_sha256": "bd479c4332bbaad3fc31fb22c2a85f10cd5037bff813d876e7068b598dfa40a1",
+      "published_bytes": 8119,
+      "decoded_sha256": "bd479c4332bbaad3fc31fb22c2a85f10cd5037bff813d876e7068b598dfa40a1",
+      "decoded_bytes": 8119,
+      "transformations": []
+    },
+    {
+      "path": "tools/startup_order.py",
+      "source": "startup-lab/startup_order.py",
+      "source_sha256": "a2d2dec7b580f507ebd4116ffa4b54a1cd4ea449c48014dd9af0aced4a958b64",
+      "published_sha256": "a2d2dec7b580f507ebd4116ffa4b54a1cd4ea449c48014dd9af0aced4a958b64",
+      "published_bytes": 10422,
+      "decoded_sha256": "a2d2dec7b580f507ebd4116ffa4b54a1cd4ea449c48014dd9af0aced4a958b64",
+      "decoded_bytes": 10422,
+      "transformations": []
+    },
+    {
+      "path": "tools/temporal_order.py",
+      "source": "startup-lab/temporal_order.py",
+      "source_sha256": "f21daf2a3f5163ec9a160f097e0c1f52186f8eb40d9ada1e916adb5f033f393f",
+      "published_sha256": "f21daf2a3f5163ec9a160f097e0c1f52186f8eb40d9ada1e916adb5f033f393f",
+      "published_bytes": 5820,
+      "decoded_sha256": "f21daf2a3f5163ec9a160f097e0c1f52186f8eb40d9ada1e916adb5f033f393f",
+      "decoded_bytes": 5820,
+      "transformations": []
+    },
+    {
+      "path": "tools/record_build.py",
+      "source": "startup-lab/record_build.py",
+      "source_sha256": "8cd11d04b3c749201048a58f9abdda7789dbc9b017d87eacdcb219a398be020f",
+      "published_sha256": "8cd11d04b3c749201048a58f9abdda7789dbc9b017d87eacdcb219a398be020f",
+      "published_bytes": 3508,
+      "decoded_sha256": "8cd11d04b3c749201048a58f9abdda7789dbc9b017d87eacdcb219a398be020f",
+      "decoded_bytes": 3508,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/worker.cjs",
+      "source": "startup-lab/fixtures/worker.cjs",
+      "source_sha256": "97ab7277baec6acefdf7038baf05f24efa47ea35e4a17069718ad31e83d3838e",
+      "published_sha256": "97ab7277baec6acefdf7038baf05f24efa47ea35e4a17069718ad31e83d3838e",
+      "published_bytes": 271,
+      "decoded_sha256": "97ab7277baec6acefdf7038baf05f24efa47ea35e4a17069718ad31e83d3838e",
+      "decoded_bytes": 271,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/hello.cjs",
+      "source": "startup-lab/fixtures/hello.cjs",
+      "source_sha256": "8f5ec041e08b92196a6281de093ab1b397277954e8dcf22d9598d17f296e7233",
+      "published_sha256": "8f5ec041e08b92196a6281de093ab1b397277954e8dcf22d9598d17f296e7233",
+      "published_bytes": 85,
+      "decoded_sha256": "8f5ec041e08b92196a6281de093ab1b397277954e8dcf22d9598d17f296e7233",
+      "decoded_bytes": 85,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/builtins.cjs",
+      "source": "startup-lab/fixtures/builtins.cjs",
+      "source_sha256": "414bee9337cb79425d74ce06078599f933d8022bc1b1ab53259775d66bd49ea7",
+      "published_sha256": "414bee9337cb79425d74ce06078599f933d8022bc1b1ab53259775d66bd49ea7",
+      "published_bytes": 273,
+      "decoded_sha256": "414bee9337cb79425d74ce06078599f933d8022bc1b1ab53259775d66bd49ea7",
+      "decoded_bytes": 273,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/ready.cjs",
+      "source": "startup-lab/fixtures/ready.cjs",
+      "source_sha256": "141aada4ee8e33e6b9cfce7fde3011b66135a0cbd2b44aea6741dd2b245e5f38",
+      "published_sha256": "141aada4ee8e33e6b9cfce7fde3011b66135a0cbd2b44aea6741dd2b245e5f38",
+      "published_bytes": 199,
+      "decoded_sha256": "141aada4ee8e33e6b9cfce7fde3011b66135a0cbd2b44aea6741dd2b245e5f38",
+      "decoded_bytes": 199,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/empty.cjs",
+      "source": "startup-lab/fixtures/empty.cjs",
+      "source_sha256": "347d85b2c9a883ef6623ba16c5b3f1fc1f449ad2e682e3cec6e33d05b9374bf8",
+      "published_sha256": "347d85b2c9a883ef6623ba16c5b3f1fc1f449ad2e682e3cec6e33d05b9374bf8",
+      "published_bytes": 45,
+      "decoded_sha256": "347d85b2c9a883ef6623ba16c5b3f1fc1f449ad2e682e3cec6e33d05b9374bf8",
+      "decoded_bytes": 45,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/crypto-first-use.cjs",
+      "source": "startup-lab/fixtures/crypto-first-use.cjs",
+      "source_sha256": "2d5d7bca48f511327a4a13e16e7e3cc13f28bc0dc5103edbef9213cd5abb5a0b",
+      "published_sha256": "2d5d7bca48f511327a4a13e16e7e3cc13f28bc0dc5103edbef9213cd5abb5a0b",
+      "published_bytes": 152,
+      "decoded_sha256": "2d5d7bca48f511327a4a13e16e7e3cc13f28bc0dc5103edbef9213cd5abb5a0b",
+      "decoded_bytes": 152,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/empty.mjs",
+      "source": "startup-lab/fixtures/empty.mjs",
+      "source_sha256": "fd370cab9086bc87a65e7438bb2c10d6418703e7b963dd410355eb2f93cef88c",
+      "published_sha256": "fd370cab9086bc87a65e7438bb2c10d6418703e7b963dd410355eb2f93cef88c",
+      "published_bytes": 46,
+      "decoded_sha256": "fd370cab9086bc87a65e7438bb2c10d6418703e7b963dd410355eb2f93cef88c",
+      "decoded_bytes": 46,
+      "transformations": []
+    },
+    {
+      "path": "tools/fixtures/http-ready.cjs",
+      "source": "startup-lab/fixtures/http-ready.cjs",
+      "source_sha256": "bc2a71ad0767dd215dbe559728b72230903e33c914fb13c965940ccda8b4c142",
+      "published_sha256": "bc2a71ad0767dd215dbe559728b72230903e33c914fb13c965940ccda8b4c142",
+      "published_bytes": 216,
+      "decoded_sha256": "bc2a71ad0767dd215dbe559728b72230903e33c914fb13c965940ccda8b4c142",
+      "decoded_bytes": 216,
+      "transformations": []
+    },
+    {
+      "path": "patches/series",
+      "source": "startup-lab/proposal/patches/series",
+      "source_sha256": "a1a74ba7d0c95ae2d4e0403e17e25fdefc0dc7c6862ec696c2cc376814b726c9",
+      "published_sha256": "a1a74ba7d0c95ae2d4e0403e17e25fdefc0dc7c6862ec696c2cc376814b726c9",
+      "published_bytes": 559,
+      "decoded_sha256": "a1a74ba7d0c95ae2d4e0403e17e25fdefc0dc7c6862ec696c2cc376814b726c9",
+      "decoded_bytes": 559,
+      "transformations": []
+    },
+    {
+      "path": "patches/12-deps-rapidhash-small-factor-screen.patch",
+      "source": "startup-lab/proposal/patches/12-deps-rapidhash-small-factor-screen.patch",
+      "source_sha256": "f43f965bad950f75d9aa3ec058721bc2b4378d8c55bb2f56eb40fe5815f369d1",
+      "published_sha256": "f43f965bad950f75d9aa3ec058721bc2b4378d8c55bb2f56eb40fe5815f369d1",
+      "published_bytes": 6847,
+      "decoded_sha256": "f43f965bad950f75d9aa3ec058721bc2b4378d8c55bb2f56eb40fe5815f369d1",
+      "decoded_bytes": 6847,
+      "transformations": []
+    },
+    {
+      "path": "patches/07-deps-cctz-lazy-corefoundation.patch",
+      "source": "startup-lab/proposal/patches/07-deps-cctz-lazy-corefoundation.patch",
+      "source_sha256": "826693e594e95a86f038d492843160b4cf83342a5f7b4b6468a8a9a4ff555942",
+      "published_sha256": "826693e594e95a86f038d492843160b4cf83342a5f7b4b6468a8a9a4ff555942",
+      "published_bytes": 4448,
+      "decoded_sha256": "826693e594e95a86f038d492843160b4cf83342a5f7b4b6468a8a9a4ff555942",
+      "decoded_bytes": 4448,
+      "transformations": []
+    },
+    {
+      "path": "patches/08-crypto-lazy-darwin-frameworks.patch",
+      "source": "startup-lab/proposal/patches/08-crypto-lazy-darwin-frameworks.patch",
+      "source_sha256": "9b36d38ce193e7f611f6b5b4f1070d96c27aa9940ef69749218ce75956d41812",
+      "published_sha256": "9b36d38ce193e7f611f6b5b4f1070d96c27aa9940ef69749218ce75956d41812",
+      "published_bytes": 24125,
+      "decoded_sha256": "9b36d38ce193e7f611f6b5b4f1070d96c27aa9940ef69749218ce75956d41812",
+      "decoded_bytes": 24125,
+      "transformations": []
+    },
+    {
+      "path": "patches/05-src-earlier-abseil-policy.patch",
+      "source": "startup-lab/proposal/patches/05-src-earlier-abseil-policy.patch",
+      "source_sha256": "205417225d66d2023ea832060b6f172d9128cd1eb324888d4b5b0a94f1e7799f",
+      "published_sha256": "205417225d66d2023ea832060b6f172d9128cd1eb324888d4b5b0a94f1e7799f",
+      "published_bytes": 2048,
+      "decoded_sha256": "205417225d66d2023ea832060b6f172d9128cd1eb324888d4b5b0a94f1e7799f",
+      "decoded_bytes": 2048,
+      "transformations": []
+    },
+    {
+      "path": "patches/02-build-darwin-private-symbols.patch",
+      "source": "startup-lab/proposal/patches/02-build-darwin-private-symbols.patch",
+      "source_sha256": "12147c4bb8e7aa2895f601444522a7921f9b4ea3a62211b53fd7f0c448cde939",
+      "published_sha256": "12147c4bb8e7aa2895f601444522a7921f9b4ea3a62211b53fd7f0c448cde939",
+      "published_bytes": 7035,
+      "decoded_sha256": "12147c4bb8e7aa2895f601444522a7921f9b4ea3a62211b53fd7f0c448cde939",
+      "decoded_bytes": 7035,
+      "transformations": []
+    },
+    {
+      "path": "patches/11-crypto-darwin-exit-registration.patch",
+      "source": "startup-lab/proposal/patches/11-crypto-darwin-exit-registration.patch",
+      "source_sha256": "7cf5152215b127deb712aa52f0ba00505319d2d273b061698ad9227b6dc19df8",
+      "published_sha256": "7cf5152215b127deb712aa52f0ba00505319d2d273b061698ad9227b6dc19df8",
+      "published_bytes": 1092,
+      "decoded_sha256": "7cf5152215b127deb712aa52f0ba00505319d2d273b061698ad9227b6dc19df8",
+      "decoded_bytes": 1092,
+      "transformations": []
+    },
+    {
+      "path": "patches/04-src-option-help-views.patch",
+      "source": "startup-lab/proposal/patches/04-src-option-help-views.patch",
+      "source_sha256": "290355ca3e9abbf713fb4f33f427429f5325f541748e37563157839ecfc75182",
+      "published_sha256": "290355ca3e9abbf713fb4f33f427429f5325f541748e37563157839ecfc75182",
+      "published_bytes": 3663,
+      "decoded_sha256": "290355ca3e9abbf713fb4f33f427429f5325f541748e37563157839ecfc75182",
+      "decoded_bytes": 3663,
+      "transformations": []
+    },
+    {
+      "path": "patches/06-deps-v8-fixed-raw-dispatch.patch",
+      "source": "startup-lab/proposal/patches/06-deps-v8-fixed-raw-dispatch.patch",
+      "source_sha256": "07986e064170d67a3257ee61cb2764a81f52a582311e92fcee1ba9409b369463",
+      "published_sha256": "07986e064170d67a3257ee61cb2764a81f52a582311e92fcee1ba9409b369463",
+      "published_bytes": 4893,
+      "decoded_sha256": "07986e064170d67a3257ee61cb2764a81f52a582311e92fcee1ba9409b369463",
+      "decoded_bytes": 4893,
+      "transformations": []
+    },
+    {
+      "path": "patches/15-build-bounded-whole-program-vtables.patch",
+      "source": "startup-lab/proposal/patches/15-build-bounded-whole-program-vtables.patch",
+      "source_sha256": "eedfccecdcdced202d6a98ce54b5b4c9a4af30d52c25984a0d9d08ee40e124d1",
+      "published_sha256": "eedfccecdcdced202d6a98ce54b5b4c9a4af30d52c25984a0d9d08ee40e124d1",
+      "published_bytes": 31898,
+      "decoded_sha256": "eedfccecdcdced202d6a98ce54b5b4c9a4af30d52c25984a0d9d08ee40e124d1",
+      "decoded_bytes": 31898,
+      "transformations": []
+    },
+    {
+      "path": "patches/14-build-darwin-trained-order.patch",
+      "source": "startup-lab/proposal/patches/14-build-darwin-trained-order.patch",
+      "source_sha256": "b8c63ce94ad9d7f1061951ddc3c3db322a414482d0beb03deea2325336bfe71f",
+      "published_sha256": "b8c63ce94ad9d7f1061951ddc3c3db322a414482d0beb03deea2325336bfe71f",
+      "published_bytes": 4114,
+      "decoded_sha256": "b8c63ce94ad9d7f1061951ddc3c3db322a414482d0beb03deea2325336bfe71f",
+      "decoded_bytes": 4114,
+      "transformations": []
+    },
+    {
+      "path": "patches/10-lib-compact-encoding-tables.patch",
+      "source": "startup-lab/proposal/patches/10-lib-compact-encoding-tables.patch",
+      "source_sha256": "2cebdd5ceff066a3090369ebaf50d5f2652fbf05f08478bd1b0ec8b3886d8947",
+      "published_sha256": "2cebdd5ceff066a3090369ebaf50d5f2652fbf05f08478bd1b0ec8b3886d8947",
+      "published_bytes": 32787,
+      "decoded_sha256": "2cebdd5ceff066a3090369ebaf50d5f2652fbf05f08478bd1b0ec8b3886d8947",
+      "decoded_bytes": 32787,
+      "transformations": []
+    },
+    {
+      "path": "patches/03-deps-rapidhash-native128.patch",
+      "source": "startup-lab/proposal/patches/03-deps-rapidhash-native128.patch",
+      "source_sha256": "bfa8e3cd4e8ab7dec6933dfb622bea18656678bf22c91c9933937a3a60d30ed3",
+      "published_sha256": "bfa8e3cd4e8ab7dec6933dfb622bea18656678bf22c91c9933937a3a60d30ed3",
+      "published_bytes": 4494,
+      "decoded_sha256": "bfa8e3cd4e8ab7dec6933dfb622bea18656678bf22c91c9933937a3a60d30ed3",
+      "decoded_bytes": 4494,
+      "transformations": []
+    },
+    {
+      "path": "patches/09-build-private-bundled-icu.patch",
+      "source": "startup-lab/proposal/patches/09-build-private-bundled-icu.patch",
+      "source_sha256": "893d640881a7b260afec86fff4089aebf0d11f3540e1d2bb3eb4b428d9e6f49e",
+      "published_sha256": "893d640881a7b260afec86fff4089aebf0d11f3540e1d2bb3eb4b428d9e6f49e",
+      "published_bytes": 1117,
+      "decoded_sha256": "893d640881a7b260afec86fff4089aebf0d11f3540e1d2bb3eb4b428d9e6f49e",
+      "decoded_bytes": 1117,
+      "transformations": []
+    },
+    {
+      "path": "patches/01-build-darwin-thinlto-pgo.patch",
+      "source": "startup-lab/proposal/patches/01-build-darwin-thinlto-pgo.patch",
+      "source_sha256": "3757141678773e23a85c865c70e63e0bc1c43ba7eac0f0e3061a60c75e493f64",
+      "published_sha256": "3757141678773e23a85c865c70e63e0bc1c43ba7eac0f0e3061a60c75e493f64",
+      "published_bytes": 5721,
+      "decoded_sha256": "3757141678773e23a85c865c70e63e0bc1c43ba7eac0f0e3061a60c75e493f64",
+      "decoded_bytes": 5721,
+      "transformations": []
+    },
+    {
+      "path": "patches/13-deps-rapidhash-montgomery.patch",
+      "source": "startup-lab/proposal/patches/13-deps-rapidhash-montgomery.patch",
+      "source_sha256": "310a9a10cc947539706d3a0fd523d820004f1b21b2381b202d21998c2b039d92",
+      "published_sha256": "310a9a10cc947539706d3a0fd523d820004f1b21b2381b202d21998c2b039d92",
+      "published_bytes": 7210,
+      "decoded_sha256": "310a9a10cc947539706d3a0fd523d820004f1b21b2381b202d21998c2b039d92",
+      "decoded_bytes": 7210,
+      "transformations": []
+    },
+    {
+      "path": "patches/manifest.json",
+      "source": "startup-lab/proposal/patches/manifest.json",
+      "source_sha256": "fa00a5aba0103af39d1a041798188772c51b1495d6ff9c9d80136cb102e06103",
+      "published_sha256": "ac1663132e8fe1abaf10a964794ebaaf895f1c2fca42dbe6e15790c69dc23ae4",
+      "published_bytes": 12876,
+      "decoded_sha256": "ac1663132e8fe1abaf10a964794ebaaf895f1c2fca42dbe6e15790c69dc23ae4",
+      "decoded_bytes": 12876,
+      "transformations": []
+    },
+    {
+      "path": "controls/pristine-pgo.patch",
+      "source": "artifacts/manifests/pristine-pgo-use/source.patch",
+      "source_sha256": "bb73fd419dd90532ec860fe78762855cf7bd0fe3bb796e4846ebaa178ac8b4fb",
+      "published_sha256": "bb73fd419dd90532ec860fe78762855cf7bd0fe3bb796e4846ebaa178ac8b4fb",
+      "published_bytes": 6200,
+      "decoded_sha256": "bb73fd419dd90532ec860fe78762855cf7bd0fe3bb796e4846ebaa178ac8b4fb",
+      "decoded_bytes": 6200,
+      "transformations": []
+    },
+    {
+      "path": "evidence/current-overall-defensible-clean/report.json.gz",
+      "source": "artifacts/current-overall-defensible-clean-run/report.json",
+      "source_sha256": "af1374a3d34a40215753812a2431e0258a3350a7b025e1bc1dbe2480f5e02ca1",
+      "published_sha256": "83068e58b74138a5337a15fd429e198a09dc15656527b58bc6f69a8c13ad5056",
+      "published_bytes": 18199,
+      "decoded_sha256": "08d0d9a7dcd3bea051715be955335997955b0450a34bef303927f131858b56ca",
+      "decoded_bytes": 396034,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/release-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/release-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/release-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/current-overall-defensible-clean/raw.jsonl.gz",
+      "source": "artifacts/current-overall-defensible-clean-run/raw.jsonl",
+      "source_sha256": "f6646a4d233ec8cab2e7345a11e47d0b4974590ae0762517701e8f0995927ded",
+      "published_sha256": "174960b1b172f48602737a47d548e17e1a72e0d2798901411242fd067d7b747e",
+      "published_bytes": 165399,
+      "decoded_sha256": "f6646a4d233ec8cab2e7345a11e47d0b4974590ae0762517701e8f0995927ded",
+      "decoded_bytes": 3497862,
+      "transformations": []
+    },
+    {
+      "path": "evidence/thin-lto-confirm/report.json.gz",
+      "source": "artifacts/thin-lto-confirm-run/report.json",
+      "source_sha256": "996b1d5d7a1d9f06e6361b996be16a9d302274600839d4aca3e61ce2b5fe801f",
+      "published_sha256": "0eb482165055e670b7b2a96178b812dfa8a651757c6a05bc294cde294f3faf6c",
+      "published_bytes": 9198,
+      "decoded_sha256": "ad0f001f969f7351b52382a428f045328830e84171c204b5e2943e03dbf57243",
+      "decoded_bytes": 101430,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/thin-lto-confirm/raw.jsonl.gz",
+      "source": "artifacts/thin-lto-confirm-run/raw.jsonl",
+      "source_sha256": "3fc5b36417b5f4a89d460f3c0e854b468b5fe3e30b0ba05f5cc04d944bd57328",
+      "published_sha256": "6ebabac37eefb4053cb3205c8e6787c4de7c4f929ee5e39b925e41072a165a28",
+      "published_bytes": 25415,
+      "decoded_sha256": "3fc5b36417b5f4a89d460f3c0e854b468b5fe3e30b0ba05f5cc04d944bd57328",
+      "decoded_bytes": 894805,
+      "transformations": []
+    },
+    {
+      "path": "evidence/pgo-use-confirm/report.json.gz",
+      "source": "artifacts/pgo-use-confirm-run/report.json",
+      "source_sha256": "c21f24323036bcd0d7a34b9121677a389aa9b6f981b3c296deb7e611294ed715",
+      "published_sha256": "acb59a6e590fddcc5a689cedbb27d910508b9f62ce239022106a654c4f2b996d",
+      "published_bytes": 12883,
+      "decoded_sha256": "52c63917c6e21efb7fd9c54e0ed4ced62cf5ce53a608514f40d06aa5724214ed",
+      "decoded_bytes": 248665,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/pgo-use-confirm/raw.jsonl.gz",
+      "source": "artifacts/pgo-use-confirm-run/raw.jsonl",
+      "source_sha256": "ebcdfff04e727603dcac663b5bcec3a12df6c8190289ae5e9563f837e561ca90",
+      "published_sha256": "367fa1ca0038a77ec020ad7e22b116600306fb59781084cb217632c9d56fdb3b",
+      "published_bytes": 86919,
+      "decoded_sha256": "ebcdfff04e727603dcac663b5bcec3a12df6c8190289ae5e9563f837e561ca90",
+      "decoded_bytes": 1970020,
+      "transformations": []
+    },
+    {
+      "path": "evidence/private-deps-ablation/report.json.gz",
+      "source": "artifacts/private-deps-ablation-run/report.json",
+      "source_sha256": "462121579af13d581edb0e1f778ee0facff1211d135762db7817b04246f96d22",
+      "published_sha256": "6df1d0840e3036d0cbeb791afbe74be3b161d5cd0b26defaa0f14f0adf9b1bb7",
+      "published_bytes": 10683,
+      "decoded_sha256": "a0a98f98018a53d95ac095fd5a815d1c0a045a63b4452686d217bfe46139b0bb",
+      "decoded_bytes": 134889,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/source/source_diff_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/source/source_path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/source/source_diff_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/source/source_path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/private-deps-ablation/raw.jsonl.gz",
+      "source": "artifacts/private-deps-ablation-run/raw.jsonl",
+      "source_sha256": "e49b8fc0ed032170d45354b195a3e8a738f73507705e18bed4dc80d648bd1958",
+      "published_sha256": "9475344dc66cdd5fe91837fa65a5c540b48ed66bdfea6061608393b453beba1e",
+      "published_bytes": 32375,
+      "decoded_sha256": "e49b8fc0ed032170d45354b195a3e8a738f73507705e18bed4dc80d648bd1958",
+      "decoded_bytes": 708621,
+      "transformations": []
+    },
+    {
+      "path": "evidence/deadstrip-confirmation/report.json.gz",
+      "source": "artifacts/deadstrip-confirmation-run/report.json",
+      "source_sha256": "b363ef7d3c10b92ca20aa6257e25bc54bbe2fb79c9982e9cd2f44b4cbd3f4547",
+      "published_sha256": "69eb9fc06d3a6ed6270ad65344a114a76285db691aef663185f46dd583f76fe5",
+      "published_bytes": 8934,
+      "decoded_sha256": "c4060d7751f918d4483b2509a826c47f6ed2dfd491b56507c893799bd9d02972",
+      "decoded_bytes": 101165,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/deadstrip-confirmation/raw.jsonl.gz",
+      "source": "artifacts/deadstrip-confirmation-run/raw.jsonl",
+      "source_sha256": "ce512a332909e14e14aec63d5970c491669dd4492f865c9f290ccf19dc321121",
+      "published_sha256": "90fddf404a2dcb7bb277defc34f5612a09e5babdbb16eba4a5bc22819222fc87",
+      "published_bytes": 26456,
+      "decoded_sha256": "ce512a332909e14e14aec63d5970c491669dd4492f865c9f290ccf19dc321121",
+      "decoded_bytes": 937192,
+      "transformations": []
+    },
+    {
+      "path": "evidence/hash-ablation/report.json.gz",
+      "source": "artifacts/hash-ablation-run/report.json",
+      "source_sha256": "b35bfb1cfefcd3ee7597ac369440c39e49b6854bd858d81434efa74b20db616c",
+      "published_sha256": "f82dc974a1c1de9e425215a738f47697011bdb9641f6078a2ff4453703014c71",
+      "published_bytes": 10399,
+      "decoded_sha256": "cc221921b5027626190ab3d6e09443ddbbe05b811542595f527ca001cb86c753",
+      "decoded_bytes": 121224,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/hash-ablation/raw.jsonl.gz",
+      "source": "artifacts/hash-ablation-run/raw.jsonl",
+      "source_sha256": "9deb32303e027ee3a5937d099d429255f248305673e28d020862c871ea02cb51",
+      "published_sha256": "5401cb08875f2c668d71c960a2a17659a18ef6fe11af577d46bb90959ffb780c",
+      "published_bytes": 25240,
+      "decoded_sha256": "9deb32303e027ee3a5937d099d429255f248305673e28d020862c871ea02cb51",
+      "decoded_bytes": 539059,
+      "transformations": []
+    },
+    {
+      "path": "evidence/option-help-confirm/report.json.gz",
+      "source": "artifacts/option-help-confirm-run/report.json",
+      "source_sha256": "4f80ebd9c8b5a39165fd2fd05a380e6f9794ba2be0779f273698496bb57aa4df",
+      "published_sha256": "2ec3da8018490f5f7f8f5c80df33c8e9f6374ac9148441cac850fc13fd26299e",
+      "published_bytes": 8987,
+      "decoded_sha256": "2248cd40e36ca33e9a98263490f0ab6d719e14a3424b284caadb197a8fd69dc7",
+      "decoded_bytes": 101292,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/option-help-confirm/raw.jsonl.gz",
+      "source": "artifacts/option-help-confirm-run/raw.jsonl",
+      "source_sha256": "f0ab29e975fe8a15dd259836e5c4a3b57ac013f9b07b8e520f6e13c8e8050e8b",
+      "published_sha256": "70b1cc6ecdfbcddc4c827fc123c35cf1a88b1c87e5ff2b25eb77f899f2e40759",
+      "published_bytes": 25152,
+      "decoded_sha256": "f0ab29e975fe8a15dd259836e5c4a3b57ac013f9b07b8e520f6e13c8e8050e8b",
+      "decoded_bytes": 894774,
+      "transformations": []
+    },
+    {
+      "path": "evidence/deadlock-policy-confirm/report.json.gz",
+      "source": "artifacts/deadlock-policy-confirm-run/report.json",
+      "source_sha256": "38c58a757deeafaf28de08999a99ea40449712f39f740b97613774e3fda755ae",
+      "published_sha256": "05880cec17eaa0692757564d6ccb5bb65ca886e9a07ebf6bb1146a1ceede3afd",
+      "published_bytes": 15620,
+      "decoded_sha256": "095cd3799680f6b3f48a21436e679adfd97d15358bc7f3c02329747e2b9f791c",
+      "decoded_bytes": 348419,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/deadlock-policy-confirm/raw.jsonl.gz",
+      "source": "artifacts/deadlock-policy-confirm-run/raw.jsonl",
+      "source_sha256": "556c125e449058da3aa378d08bfe465a90885828270aea76303677911c31ca52",
+      "published_sha256": "bbfc84bb84a0123f31f9afcf370b5e29b239dd3b7c42a675a22ad46bbf73f839",
+      "published_bytes": 137107,
+      "decoded_sha256": "556c125e449058da3aa378d08bfe465a90885828270aea76303677911c31ca52",
+      "decoded_bytes": 3130355,
+      "transformations": []
+    },
+    {
+      "path": "evidence/snapshot-dispatch-confirm/report.json.gz",
+      "source": "artifacts/snapshot-dispatch-confirm-run/report.json",
+      "source_sha256": "a8fda6512f0b2da631f696fce74bba0452d995fc8bf9077a7517ca563a0424b5",
+      "published_sha256": "2e504ea598db0a44bb5d008be1be8ddada933ce3ab443ddf0ef6e9629c1e69d2",
+      "published_bytes": 9532,
+      "decoded_sha256": "9e532b92ff04abbf7e2c6d64893308e1944c3b06db1ecd3bccb58f8dbe7577f2",
+      "decoded_bytes": 121072,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/snapshot-dispatch-confirm/raw.jsonl.gz",
+      "source": "artifacts/snapshot-dispatch-confirm-run/raw.jsonl",
+      "source_sha256": "8623cd9b32ac5b1e9052739801e655970c373c442e3d750f0bd9e9a865633f3f",
+      "published_sha256": "90e1d6dae1e334ec0eee589114147dbaf2d8de1f785249dd602f06afea8bafc3",
+      "published_bytes": 40396,
+      "decoded_sha256": "8623cd9b32ac5b1e9052739801e655970c373c442e3d750f0bd9e9a865633f3f",
+      "decoded_bytes": 1235513,
+      "transformations": []
+    },
+    {
+      "path": "evidence/lazy-frameworks-confirm/report.json.gz",
+      "source": "artifacts/lazy-frameworks-confirm-run/report.json",
+      "source_sha256": "026cd636e804a1010cd62f6f72a4738b4e37131220080ec81f274d305bc24040",
+      "published_sha256": "2c3f1ab4ca51ab44edd4ab77a1dfbb61e4c65e18a13683772ac0f2ad73274b6e",
+      "published_bytes": 9807,
+      "decoded_sha256": "5962448a0e7b665c942de2875881803f38c560cc4c8a4c0ad2491a7090c2c90b",
+      "decoded_bytes": 121409,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/lazy-frameworks-confirm/raw.jsonl.gz",
+      "source": "artifacts/lazy-frameworks-confirm-run/raw.jsonl",
+      "source_sha256": "8a580411ad2d136fb8fa3a6b50523a45dad8b53985c6c4323a0c7784387be7eb",
+      "published_sha256": "82c66ffa2608b5dd8a340f8e87681c844f1d18d120ba296378c25fdce27df3a5",
+      "published_bytes": 40207,
+      "decoded_sha256": "8a580411ad2d136fb8fa3a6b50523a45dad8b53985c6c4323a0c7784387be7eb",
+      "decoded_bytes": 1211822,
+      "transformations": []
+    },
+    {
+      "path": "evidence/icu-no-wpd-confirm/report.json.gz",
+      "source": "artifacts/icu-no-wpd-confirm-run/report.json",
+      "source_sha256": "0e93718ae55f2a112060edaafc945af19bb9a667e7e611ebe63cee22efa0b0c3",
+      "published_sha256": "098a1a49fcae649b095188d57226bf37630840ca2f64461c71e6224289aa8867",
+      "published_bytes": 15224,
+      "decoded_sha256": "8f0e39e73fdfed72a32a46b3355f30331e790acff9a7e569cf463767691f1708",
+      "decoded_bytes": 316216,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/icu-no-wpd-confirm/raw.jsonl.gz",
+      "source": "artifacts/icu-no-wpd-confirm-run/raw.jsonl",
+      "source_sha256": "37249cbcab47ffa491e783f4686fa455180261b15b491b2ec7dca3fabbe6a549",
+      "published_sha256": "e46113e1465f6d3c023e3bd09113d31f5febfb8857a47dbcfef923205a9dde8a",
+      "published_bytes": 126118,
+      "decoded_sha256": "37249cbcab47ffa491e783f4686fa455180261b15b491b2ec7dca3fabbe6a549",
+      "decoded_bytes": 2781988,
+      "transformations": []
+    },
+    {
+      "path": "evidence/encoding-compact-eager-confirm/report.json.gz",
+      "source": "artifacts/encoding-compact-eager-confirm-run/report.json",
+      "source_sha256": "91a3fc7f6f71b7febff3eeb240968560df8aee645f54a565f8a00e10ade574e7",
+      "published_sha256": "82863569d3cf5290827e3ecad318823099dcd5182b8811b255f29e43bab71799",
+      "published_bytes": 16554,
+      "decoded_sha256": "c05395a28ff606a43018163a6429cafaef656dcbb54b9b1718a6c2f85dd408d9",
+      "decoded_bytes": 381145,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/blob-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/legacy-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/utf8-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/encoding-compact-eager-confirm/raw.jsonl.gz",
+      "source": "artifacts/encoding-compact-eager-confirm-run/raw.jsonl",
+      "source_sha256": "5f991110494813307a0130da4041ec558a2d2f14b67e608219ac41d162b277a1",
+      "published_sha256": "782eb691b537d92fcb82a5e71aeb3efe9089661f91b53d6dcf1ff2bd24d4428d",
+      "published_bytes": 154278,
+      "decoded_sha256": "5f991110494813307a0130da4041ec558a2d2f14b67e608219ac41d162b277a1",
+      "decoded_bytes": 3582954,
+      "transformations": []
+    },
+    {
+      "path": "evidence/atexit-ablation/report.json.gz",
+      "source": "artifacts/atexit-ablation-run/report.json",
+      "source_sha256": "7e0c04cd8bb34c98f50c19a12a02fbf8e92a5cdcc5808132c5c46c8f6349c97d",
+      "published_sha256": "2872002ab642287587deec915ec6d7338ec4e631f58d618a3cd18234539dcc41",
+      "published_bytes": 10665,
+      "decoded_sha256": "932039b249928d2a505ffc476fea7c6fc621de754a51ec6cf1f6550037627dcd",
+      "decoded_bytes": 133885,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/atexit-ablation/raw.jsonl.gz",
+      "source": "artifacts/atexit-ablation-run/raw.jsonl",
+      "source_sha256": "c0f295370d546a132b23bfa5fac65db7356e7e8f31017320e5595a741f728a26",
+      "published_sha256": "5d75e518a422239b27828d4b4c98a7f2bf6bad1f4469c43d798689fe49e199a9",
+      "published_bytes": 32477,
+      "decoded_sha256": "c0f295370d546a132b23bfa5fac65db7356e7e8f31017320e5595a741f728a26",
+      "decoded_bytes": 708664,
+      "transformations": []
+    },
+    {
+      "path": "evidence/curated-node-atexit-isolation/report.json.gz",
+      "source": "artifacts/curated-node-atexit-isolation-run/report.json",
+      "source_sha256": "6516a36955e5edd61bb673ac9f678d62dc99d66be310a661c450bcfcf0b5657a",
+      "published_sha256": "e38a402e67a633d12de4c181f5af7810ade74c4cda81bb79c8d254d5ea010794",
+      "published_bytes": 14912,
+      "decoded_sha256": "215cc2b200249f6d8fff8f3ab9f16f96cb85a1826ee1fe2123d38ea6fbb0f743",
+      "decoded_bytes": 315160,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/curated-node-atexit-isolation/raw.jsonl.gz",
+      "source": "artifacts/curated-node-atexit-isolation-run/raw.jsonl",
+      "source_sha256": "ab7e42ac60ce1204a11408d5b9612aae1ff2af825a2d38bec75b1c24108a6a7e",
+      "published_sha256": "dc21221b1c49cddc96269072ef8c514c9119cafa4ebf4b7e92cabbf5d709aa0b",
+      "published_bytes": 124097,
+      "decoded_sha256": "ab7e42ac60ce1204a11408d5b9612aae1ff2af825a2d38bec75b1c24108a6a7e",
+      "decoded_bytes": 2782138,
+      "transformations": []
+    },
+    {
+      "path": "evidence/small-factors-confirm/report.json.gz",
+      "source": "artifacts/small-factors-confirm-run/report.json",
+      "source_sha256": "8f5302671c3d8fd82c0502468235dfd10a40f19a892f065da4d3566e80235171",
+      "published_sha256": "b8a9bbaf017280ccd7d770f75b4051f0d9de0e1f3d696dcc77d21b592ad77057",
+      "published_bytes": 9709,
+      "decoded_sha256": "0e66b32d5156beecf7fbd12b4e24faedf582a416a8538c3f624107d98da44517",
+      "decoded_bytes": 121981,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/small-factors-confirm/raw.jsonl.gz",
+      "source": "artifacts/small-factors-confirm-run/raw.jsonl",
+      "source_sha256": "bee2c23ec87ebdf984f8b52530be83b6fd033e70f17d0da7fb20b42276582ecb",
+      "published_sha256": "8ad516237362288ec59676f8d8706079cc09f23e1c1d6f11a58c41a1a7c4258d",
+      "published_bytes": 39994,
+      "decoded_sha256": "bee2c23ec87ebdf984f8b52530be83b6fd033e70f17d0da7fb20b42276582ecb",
+      "decoded_bytes": 1211866,
+      "transformations": []
+    },
+    {
+      "path": "evidence/montgomery-confirm/report.json.gz",
+      "source": "artifacts/montgomery-confirm-run/report.json",
+      "source_sha256": "46dd6cd25d3cbd2068f70b3aa641aa2358a8fe574f44a7baca26a1d245ee8377",
+      "published_sha256": "c5172ab13a84b82490176348eeea201f6d93a6378d82d8bda520768af9a50fc5",
+      "published_bytes": 10975,
+      "decoded_sha256": "423530f0b9ddd681a14c1d7ae507899d55e7e5e423f95ccecebea471b0d22398",
+      "decoded_bytes": 153775,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/montgomery-confirm/raw.jsonl.gz",
+      "source": "artifacts/montgomery-confirm-run/raw.jsonl",
+      "source_sha256": "237d75ef0da37244bd2320dd9f97490a9231df697b1d4150224c80aacdd188b3",
+      "published_sha256": "bee1c822e45b14ec987e12e0fd9b03b5a103e06a67aa5a613ff5b42eeed0c84d",
+      "published_bytes": 62459,
+      "decoded_sha256": "237d75ef0da37244bd2320dd9f97490a9231df697b1d4150224c80aacdd188b3",
+      "decoded_bytes": 1925543,
+      "transformations": []
+    },
+    {
+      "path": "evidence/temporal-layout-fork-all-repeat/report.json.gz",
+      "source": "artifacts/temporal-layout-fork-all-repeat-run/report.json",
+      "source_sha256": "30d1c1f53d30053e5fef39749c28c284c3fb15862085c9984ef78b9a3342e37a",
+      "published_sha256": "276b35da3a4161de6e9684f5982c1e3332deed6abad83cfd03a88390f8fe447b",
+      "published_bytes": 17854,
+      "decoded_sha256": "8ef333f00f4e5bb7b6c8afb6b26ebb2dfc9e7fd95071b104965a2a7745304af8",
+      "decoded_bytes": 416991,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/build_command",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/build_command",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/temporal-layout-fork-all-repeat/raw.jsonl.gz",
+      "source": "artifacts/temporal-layout-fork-all-repeat-run/raw.jsonl",
+      "source_sha256": "526b2a0540151c396732871adddd017778718efba0b99fd440e5a613ec2e509c",
+      "published_sha256": "2987fda68a5c66d51a42aa8808296dde73506fa512c9bde19c7c3635fb9212f6",
+      "published_bytes": 172091,
+      "decoded_sha256": "526b2a0540151c396732871adddd017778718efba0b99fd440e5a613ec2e509c",
+      "decoded_bytes": 3942373,
+      "transformations": []
+    },
+    {
+      "path": "evidence/whole-program-vtables-repeat/report.json.gz",
+      "source": "artifacts/whole-program-vtables-repeat-run/report.json",
+      "source_sha256": "f6d133cba321a9b62b129c7ba6b20878c36d0a72995876d579d26c9dc951148e",
+      "published_sha256": "341edada4fd6bb8ca660c279905f979d260c28cfcca69c982e04cb1d1544efdb",
+      "published_bytes": 17641,
+      "decoded_sha256": "9b3ee2725cc9d0569b957af568676a062e7880ad0ed5aabc51ad2ec3311fe5c7",
+      "decoded_bytes": 416676,
+      "transformations": [
+        {
+          "field": "/environment_policy/removed_values/NODE_COMPILE_CACHE",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_OPTIONS",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/environment_policy/removed_values/NODE_PATH",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/csv",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/raw_files/jsonl",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/baseline-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/bun/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/binary_linkage",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/normalized_config/variables/node_pgo_profile",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_config/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/contents/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/build_manifest/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/runtimes/fork-node/revision",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/builtins/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/crypto-first-use/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-cjs/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/empty-esm/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/hello/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/http-ready/args/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/workloads/worker/args/0",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/whole-program-vtables-repeat/raw.jsonl.gz",
+      "source": "artifacts/whole-program-vtables-repeat-run/raw.jsonl",
+      "source_sha256": "eb65748c9ed2406a881dc12b6dc2683806add1a679b45cc36688506981aacc12",
+      "published_sha256": "cfaa7707ef2c66d3de8b832270f0531eaa89baaa72353fb69e514f470bd0a761",
+      "published_bytes": 173755,
+      "decoded_sha256": "eb65748c9ed2406a881dc12b6dc2683806add1a679b45cc36688506981aacc12",
+      "decoded_bytes": 3942374,
+      "transformations": []
+    },
+    {
+      "path": "evidence/icu-export-audit.json",
+      "source": "artifacts/icu-static-hidden-v2/export-review.json",
+      "source_sha256": "eb3d5db59f9da69747b0eba4dfbe6908017f1ab28cb253db93bb6b7a9bd83cbb",
+      "published_sha256": "094f13c8985dcea7b3e95812677ef2aa3d1b670ce6af2214327d3dac4927250d",
+      "published_bytes": 721,
+      "decoded_sha256": "094f13c8985dcea7b3e95812677ef2aa3d1b670ce6af2214327d3dac4927250d",
+      "decoded_bytes": 721,
+      "transformations": []
+    },
+    {
+      "path": "evidence/hash-oracle.json",
+      "source": "artifacts/defensible-hash-oracle-v2/result.json",
+      "source_sha256": "54d29abeb7643c12541e57ae57a44d190fa1439dba434ec1852784c582397338",
+      "published_sha256": "c92ad8ce18106983f55cc163f23057ef6e12a012b9848a1f9fdaec26d6d66854",
+      "published_bytes": 4976,
+      "decoded_sha256": "c92ad8ce18106983f55cc163f23057ef6e12a012b9848a1f9fdaec26d6d66854",
+      "decoded_bytes": 4976,
+      "transformations": [
+        {
+          "field": "/current/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/pristine/path",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-native/5",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-native/7",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-native/9",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-native/11",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-native/13",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-portable/5",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-portable/7",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-portable/9",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-portable/11",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/current-portable/13",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-native/5",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-native/7",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-native/9",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-native/11",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-native/13",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-portable/5",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-portable/7",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-portable/9",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-portable/11",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/commands/pristine-portable/13",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/local-gate.json",
+      "source": "artifacts/defensible-v1-full-gates/result.json",
+      "source_sha256": "60254d88c1f87c831efefe3f44b673bfbc5ea7e3a6f93fef0e370b077ee355e8",
+      "published_sha256": "2de6e475893dedf17ede146056379868c2a4c087270cb739f13f0657a49901cc",
+      "published_bytes": 808,
+      "decoded_sha256": "2de6e475893dedf17ede146056379868c2a4c087270cb739f13f0657a49901cc",
+      "decoded_bytes": 808,
+      "transformations": []
+    },
+    {
+      "path": "evidence/wpd-build-policy.json",
+      "source": "artifacts/defensible-source-preparation-v2/wpd-config-controls.json",
+      "source_sha256": "1e27675342617cd7ca41a26aa4141c16d689aea6d2ef01bc586fe2fc49e99db4",
+      "published_sha256": "519bf59e96c589632416a107f88a85431bc69bba75f7fc440ade1b5f9ffb8148",
+      "published_bytes": 30256,
+      "decoded_sha256": "519bf59e96c589632416a107f88a85431bc69bba75f7fc440ade1b5f9ffb8148",
+      "decoded_bytes": 30256,
+      "transformations": [
+        {
+          "field": "/actual_gyp_cases/0/commands/1",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/0/commands/6",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/0/commands/8",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/1/commands/1",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/1/commands/6",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/1/commands/8",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/2/commands/1",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/2/commands/6",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/2/commands/8",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/3/commands/1",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/3/commands/6",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/actual_gyp_cases/3/commands/8",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/final-config-scope.json",
+      "source": "artifacts/current-overall-defensible-clean/scope.json",
+      "source_sha256": "b1ecd2b6d99ef8b56cb5c232ce4ace563eec6e0e408b83f1b91eee9fc8bc5c28",
+      "published_sha256": "10d9d4cec37774046a384466e9d259b2eafd61a8ba68912c3994a1e17be930e5",
+      "published_bytes": 5660,
+      "decoded_sha256": "10d9d4cec37774046a384466e9d259b2eafd61a8ba68912c3994a1e17be930e5",
+      "decoded_bytes": 5660,
+      "transformations": [
+        {
+          "field": "/manifests/baseline/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/manifests/baseline/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/manifests/baseline/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/manifests/candidate/binary",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/manifests/candidate/source",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/manifests/candidate/notes",
+          "operation": "omit-free-form-notes"
+        },
+        {
+          "field": "/only_config_delta/node_darwin_order_file",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/only_config_delta/node_darwin_order_file_input",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/note",
+          "operation": "omit-free-form-notes"
+        }
+      ]
+    },
+    {
+      "path": "evidence/wpd-control/result.json",
+      "source": "artifacts/whole-program-vtables-probe-sdk/result.json",
+      "source_sha256": "9d2f5543fc383dad99e53bc74944dd32a2e434c0730fce1cfed27120758ca205",
+      "published_sha256": "24b7dd6d1d92bd38935e321ef0aeb2b6caea992d67b651e63b57e99b80c14ef9",
+      "published_bytes": 8872,
+      "decoded_sha256": "24b7dd6d1d92bd38935e321ef0aeb2b6caea992d67b651e63b57e99b80c14ef9",
+      "decoded_bytes": 8872,
+      "transformations": [
+        {
+          "field": "/events/3/argv/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/events/3/argv/1",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/events/8/argv/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/events/8/argv/1",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/events/13/argv/0",
+          "operation": "normalize-local-path"
+        },
+        {
+          "field": "/events/13/argv/1",
+          "operation": "normalize-local-path"
+        }
+      ]
+    },
+    {
+      "path": "evidence/wpd-control/control-run.txt",
+      "source": "artifacts/whole-program-vtables-probe-sdk/control-run.txt",
+      "source_sha256": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+      "published_sha256": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+      "published_bytes": 10,
+      "decoded_sha256": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+      "decoded_bytes": 10,
+      "transformations": []
+    },
+    {
+      "path": "evidence/wpd-control/hidden-run.txt",
+      "source": "artifacts/whole-program-vtables-probe-sdk/hidden-run.txt",
+      "source_sha256": "b85644b5a6f2b2c6cc73a1cd69e963b459343f520716a7e7998fa48a6662bef5",
+      "published_sha256": "b85644b5a6f2b2c6cc73a1cd69e963b459343f520716a7e7998fa48a6662bef5",
+      "published_bytes": 11,
+      "decoded_sha256": "b85644b5a6f2b2c6cc73a1cd69e963b459343f520716a7e7998fa48a6662bef5",
+      "decoded_bytes": 11,
+      "transformations": []
+    },
+    {
+      "path": "evidence/wpd-control/public-run.txt",
+      "source": "artifacts/whole-program-vtables-probe-sdk/public-run.txt",
+      "source_sha256": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+      "published_sha256": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+      "published_bytes": 10,
+      "decoded_sha256": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+      "decoded_bytes": 10,
+      "transformations": []
+    },
+    {
+      "path": "evidence/wpd-control/base.h",
+      "source": "artifacts/whole-program-vtables-probe-sdk/base.h",
+      "source_sha256": "9364478bab8eedd943399764b698941a62dfb19294be0c65b6487b7b8c57cefd",
+      "published_sha256": "9364478bab8eedd943399764b698941a62dfb19294be0c65b6487b7b8c57cefd",
+      "published_bytes": 290,
+      "decoded_sha256": "9364478bab8eedd943399764b698941a62dfb19294be0c65b6487b7b8c57cefd",
+      "decoded_bytes": 290,
+      "transformations": []
+    },
+    {
+      "path": "evidence/wpd-control/plugin.cc",
+      "source": "artifacts/whole-program-vtables-probe-sdk/plugin.cc",
+      "source_sha256": "a4cfc95b2d6fca9c23bc20a933f3c6da4268c37f913375f4c05276a8d24d8161",
+      "published_sha256": "a4cfc95b2d6fca9c23bc20a933f3c6da4268c37f913375f4c05276a8d24d8161",
+      "published_bytes": 192,
+      "decoded_sha256": "a4cfc95b2d6fca9c23bc20a933f3c6da4268c37f913375f4c05276a8d24d8161",
+      "decoded_bytes": 192,
+      "transformations": []
+    },
+    {
+      "path": "evidence/wpd-control/main.cc",
+      "source": "artifacts/whole-program-vtables-probe-sdk/main.cc",
+      "source_sha256": "ed57f3dc521122b080f253a83f75fd3f87bd667859f8cbeff94c9fc80a400de6",
+      "published_sha256": "ed57f3dc521122b080f253a83f75fd3f87bd667859f8cbeff94c9fc80a400de6",
+      "published_bytes": 591,
+      "decoded_sha256": "ed57f3dc521122b080f253a83f75fd3f87bd667859f8cbeff94c9fc80a400de6",
+      "decoded_bytes": 591,
+      "transformations": []
+    },
+    {
+      "path": "evidence/wpd-control/call.cc",
+      "source": "artifacts/whole-program-vtables-probe-sdk/call.cc",
+      "source_sha256": "bc1ee88abdc45301e7c8e1f726a42227b52415663c3b58e55d4fe7ff4f470c22",
+      "published_sha256": "bc1ee88abdc45301e7c8e1f726a42227b52415663c3b58e55d4fe7ff4f470c22",
+      "published_bytes": 133,
+      "decoded_sha256": "bc1ee88abdc45301e7c8e1f726a42227b52415663c3b58e55d4fe7ff4f470c22",
+      "decoded_bytes": 133,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/test_startup_lab.py",
+      "source": "startup-lab/tests/test_startup_lab.py",
+      "source_sha256": "4a5eb4a3d344e4bc2762466e3907e5bc2d6918d20a3f280544608c260a6bfbd3",
+      "published_sha256": "4a5eb4a3d344e4bc2762466e3907e5bc2d6918d20a3f280544608c260a6bfbd3",
+      "published_bytes": 15834,
+      "decoded_sha256": "4a5eb4a3d344e4bc2762466e3907e5bc2d6918d20a3f280544608c260a6bfbd3",
+      "decoded_bytes": 15834,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/test_pgo_train.py",
+      "source": "startup-lab/tests/test_pgo_train.py",
+      "source_sha256": "c0b041bb460be259ae84c34417ec1c8365201d93818b26e6a0e23ceec59bfe3a",
+      "published_sha256": "c0b041bb460be259ae84c34417ec1c8365201d93818b26e6a0e23ceec59bfe3a",
+      "published_bytes": 7155,
+      "decoded_sha256": "c0b041bb460be259ae84c34417ec1c8365201d93818b26e6a0e23ceec59bfe3a",
+      "decoded_bytes": 7155,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/test_startup_order.py",
+      "source": "startup-lab/tests/test_startup_order.py",
+      "source_sha256": "3ce11663e441d7a67fde1e121107a95c250d499434dfdb71fa0c587cd6a668bb",
+      "published_sha256": "3ce11663e441d7a67fde1e121107a95c250d499434dfdb71fa0c587cd6a668bb",
+      "published_bytes": 5003,
+      "decoded_sha256": "3ce11663e441d7a67fde1e121107a95c250d499434dfdb71fa0c587cd6a668bb",
+      "decoded_bytes": 5003,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/test_temporal_order.py",
+      "source": "startup-lab/tests/test_temporal_order.py",
+      "source_sha256": "1b097779ea90ab3207c52e32426b6df8822c14d152d58fa81f1f35daa2d74a31",
+      "published_sha256": "1b097779ea90ab3207c52e32426b6df8822c14d152d58fa81f1f35daa2d74a31",
+      "published_bytes": 2646,
+      "decoded_sha256": "1b097779ea90ab3207c52e32426b6df8822c14d152d58fa81f1f35daa2d74a31",
+      "decoded_bytes": 2646,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/mock_child_pipe.py",
+      "source": "startup-lab/tests/mock_child_pipe.py",
+      "source_sha256": "e9a715008b8b8320bc0f44b366753dc07bd2e0c368435eccc8d55b3fd2c02289",
+      "published_sha256": "e9a715008b8b8320bc0f44b366753dc07bd2e0c368435eccc8d55b3fd2c02289",
+      "published_bytes": 282,
+      "decoded_sha256": "e9a715008b8b8320bc0f44b366753dc07bd2e0c368435eccc8d55b3fd2c02289",
+      "decoded_bytes": 282,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/mock_invalid_marker.py",
+      "source": "startup-lab/tests/mock_invalid_marker.py",
+      "source_sha256": "2a9ca25a2b1d441f4454cfdc428973d4f9501ea3dcc21d096edfb4c71757f4b5",
+      "published_sha256": "2a9ca25a2b1d441f4454cfdc428973d4f9501ea3dcc21d096edfb4c71757f4b5",
+      "published_bytes": 204,
+      "decoded_sha256": "2a9ca25a2b1d441f4454cfdc428973d4f9501ea3dcc21d096edfb4c71757f4b5",
+      "decoded_bytes": 204,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/mock_large_stdout.py",
+      "source": "startup-lab/tests/mock_large_stdout.py",
+      "source_sha256": "45f995e6255a1dd23c11e50de47763665f52631cea9d8e4b476cc58d7ea11f70",
+      "published_sha256": "45f995e6255a1dd23c11e50de47763665f52631cea9d8e4b476cc58d7ea11f70",
+      "published_bytes": 178,
+      "decoded_sha256": "45f995e6255a1dd23c11e50de47763665f52631cea9d8e4b476cc58d7ea11f70",
+      "decoded_bytes": 178,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/mock_missing_marker.py",
+      "source": "startup-lab/tests/mock_missing_marker.py",
+      "source_sha256": "82f23350b78f314d5c73f32a749969f7800591bdf87cb477e4cce6a94a178871",
+      "published_sha256": "82f23350b78f314d5c73f32a749969f7800591bdf87cb477e4cce6a94a178871",
+      "published_bytes": 128,
+      "decoded_sha256": "82f23350b78f314d5c73f32a749969f7800591bdf87cb477e4cce6a94a178871",
+      "decoded_bytes": 128,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/mock_orphan_pipe.py",
+      "source": "startup-lab/tests/mock_orphan_pipe.py",
+      "source_sha256": "fd9f782632e205dffe83b72cfb9cfeaec2ce7a9007b61032260d5fd03adda337",
+      "published_sha256": "fd9f782632e205dffe83b72cfb9cfeaec2ce7a9007b61032260d5fd03adda337",
+      "published_bytes": 242,
+      "decoded_sha256": "fd9f782632e205dffe83b72cfb9cfeaec2ce7a9007b61032260d5fd03adda337",
+      "decoded_bytes": 242,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/mock_runtime.py",
+      "source": "startup-lab/tests/mock_runtime.py",
+      "source_sha256": "1db64e6b2f31426d0f698e41d7658bc0caee4b817caa9990cc4f09a1a8ccdbe7",
+      "published_sha256": "1db64e6b2f31426d0f698e41d7658bc0caee4b817caa9990cc4f09a1a8ccdbe7",
+      "published_bytes": 293,
+      "decoded_sha256": "1db64e6b2f31426d0f698e41d7658bc0caee4b817caa9990cc4f09a1a8ccdbe7",
+      "decoded_bytes": 293,
+      "transformations": []
+    },
+    {
+      "path": "README.md",
+      "source": null,
+      "source_sha256": null,
+      "published_sha256": "c738129d40d5a57e02fc054e6c47e03b33b46d5d33492a8a3e31702dc4aeb3eb",
+      "published_bytes": 4976,
+      "decoded_sha256": "c738129d40d5a57e02fc054e6c47e03b33b46d5d33492a8a3e31702dc4aeb3eb",
+      "decoded_bytes": 4976,
+      "transformations": []
+    },
+    {
+      "path": "PATCHES.md",
+      "source": "Frozen public Mac export/PATCHES.md",
+      "source_sha256": "f309ea73937bac2a8a24222a6898c98f01f5b0379979a7bd587507dafc14baf5",
+      "published_sha256": "9bdf47e2a96d572d2f7fea1e98b59d63a1329fbe3137fc5ec92764869ee241a0",
+      "published_bytes": 11363,
+      "decoded_sha256": "9bdf47e2a96d572d2f7fea1e98b59d63a1329fbe3137fc5ec92764869ee241a0",
+      "decoded_bytes": 11363,
+      "transformations": [
+        "Replaced one source link with the pinned upstream URL for nested documentation; measurement data unchanged"
+      ]
+    },
+    {
+      "path": "REPRODUCE.md",
+      "source": null,
+      "source_sha256": null,
+      "published_sha256": "eae37c812307e090321cabed02e82f7a2cd7bbac72ffee41a89865fcd2ce46f1",
+      "published_bytes": 8459,
+      "decoded_sha256": "eae37c812307e090321cabed02e82f7a2cd7bbac72ffee41a89865fcd2ce46f1",
+      "decoded_bytes": 8459,
+      "transformations": []
+    },
+    {
+      "path": "evidence/index.json",
+      "source": null,
+      "source_sha256": null,
+      "published_sha256": "0f5da01e8241c6161ac29971edd1458b672d353c26ecc057e1be8d64a5a1ebdf",
+      "published_bytes": 54651,
+      "decoded_sha256": "0f5da01e8241c6161ac29971edd1458b672d353c26ecc057e1be8d64a5a1ebdf",
+      "decoded_bytes": 54651,
+      "transformations": []
+    },
+    {
+      "path": "tools/verify_evidence.py",
+      "source": null,
+      "source_sha256": null,
+      "published_sha256": "202845d6baa510013fac899d763af622ff7cdb054949ec791e0f2513127062c1",
+      "published_bytes": 4609,
+      "decoded_sha256": "202845d6baa510013fac899d763af622ff7cdb054949ec791e0f2513127062c1",
+      "decoded_bytes": 4609,
+      "transformations": []
+    },
+    {
+      "path": "tools/clean_env.py",
+      "source": null,
+      "source_sha256": null,
+      "published_sha256": "9b6e5aef4db0652af4ceced02cd241ce9f50da6364a818e2209410f6a73d1480",
+      "published_bytes": 391,
+      "decoded_sha256": "9b6e5aef4db0652af4ceced02cd241ce9f50da6364a818e2209410f6a73d1480",
+      "decoded_bytes": 391,
+      "transformations": []
+    },
+    {
+      "path": "tools/tests/test_public_evidence.py",
+      "source": null,
+      "source_sha256": null,
+      "published_sha256": "a73f5ad23af74e1310fae79c63e47710a6d5951c2e16cac994370f9cac46fece",
+      "published_bytes": 2360,
+      "decoded_sha256": "a73f5ad23af74e1310fae79c63e47710a6d5951c2e16cac994370f9cac46fece",
+      "decoded_bytes": 2360,
+      "transformations": []
+    }
+  ]
+}

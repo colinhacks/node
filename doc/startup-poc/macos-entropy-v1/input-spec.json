@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "inputs": [
+    {"kind":"paired","name":"identity-100","report":"identity-100/report.json","raw":"identity-100/raw.jsonl"},
+    {"kind":"paired","name":"startup-350","report":"startup-350/report.json","raw":"startup-350/raw.jsonl"},
+    {"kind":"paired","name":"throughput-30","report":"throughput-30/report.json","raw":"throughput-30/raw.jsonl"},
+    {"kind":"paired","name":"throughput-identity-30","report":"throughput-identity-30/report.json","raw":"throughput-identity-30/raw.jsonl"},
+    {"kind":"paired","name":"fs-read-interleaved-60","report":"fs-read-interleaved-60/run/report.json","raw":"fs-read-interleaved-60/run/raw.jsonl"}
+  ]
+}

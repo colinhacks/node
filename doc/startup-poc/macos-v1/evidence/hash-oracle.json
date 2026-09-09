@@ -1,0 +1,135 @@
+{
+  "base": "8af75451e9041cd6058080ad3d4a65546797b418",
+  "commands": {
+    "current-native": [
+      "clang++",
+      "-std=c++20",
+      "-O2",
+      "-DNDEBUG",
+      "-DV8_USE_DEFAULT_HASHER_SECRET=0",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/current/native/oracle.cc",
+      "-o",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/current/native/oracle",
+      "-I",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/current/native",
+      "-I",
+      "<workspace>/node/deps/v8",
+      "-I",
+      "<workspace>/node/deps/v8/third_party/rapidhash-v8"
+    ],
+    "current-portable": [
+      "clang++",
+      "-std=c++20",
+      "-O2",
+      "-DNDEBUG",
+      "-DV8_USE_DEFAULT_HASHER_SECRET=0",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/current/portable/oracle.cc",
+      "-o",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/current/portable/oracle",
+      "-I",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/current/portable",
+      "-I",
+      "<workspace>/node/deps/v8",
+      "-I",
+      "<workspace>/node/deps/v8/third_party/rapidhash-v8",
+      "-U__SIZEOF_INT128__"
+    ],
+    "pristine-native": [
+      "clang++",
+      "-std=c++20",
+      "-O2",
+      "-DNDEBUG",
+      "-DV8_USE_DEFAULT_HASHER_SECRET=0",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/pristine/native/oracle.cc",
+      "-o",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/pristine/native/oracle",
+      "-I",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/pristine/native",
+      "-I",
+      "<workspace>/node/deps/v8",
+      "-I",
+      "<workspace>/node/deps/v8/third_party/rapidhash-v8"
+    ],
+    "pristine-portable": [
+      "clang++",
+      "-std=c++20",
+      "-O2",
+      "-DNDEBUG",
+      "-DV8_USE_DEFAULT_HASHER_SECRET=0",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/pristine/portable/oracle.cc",
+      "-o",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/pristine/portable/oracle",
+      "-I",
+      "<workspace>/artifacts/defensible-hash-oracle-v2/pristine/portable",
+      "-I",
+      "<workspace>/node/deps/v8",
+      "-I",
+      "<workspace>/node/deps/v8/third_party/rapidhash-v8",
+      "-U__SIZEOF_INT128__"
+    ]
+  },
+  "compiler": [
+    "clang++"
+  ],
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "counts": {
+    "edge_seeds": 16,
+    "generated_seeds": 512,
+    "high_bit_words": 744,
+    "secret_words": 1584,
+    "top_byte_f0_words": 21,
+    "total_seeds": 528
+  },
+  "current": {
+    "path": "<workspace>/node/deps/v8/third_party/rapidhash-v8/secret.h",
+    "sha256": "3bfefb85a4d7c89675cb8f96eca96a4ed0f7b49be442fa1cbcd4b35da40299a7"
+  },
+  "driver_sha256": "5b5ff37da05dd03686482591175216d22fb226d30672b4922f87e5a4e017bdfe",
+  "executables": {
+    "current-native": {
+      "path": "current/native/oracle",
+      "sha256": "c019ef4af70f5031a91132e72521e1c317ae14d75d1f30e34aa5efaf786f16d0"
+    },
+    "current-portable": {
+      "path": "current/portable/oracle",
+      "sha256": "435bbdde31a84e181fef66aef52de40369a71e5572fc7a7aae360b99a2545d5c"
+    },
+    "pristine-native": {
+      "path": "pristine/native/oracle",
+      "sha256": "8c5add915439ff69f7a8d918b9c96b48eb86e005f2687ad6e237314fcc5eb974"
+    },
+    "pristine-portable": {
+      "path": "pristine/portable/oracle",
+      "sha256": "e23ed81e55a13d69fc9d561d58070b978ce55645a9082ca880dd4bb2e2d52562"
+    }
+  },
+  "node_head": "8af75451e9041cd6058080ad3d4a65546797b418",
+  "oracle_sha256": "4dd14de47efae0e0e402f39426bd31d710068cd52b8cabc9b7e76d2c3023bcee",
+  "outputs": {
+    "current-native": {
+      "path": "current/native/raw.out",
+      "sha256": "77d14b219ad74cfb6276d58828a633f3d09733609e94335251397184fc5b1538"
+    },
+    "current-portable": {
+      "path": "current/portable/raw.out",
+      "sha256": "b2076b631b73201463fa652f87acf6cf102b4f79bc097374ead610ca73e01cb9"
+    },
+    "pristine-native": {
+      "path": "pristine/native/raw.out",
+      "sha256": "77d14b219ad74cfb6276d58828a633f3d09733609e94335251397184fc5b1538"
+    },
+    "pristine-portable": {
+      "path": "pristine/portable/raw.out",
+      "sha256": "b2076b631b73201463fa652f87acf6cf102b4f79bc097374ead610ca73e01cb9"
+    }
+  },
+  "platform_limit": "native mode requires the host compiler's __int128; portable mode is a forced preprocessor branch, not a cross-platform execution claim",
+  "pristine": {
+    "path": "<workspace>/artifacts/defensible-hash-oracle-v2/pristine-secret.h",
+    "sha256": "105f18fae2b46a2b0747c6618f782d30a3938f8031ba59c9d802c6bba59b8291"
+  },
+  "python_secret_contract": "passed",
+  "raw_output_difference": "the first I line records the selected compiler branch",
+  "scope": "actual rapidhash_make_secret seed inputs only; no direct internal arithmetic calls with synthetic operands",
+  "semantic_outputs_equal": true
+}

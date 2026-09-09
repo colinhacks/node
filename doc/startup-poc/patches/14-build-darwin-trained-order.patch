@@ -1,0 +1,111 @@
+diff --git a/common.gypi b/common.gypi
+index f4cf202b..8139bcdc 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -13,6 +13,9 @@
+     'enable_pgo_generate%': '0',
+     'enable_pgo_use%': '0',
+     'node_pgo_profile%': '',
++    'node_darwin_order_file%': '',
++    'node_darwin_order_file_input%': '',
++    'node_use_darwin_order_file%': 'false',
+     'clang_profile_lib%': '',
+     'python%': 'python',
+     'emulator%': [],
+diff --git a/configure.py b/configure.py
+index 54fc56d8..408dcb8b 100755
+--- a/configure.py
++++ b/configure.py
+@@ -945,6 +945,12 @@ parser.add_argument('--use-section-ordering-file',
+          'Node.js be linked using the gold linker. The gold linker must have ' +
+          'version 1.2 or greater.')
+ 
++parser.add_argument('--use-darwin-order-file',
++    action='store',
++    dest='node_darwin_order_file',
++    default='',
++    help='Pass an order file to the static macOS Node.js CLI linker.')
++
+ intl_optgroup.add_argument('--with-intl',
+     action='store',
+     dest='with_intl',
+@@ -2005,6 +2011,28 @@ def configure_node(o):
+     # Ninja expands dollar signs before the shell parses the compiler flags.
+     o['variables']['node_pgo_profile'] = shlex.quote(str(profile)).replace('$', '$$')
+ 
++  o['variables']['node_darwin_order_file'] = ''
++  o['variables']['node_darwin_order_file_input'] = ''
++  o['variables']['node_use_darwin_order_file'] = 'false'
++  if options.node_darwin_order_file:
++    if flavor != 'mac':
++      raise Exception('--use-darwin-order-file is only supported on macOS.')
++    if options.shared:
++      raise Exception('--use-darwin-order-file does not support --shared.')
++    if not options.use_ninja:
++      raise Exception('--use-darwin-order-file requires --ninja.')
++    order_file = Path(options.node_darwin_order_file).resolve()
++    if not order_file.is_file():
++      raise Exception(f'Darwin order file not found: {order_file}')
++    if '\n' in str(order_file) or '\r' in str(order_file):
++      raise Exception('Darwin order file paths must not contain newlines.')
++    # Ninja expands dollar signs before the shell parses the linker flags.
++    o['variables']['node_darwin_order_file'] = \
++      shlex.quote(str(order_file)).replace('$', '$$')
++    # $!PRODUCT_DIR lets GYP pass an absolute Ninja input containing '$'.
++    o['variables']['node_darwin_order_file_input'] = \
++      '$!PRODUCT_DIR/' + str(order_file).replace('$', '$$')
++    o['variables']['node_use_darwin_order_file'] = 'true'
+ 
+   if flavor == 'linux':
+     if options.enable_pgo_generate or options.enable_pgo_use:
+diff --git a/node.gyp b/node.gyp
+index bd58ddf7..496ca593 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -641,6 +641,19 @@
+             'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
+           },
+         }],
++        ['OS=="mac" and node_shared=="false" and node_use_darwin_order_file=="true"', {
++          'dependencies': [
++            'node_darwin_order_file',
++          ],
++          'xcode_settings': {
++            'OTHER_LDFLAGS': [
++              '-Xlinker',
++              '-order_file',
++              '-Xlinker',
++              '<(node_darwin_order_file)',
++            ],
++          },
++        }],
+         [ 'node_shared_hdr_histogram=="false"', {
+           'dependencies': [
+             'deps/histogram/histogram.gyp:histogram',
+@@ -1779,6 +1792,26 @@
+   ], # end targets
+ 
+   'conditions': [
++    ['OS=="mac" and node_shared=="false" and node_use_darwin_order_file=="true"', {
++     'targets': [
++       {
++         'target_name': 'node_darwin_order_file',
++         'type': 'none',
++         'actions': [
++           {
++             'action_name': 'stamp_darwin_order_file',
++             'inputs': [ '<(node_darwin_order_file_input)', ],
++             'outputs': [ '<(SHARED_INTERMEDIATE_DIR)/node_darwin_order_file.stamp', ],
++             'action': [
++               '<(python)', '-c',
++               'from pathlib import Path; Path(__import__("sys").argv[1]).touch()',
++               '<@(_outputs)',
++             ],
++           },
++         ],
++       },
++     ],
++   }],
+     ['OS=="win" and node_shared=="true"', {
+      'targets': [
+        {

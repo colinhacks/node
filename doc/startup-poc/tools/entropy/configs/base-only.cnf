@@ -1,0 +1,10 @@
+nodejs_conf = nodejs_init
+
+[nodejs_init]
+providers = provider_sect
+
+[provider_sect]
+base = base_sect
+
+[base_sect]
+activate = 1

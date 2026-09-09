@@ -1,0 +1,243 @@
+{
+  "all_source_bytes_match": true,
+  "base": "8af75451e9041cd6058080ad3d4a65546797b418",
+  "complete_series_replay_passed": true,
+  "files": {
+    "common.gypi": "42d1632ef21aefb6019a4ed82b1689926115848a67010f6471d2af7365ba9f7d",
+    "configure.py": "60a67501f4a37fb0b91630f4343ee8fb4eefabd29ca140d553c62b5e3d07e767",
+    "deps/ada/ada.gyp": "e4e56dd1ff783ebb76fa4e75c40e4dcd0f4f6e134d0f5af6c4cc9600e1a34f46",
+    "deps/openssl/openssl/crypto/init.c": "9c5666dee6e138d2c59f869d287f07b23e8aeaad6ed0a49a19145aee0589b3ed",
+    "deps/v8/include/cppgc/custom-space.h": "66288e6532c1e7bd57c522156c938e1b435463700be6dcb6e8873564573f638a",
+    "deps/v8/include/cppgc/garbage-collected.h": "08a6a1d8578d4c8192ab44f84fd80c0ff8ef5211f14e108268c6c7ebae89167e",
+    "deps/v8/include/cppgc/heap.h": "a83918e007d85a42b5eb5ea28d9d7552f83ff9fde82a8431e31764b9e2dc6011",
+    "deps/v8/include/cppgc/name-provider.h": "f5b4adb585959c11597ed38cd650aa8c1ead400091ba8f3c1742f0b89b7ff245",
+    "deps/v8/include/cppgc/platform.h": "4fee8fcf505d43d2cc1b8e51174a7f101ab2cdf965d104f8c04a83afed3d9791",
+    "deps/v8/include/cppgc/visitor.h": "51ae85a2f286c28a0a4be9600fa895ebd99c286b4fc3abf5acc08132b88f7813",
+    "deps/v8/include/libplatform/v8-tracing.h": "67183cca579c5b0ce688e3e79149def20a14ec8071c65b0bd081c1cb3a6ffc94",
+    "deps/v8/include/v8-array-buffer.h": "aed0e7a6c8d08b491cc9c7c02392c8830d7e4bbd6c6ca9473c30980b88f5faa7",
+    "deps/v8/include/v8-context.h": "61397446686966d59d6234ba171ac06a85276f5e86f35ff0f0fea911591b4845",
+    "deps/v8/include/v8-cppgc.h": "423b42f69906a68ae752a0f23c9ee4b7c9f056ef9e586570a6e9ba3c2824e656",
+    "deps/v8/include/v8-embedder-heap.h": "fe5edda29dda9c26c3da4f72d1300d41ac67ce07b1907d9d61de47aa895eb88e",
+    "deps/v8/include/v8-extension.h": "6a124de5374e8c0e26a38e6bb406f6c4ee3bd516a1e8e5da86111c315dc30e26",
+    "deps/v8/include/v8-inspector.h": "f007c39917c967f24dfeba5054f67c9eae4786f5c5ef7e9c4703abbf123caaa2",
+    "deps/v8/include/v8-metrics.h": "c2d91779f393602a4fbc19720a345193979bcfe0ef62dabe20bbaf6d7e95debe",
+    "deps/v8/include/v8-microtask-queue.h": "90c5b1acacab7029d5fb806c7dedc2fe17c479458b97c1980fc059dd74db2f59",
+    "deps/v8/include/v8-object.h": "5faa2eae6ac25615d33ef72563c5f1c3520242706589338748e958c449235712",
+    "deps/v8/include/v8-persistent-handle.h": "dcbdbec12a985bd8cb4213ec6521865e4e5b198cc0f76f8106aef3ddf074c0b5",
+    "deps/v8/include/v8-platform.h": "ce4145d6009ad0fc968ed50f865b3d2d0131d2a4679a87907272f165d1418dbb",
+    "deps/v8/include/v8-primitive.h": "b0bf38dda7d695aa86f5a66fbc923bc456e3885afe43ddac70efa5b4c6292cad",
+    "deps/v8/include/v8-profiler.h": "4947dfae798a10326941967a9493dd0cbb27f6f6a2f83a0daee070edea9799ed",
+    "deps/v8/include/v8-script.h": "cf5c554d2c77f6c9496ef2e8e1693faaee814244ee241836af8b7c1b4ab73bbc",
+    "deps/v8/include/v8-statistics.h": "d19004841feb312c1aa53d7101bbd7c1dc6806f63150dc283d7451ddd1328260",
+    "deps/v8/include/v8-value-serializer.h": "5e046c1ab76a22a32f5acd944d6a5eb27ce73e439c171147a00fb4ff4befecf2",
+    "deps/v8/include/v8-wasm.h": "8eda557d23535d82f75fb67edfa0a538945cfd7fa177252d5383c3fd90dbd447",
+    "deps/v8/include/v8config.h": "d44e603e12c2e97ad4bbd70fb74411b03c74dcbf5cef622616d4a753355a1e58",
+    "deps/v8/src/snapshot/deserializer.cc": "a97071aeca7c0526d642753dc73e353c29e2c62c5027790b20bcc4e33e1fc67d",
+    "deps/v8/src/snapshot/deserializer.h": "02f47227eccab913b83b6b1824f8a62cfe32e64ea57ba0dcf62adc9f859485d3",
+    "deps/v8/third_party/abseil-cpp/absl/time/internal/cctz/src/time_zone_lookup.cc": "1d9d54c95b2bafa21ca022402ddc544c9064243a4c9d5164da9aae44ebcec248",
+    "deps/v8/third_party/rapidhash-v8/secret.h": "3bfefb85a4d7c89675cb8f96eca96a4ed0f7b49be442fa1cbcd4b35da40299a7",
+    "lib/internal/encoding/single-byte.js": "23767cd444894064724496913e1ee9803b70e46f7c31242d2570531b05afeb16",
+    "node.gyp": "b7a76f7b1ae384b66583a6130cf2ce05af85637efc098a739f5513ae9e99f58f",
+    "node.gypi": "fae2a92b9efb22d9c72f74b19476706efc9828fb2f034d9a710cf63585211d14",
+    "src/crypto/crypto_context.cc": "cfcaf08670b10e4162ff8df1b8c6d25f9a90604bbf130506492a08704b8aaa81",
+    "src/node.cc": "8437482e4eb72baf60bd9276ae38068c1a39a0202a7e484942d8004f0edfa777",
+    "src/node.h": "0e8e79bc565ccb0b027546316ccbe8557668f23a790fa35f2c787a24929ff10d",
+    "src/node_darwin_frameworks.cc": "7baba99a77b292e8597aded59c1d4f2ed02020eba8a10a764adbd2ab4f062aff",
+    "src/node_darwin_frameworks.h": "97274071576c6af6a2c1ef1451cc45421705752a10bb74cb9630cd96f7312414",
+    "src/node_object_wrap.h": "6cfd4fb660da1150e16a9f7b23a7302b061683255fac86bc35ac709e95852442",
+    "src/node_options.cc": "d0eff43e957a5e2741a31c8d2be9f1bc908803f7153a70225bda99fd451f15e7",
+    "src/node_options.h": "abfd71b821ae7039dbb4c9a258147ba435831e74cbbb1278f1a65233e27e55dd",
+    "src/node_postmortem_metadata.cc": "16a3d36088c7e335d83067ff6d0972b7addcb627af2845ff8eb8b92463c973c5",
+    "src/node_sea_bin.cc": "8fdefcbe92f4cb770fd7bad6272a008ad73c60d8a7f8d67d7afe2ee157082c57",
+    "test/cctest/test_hash_montgomery.cc": "5b40e5156e6afcdc92b33ad3c4a44516c3aa3c8c89af70f7e0f860630e1435c2",
+    "test/cctest/test_hash_secret.cc": "5350efbceb52af51acb9f2cc96592dcf86cc40a9c64cae4c4118ca8475c970ca",
+    "test/cctest/test_hash_small_factors.cc": "f8820131dc963de39ade49207d8ea8f7aa5e4bbb0f3160bf35b2c94cd6d5c2fd",
+    "test/cctest/test_postmortem_exports.cc": "13d8b0db19b3f453719e4206fb8d84e4096afb38ed6499e8a6fd53ac912ae2df",
+    "test/parallel/test-options-help-storage.js": "2caa20771059bcc8f2c38695c414e8a353eac17f8f823e88a80c65b92c9d065f",
+    "tools/icu/icu-generic.gyp": "17f6f42443a5dc09f6a6c7a28aeea0a51a84ada3f44734a97036e016e098e5ca",
+    "tools/v8_gypfiles/abseil.gyp": "e04d467d83d51d0e24f06a21442d1df972891ed34eb98046f670a0375dd6d95d"
+  },
+  "patches": [
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "01-build-darwin-thinlto-pgo.patch",
+      "from_tree": "2c347a0a1c243e0157f4cd918c5213215b406488",
+      "sha256": "3757141678773e23a85c865c70e63e0bc1c43ba7eac0f0e3061a60c75e493f64",
+      "standalone_apply_check": true,
+      "to_tree": "1e0a2a550b5a3ed5e3960a84dac7b3a60ce227a4"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "02-build-darwin-private-symbols.patch",
+      "from_tree": "1e0a2a550b5a3ed5e3960a84dac7b3a60ce227a4",
+      "sha256": "12147c4bb8e7aa2895f601444522a7921f9b4ea3a62211b53fd7f0c448cde939",
+      "standalone_apply_check": true,
+      "to_tree": "e5ab6348aecbce33c0a91e3f154f5d0a841a4122"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "03-deps-rapidhash-native128.patch",
+      "from_tree": "e5ab6348aecbce33c0a91e3f154f5d0a841a4122",
+      "sha256": "bfa8e3cd4e8ab7dec6933dfb622bea18656678bf22c91c9933937a3a60d30ed3",
+      "standalone_apply_check": true,
+      "to_tree": "e228b384af55bed1ba5cc78f755e5e0f3be779e5"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "04-src-option-help-views.patch",
+      "from_tree": "e228b384af55bed1ba5cc78f755e5e0f3be779e5",
+      "sha256": "290355ca3e9abbf713fb4f33f427429f5325f541748e37563157839ecfc75182",
+      "standalone_apply_check": true,
+      "to_tree": "f6c7a08a05323ee90f5355719468e295f37d75cf"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "05-src-earlier-abseil-policy.patch",
+      "from_tree": "f6c7a08a05323ee90f5355719468e295f37d75cf",
+      "sha256": "205417225d66d2023ea832060b6f172d9128cd1eb324888d4b5b0a94f1e7799f",
+      "standalone_apply_check": true,
+      "to_tree": "7c42bdc14caa2f0d2e24d572523e502146610f11"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "06-deps-v8-fixed-raw-dispatch.patch",
+      "from_tree": "7c42bdc14caa2f0d2e24d572523e502146610f11",
+      "sha256": "07986e064170d67a3257ee61cb2764a81f52a582311e92fcee1ba9409b369463",
+      "standalone_apply_check": true,
+      "to_tree": "4108909f40432d9b982a338670bfa7246b33d575"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "07-deps-cctz-lazy-corefoundation.patch",
+      "from_tree": "4108909f40432d9b982a338670bfa7246b33d575",
+      "sha256": "826693e594e95a86f038d492843160b4cf83342a5f7b4b6468a8a9a4ff555942",
+      "standalone_apply_check": true,
+      "to_tree": "614f76ffc1c51e7047b5dfeec044491abe064ea6"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "08-crypto-lazy-darwin-frameworks.patch",
+      "from_tree": "614f76ffc1c51e7047b5dfeec044491abe064ea6",
+      "sha256": "9b36d38ce193e7f611f6b5b4f1070d96c27aa9940ef69749218ce75956d41812",
+      "standalone_apply_check": true,
+      "to_tree": "b82772654192855bfbec0f42b40fa875e0782327"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "09-build-private-bundled-icu.patch",
+      "from_tree": "b82772654192855bfbec0f42b40fa875e0782327",
+      "sha256": "893d640881a7b260afec86fff4089aebf0d11f3540e1d2bb3eb4b428d9e6f49e",
+      "standalone_apply_check": true,
+      "to_tree": "e5d0fce0cc41ead7e73bf0804b26336be74fdf0e"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "10-lib-compact-encoding-tables.patch",
+      "from_tree": "e5d0fce0cc41ead7e73bf0804b26336be74fdf0e",
+      "sha256": "2cebdd5ceff066a3090369ebaf50d5f2652fbf05f08478bd1b0ec8b3886d8947",
+      "standalone_apply_check": true,
+      "to_tree": "70ef3c415cb768851b0f2dc799146017f1fd4339"
+    },
+    {
+      "checked_dependency_order": [],
+      "dependencies": [],
+      "dependency_apply_check": true,
+      "file": "11-crypto-darwin-exit-registration.patch",
+      "from_tree": "70ef3c415cb768851b0f2dc799146017f1fd4339",
+      "sha256": "7cf5152215b127deb712aa52f0ba00505319d2d273b061698ad9227b6dc19df8",
+      "standalone_apply_check": true,
+      "to_tree": "56e86a0804f7808cf8e28f3ce649043612c918a7"
+    },
+    {
+      "checked_dependency_order": [
+        3
+      ],
+      "dependencies": [
+        3
+      ],
+      "dependency_apply_check": true,
+      "file": "12-deps-rapidhash-small-factor-screen.patch",
+      "from_tree": "56e86a0804f7808cf8e28f3ce649043612c918a7",
+      "sha256": "f43f965bad950f75d9aa3ec058721bc2b4378d8c55bb2f56eb40fe5815f369d1",
+      "standalone_apply_check": true,
+      "to_tree": "18a261d8f6e037eb2696fdc966241a687a675319"
+    },
+    {
+      "checked_dependency_order": [
+        3,
+        12
+      ],
+      "dependencies": [
+        3,
+        12
+      ],
+      "dependency_apply_check": true,
+      "file": "13-deps-rapidhash-montgomery.patch",
+      "from_tree": "18a261d8f6e037eb2696fdc966241a687a675319",
+      "sha256": "310a9a10cc947539706d3a0fd523d820004f1b21b2381b202d21998c2b039d92",
+      "standalone_apply_check": true,
+      "to_tree": "afd1ba169e821ef5237d13ee1a0318f4e2298058"
+    },
+    {
+      "checked_dependency_order": [
+        1,
+        2
+      ],
+      "dependencies": [
+        1,
+        2
+      ],
+      "dependency_apply_check": true,
+      "file": "14-build-darwin-trained-order.patch",
+      "from_tree": "afd1ba169e821ef5237d13ee1a0318f4e2298058",
+      "sha256": "b8c63ce94ad9d7f1061951ddc3c3db322a414482d0beb03deea2325336bfe71f",
+      "standalone_apply_check": false,
+      "standalone_context_notes": "error: patch failed: common.gypi:13\nerror: common.gypi: patch does not apply\nerror: patch failed: configure.py:2005\nerror: configure.py: patch does not apply\nerror: patch failed: node.gyp:641\nerror: node.gyp: patch does not apply\n",
+      "to_tree": "64d1338f925bea24df17ad2683bb2bb27cecae0a"
+    },
+    {
+      "checked_dependency_order": [
+        1,
+        2,
+        9,
+        14
+      ],
+      "dependencies": [
+        1,
+        2,
+        9,
+        14
+      ],
+      "dependency_apply_check": true,
+      "file": "15-build-bounded-whole-program-vtables.patch",
+      "from_tree": "64d1338f925bea24df17ad2683bb2bb27cecae0a",
+      "sha256": "eedfccecdcdced202d6a98ce54b5b4c9a4af30d52c25984a0d9d08ee40e124d1",
+      "standalone_apply_check": false,
+      "standalone_context_notes": "error: patch failed: common.gypi:13\nerror: common.gypi: patch does not apply\n",
+      "to_tree": "3caaff2173e0fde07da451409d5979ed17a62dbb"
+    }
+  ],
+  "resulting_tree": "3caaff2173e0fde07da451409d5979ed17a62dbb",
+  "scope": "Unsigned ordered patch series, with dependencies disclosed; no commits or external submission.",
+  "source_patch_sha256": "54fb80e50d2ec8ca1a340d9dd374ec50d3905148ffbfd89ab05159ccdce2f514"
+}

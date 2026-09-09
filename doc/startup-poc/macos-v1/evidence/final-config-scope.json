@@ -1,0 +1,76 @@
+{
+  "manifests": {
+    "baseline": {
+      "binary": "<workspace>/artifacts/node-pristine-pgo-use",
+      "binary_bytes": 119326280,
+      "binary_sha256": "836ec5f8f76b35f46e8c7badd8d4a9e6a03fc6841d85155ffecf6232281f6eb8",
+      "build_command": "Python argv configure and CCACHE_DISABLE=1 ninja -C out/Release -j4 node cctest embedtest using the frozen named PGO profile recorded in config.gypi",
+      "build_ninja_sha256": "96f583173e03634736e3b4a01139df3e9a57800077944e5d86300bce07314d38",
+      "config_sha256": "612eca91ac37918e878e9c5438e43c12fde73d237bc66971e974f3ae840ba9f0",
+      "head": "8af75451e9041cd6058080ad3d4a65546797b418",
+      "node_ninja_sha256": "601a2fe9b74bbfce5b6e84e5e6bd6b7c853d3fdb07ee781392ff4c034fceba4e",
+      "recorded_at_utc": "2026-09-07T04:21:26.575478+00:00",
+      "schema": 1,
+      "source": "<workspace>/worktrees/upstream",
+      "source_patch_sha256": "bb73fd419dd90532ec860fe78762855cf7bd0fe3bb796e4846ebaa178ac8b4fb",
+      "status": " M common.gypi\n M configure.py\n M node.gyp\n",
+      "untracked": [],
+      "v8_base_ninja_sha256": "af8a0dded66c837e0ad5f1fc815f32f50d1c51594f08620b0dbb08369a2a6fae",
+      "version": "v27.0.0-pre"
+    },
+    "candidate": {
+      "binary": "<workspace>/artifacts/node-defensible-v1",
+      "binary_bytes": 116736552,
+      "binary_sha256": "f7845d078891ed853f9cdc0e7d38f105bd7bec9c7ac9d16a5978f6bc7a469d42",
+      "build_command": "configure --ninja --enable-thin-lto --enable-pgo-use --pgo-profile PROFILE --use-darwin-order-file ORDER; ninja -C out/Release -j2 node cctest embedtest",
+      "build_ninja_sha256": "35b7071b38f170747d3d5be0586f85b806902dce820d19c15b3f3850ac0fef27",
+      "config_sha256": "c1d4dc1e42bb24a3c74622acbb075bc55ebbcbf9e29f4bfbe8e6912adb64a901",
+      "head": "8af75451e9041cd6058080ad3d4a65546797b418",
+      "node_ninja_sha256": "a29ef478bd2e32589eb60a7c4057794dd41b3148ae79a9983db81ac2e0d7dba3",
+      "recorded_at_utc": "2026-09-07T20:13:14.127440+00:00",
+      "schema": 1,
+      "source": "<workspace>/node",
+      "source_patch_sha256": "54fb80e50d2ec8ca1a340d9dd374ec50d3905148ffbfd89ab05159ccdce2f514",
+      "status": " M common.gypi\n M configure.py\n M deps/ada/ada.gyp\n M deps/openssl/openssl/crypto/init.c\n M deps/v8/include/cppgc/custom-space.h\n M deps/v8/include/cppgc/garbage-collected.h\n M deps/v8/include/cppgc/heap.h\n M deps/v8/include/cppgc/name-provider.h\n M deps/v8/include/cppgc/platform.h\n M deps/v8/include/cppgc/visitor.h\n M deps/v8/include/libplatform/v8-tracing.h\n M deps/v8/include/v8-array-buffer.h\n M deps/v8/include/v8-context.h\n M deps/v8/include/v8-cppgc.h\n M deps/v8/include/v8-embedder-heap.h\n M deps/v8/include/v8-extension.h\n M deps/v8/include/v8-inspector.h\n M deps/v8/include/v8-metrics.h\n M deps/v8/include/v8-microtask-queue.h\n M deps/v8/include/v8-object.h\n M deps/v8/include/v8-persistent-handle.h\n M deps/v8/include/v8-platform.h\n M deps/v8/include/v8-primitive.h\n M deps/v8/include/v8-profiler.h\n M deps/v8/include/v8-script.h\n M deps/v8/include/v8-statistics.h\n M deps/v8/include/v8-value-serializer.h\n M deps/v8/include/v8-wasm.h\n M deps/v8/include/v8config.h\n M deps/v8/src/snapshot/deserializer.cc\n M deps/v8/src/snapshot/deserializer.h\n M deps/v8/third_party/abseil-cpp/absl/time/internal/cctz/src/time_zone_lookup.cc\n M deps/v8/third_party/rapidhash-v8/secret.h\n M lib/internal/encoding/single-byte.js\n M node.gyp\n M node.gypi\n M src/crypto/crypto_context.cc\n M src/node.cc\n M src/node.h\n M src/node_object_wrap.h\n M src/node_options.cc\n M src/node_options.h\n M src/node_postmortem_metadata.cc\n M src/node_sea_bin.cc\n M tools/icu/icu-generic.gyp\n M tools/v8_gypfiles/abseil.gyp\n?? src/node_darwin_frameworks.cc\n?? src/node_darwin_frameworks.h\n?? test/cctest/test_hash_montgomery.cc\n?? test/cctest/test_hash_secret.cc\n?? test/cctest/test_hash_small_factors.cc\n?? test/cctest/test_postmortem_exports.cc\n?? test/parallel/test-options-help-storage.js\n",
+      "untracked": [
+        {
+          "path": "src/node_darwin_frameworks.cc",
+          "sha256": "7baba99a77b292e8597aded59c1d4f2ed02020eba8a10a764adbd2ab4f062aff"
+        },
+        {
+          "path": "src/node_darwin_frameworks.h",
+          "sha256": "97274071576c6af6a2c1ef1451cc45421705752a10bb74cb9630cd96f7312414"
+        },
+        {
+          "path": "test/cctest/test_hash_montgomery.cc",
+          "sha256": "5b40e5156e6afcdc92b33ad3c4a44516c3aa3c8c89af70f7e0f860630e1435c2"
+        },
+        {
+          "path": "test/cctest/test_hash_secret.cc",
+          "sha256": "5350efbceb52af51acb9f2cc96592dcf86cc40a9c64cae4c4118ca8475c970ca"
+        },
+        {
+          "path": "test/cctest/test_hash_small_factors.cc",
+          "sha256": "f8820131dc963de39ade49207d8ea8f7aa5e4bbb0f3160bf35b2c94cd6d5c2fd"
+        },
+        {
+          "path": "test/cctest/test_postmortem_exports.cc",
+          "sha256": "13d8b0db19b3f453719e4206fb8d84e4096afb38ed6499e8a6fd53ac912ae2df"
+        },
+        {
+          "path": "test/parallel/test-options-help-storage.js",
+          "sha256": "2caa20771059bcc8f2c38695c414e8a353eac17f8f823e88a80c65b92c9d065f"
+        }
+      ],
+      "v8_base_ninja_sha256": "93d5f7fb09dde662ddc1ed9dd3e984d0b51f7d021bcd12362b5e0e6082c6f3fa",
+      "version": "v27.0.0-pre"
+    }
+  },
+  "only_config_delta": {
+    "node_darwin_order_file": "<workspace>/artifacts/temporal-layout-fork/mapping/startup-temporal.order",
+    "node_darwin_order_file_input": "$!PRODUCT_DIR/<workspace>/artifacts/temporal-layout-fork/mapping/startup-temporal.order",
+    "node_use_darwin_order_file": "true",
+    "node_whole_program_vtables": "true"
+  },
+  "same_profile": true
+}

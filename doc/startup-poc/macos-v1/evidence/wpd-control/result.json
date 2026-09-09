@@ -1,0 +1,262 @@
+{
+  "events": [
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "--version"
+      ],
+      "log": "compiler.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-dynamiclib",
+        "plugin.cc",
+        "-o",
+        "control.dylib"
+      ],
+      "log": "control-plugin-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "main.cc",
+        "call.cc",
+        "-o",
+        "control"
+      ],
+      "log": "control-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "<workspace>/artifacts/whole-program-vtables-probe-sdk/control",
+        "<workspace>/artifacts/whole-program-vtables-probe-sdk/control.dylib"
+      ],
+      "log": "control-run.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "xcrun",
+        "otool",
+        "-tvV",
+        "control"
+      ],
+      "log": "control-disassembly.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-S",
+        "-emit-llvm",
+        "call.cc",
+        "-o",
+        "control.ll"
+      ],
+      "log": "control-ir-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-fwhole-program-vtables",
+        "-dynamiclib",
+        "plugin.cc",
+        "-o",
+        "hidden.dylib"
+      ],
+      "log": "hidden-plugin-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-fwhole-program-vtables",
+        "main.cc",
+        "call.cc",
+        "-o",
+        "hidden"
+      ],
+      "log": "hidden-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "<workspace>/artifacts/whole-program-vtables-probe-sdk/hidden",
+        "<workspace>/artifacts/whole-program-vtables-probe-sdk/hidden.dylib"
+      ],
+      "log": "hidden-run.txt",
+      "returncode": 6
+    },
+    {
+      "argv": [
+        "xcrun",
+        "otool",
+        "-tvV",
+        "hidden"
+      ],
+      "log": "hidden-disassembly.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-fwhole-program-vtables",
+        "-S",
+        "-emit-llvm",
+        "call.cc",
+        "-o",
+        "hidden.ll"
+      ],
+      "log": "hidden-ir-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-fwhole-program-vtables",
+        "-DPUBLIC_LTO",
+        "-dynamiclib",
+        "plugin.cc",
+        "-o",
+        "public.dylib"
+      ],
+      "log": "public-plugin-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-fwhole-program-vtables",
+        "-DPUBLIC_LTO",
+        "main.cc",
+        "call.cc",
+        "-o",
+        "public"
+      ],
+      "log": "public-build.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "<workspace>/artifacts/whole-program-vtables-probe-sdk/public",
+        "<workspace>/artifacts/whole-program-vtables-probe-sdk/public.dylib"
+      ],
+      "log": "public-run.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "xcrun",
+        "otool",
+        "-tvV",
+        "public"
+      ],
+      "log": "public-disassembly.txt",
+      "returncode": 0
+    },
+    {
+      "argv": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+        "-std=c++20",
+        "-O3",
+        "-fvisibility=hidden",
+        "-flto=thin",
+        "-fwhole-program-vtables",
+        "-DPUBLIC_LTO",
+        "-S",
+        "-emit-llvm",
+        "call.cc",
+        "-o",
+        "public.ll"
+      ],
+      "log": "public-ir-build.txt",
+      "returncode": 0
+    }
+  ],
+  "sha256": {
+    "base.h": "9364478bab8eedd943399764b698941a62dfb19294be0c65b6487b7b8c57cefd",
+    "call.cc": "bc1ee88abdc45301e7c8e1f726a42227b52415663c3b58e55d4fe7ff4f470c22",
+    "compiler.txt": "042af9433fb0dd5784acb36e7f4de32c0c64bb8a17741dc90013c2895d32855a",
+    "control": "3b965b5648b5ded262ae40cb17c82350b02d3b31c03deebc7ff77c55f0a67d50",
+    "control-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "control-disassembly.txt": "a37dee356837806bce676d5ebc95a613754a92c6d6529577796ee49b2fd577d5",
+    "control-ir-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "control-plugin-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "control-run.txt": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+    "control.dylib": "90e22a0f568aa4a7e0a19d7dc4ee4a6352e957f5ae5be4aee8a4d2e4a65e9b93",
+    "control.ll": "aef589d387179befa6d78580d50432f87bed523968ec87010d3ed2d0798e1955",
+    "hidden": "4c5bd55b57f6863e4cb0e1e2e004e2d40ee32efd1beaf408793a80e3a3247b7c",
+    "hidden-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hidden-disassembly.txt": "0b8f16c8410ffc4ef915476185dd1c111bae39cafc013a35751bef950e385732",
+    "hidden-ir-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hidden-plugin-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hidden-run.txt": "b85644b5a6f2b2c6cc73a1cd69e963b459343f520716a7e7998fa48a6662bef5",
+    "hidden.dylib": "ab2b89660c63f287e53fa5e5fb832128129c7711393635946e46fd5d2976f744",
+    "hidden.ll": "96842f1480bd8c295dc9ba23d3287a162145a6988d66946e8d06bd53fe6b56d6",
+    "main.cc": "ed57f3dc521122b080f253a83f75fd3f87bd667859f8cbeff94c9fc80a400de6",
+    "plugin.cc": "a4cfc95b2d6fca9c23bc20a933f3c6da4268c37f913375f4c05276a8d24d8161",
+    "public": "ed2cca2d3ddd98c02fb1e81edd5504bf4a82f49fd3d437294b925a9ac6fe3586",
+    "public-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public-disassembly.txt": "df6929df33a5391270c3331656bdfc5252e39ed923d12166c3f843f647e0efa2",
+    "public-ir-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public-plugin-build.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public-run.txt": "e7ec653eb4530b66480d3d857bfce05a43da2e0de3b10f6f35c3941964509453",
+    "public.dylib": "118d31415072aff02c731986ebea74002f6891333b0162cd7c8de3cfa5fff23c",
+    "public.ll": "7ff944f0569afc2f0d992d493efd06fa952cb9279ea32f012f74134fa1d1cd7e"
+  }
+}

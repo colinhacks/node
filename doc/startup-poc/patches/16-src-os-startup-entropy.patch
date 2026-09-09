@@ -1,0 +1,203 @@
+diff --git a/src/node.cc b/src/node.cc
+index a842a59..d8b2d36 100644
+--- a/src/node.cc
++++ b/src/node.cc
+@@ -49,6 +49,9 @@
+ 
+ #if HAVE_OPENSSL
+ #include "ncrypto.h"
++#if OPENSSL_VERSION_MAJOR >= 3
++#include <openssl/provider.h>
++#endif
+ #include "node_crypto.h"
+ #if OPENSSL_VERSION_MAJOR >= 3 && !defined(CONF_MFLAGS_IGNORE_MISSING_FILE)
+ // OpenSSL hides this deprecated macro under OPENSSL_NO_DEPRECATED, but the
+@@ -1259,8 +1262,22 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
+     }
+     crypto::InstallFipsIndicatorCallback();
+ 
+-    // Ensure CSPRNG is properly seeded.
+-    CHECK(ncrypto::CSPRNG(nullptr, 0));
++    // Activating the default provider here keeps --openssl-legacy-provider
++    // working. Its explicit load disables OpenSSL's fallback, and the eager
++    // CSPRNG check used to activate the provider as a side effect. Only
++    // check the seeding when that provider is missing or FIPS is on, so a
++    // configuration without a DRBG still aborts at startup instead of
++    // hanging at the first crypto call. Otherwise the DRBG is instantiated
++    // on first use.
++#if OPENSSL_VERSION_MAJOR >= 3
++    const bool check_csprng = ncrypto::isFipsEnabled() ||
++                              !OSSL_PROVIDER_available(nullptr, "default");
++#else
++    const bool check_csprng = true;
++#endif
++    if (check_csprng) {
++      CHECK(ncrypto::CSPRNG(nullptr, 0));
++    }
+ #endif  // !defined(OPENSSL_IS_BORINGSSL)
+ #endif  // HAVE_OPENSSL
+   }
+@@ -1276,12 +1293,19 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
+ #if HAVE_OPENSSL
+   if (!(flags & ProcessInitializationFlags::kNoInitOpenSSL)) {
+ #ifndef OPENSSL_IS_BORINGSSL
++    // V8 uses the entropy for hash seeds, ASLR and Math.random(), none of
++    // it cryptographic. Going through OpenSSL would instantiate the DRBG
++    // and build the default provider's algorithm tables on every startup.
++    // V8 falls back to very weak entropy when the source fails, so abort
++    // instead.
+     V8::SetEntropySource([](unsigned char* buffer, size_t length) {
+-      // V8 falls back to very weak entropy when this function fails
+-      // and /dev/urandom isn't available. That wouldn't be so bad if
+-      // the entropy was only used for Math.random() but it's also used for
+-      // hash table and address space layout randomization. Better to abort.
++#ifdef _AIX
++      // uv_random() reads /dev/random on AIX, which blocks. OpenSSL seeds
++      // from /dev/urandom there.
+       CHECK(ncrypto::CSPRNG(buffer, length));
++#else
++      CHECK_EQ(uv_random(nullptr, nullptr, buffer, length, 0, nullptr), 0);
++#endif
+       return true;
+     });
+ #endif  // !defined(OPENSSL_IS_BORINGSSL)
+diff --git a/test/fixtures/openssl3-conf/random_unavailable.cnf b/test/fixtures/openssl3-conf/random_unavailable.cnf
+new file mode 100644
+index 000000000000..a2dc8d2c9ffa
+--- /dev/null
++++ b/test/fixtures/openssl3-conf/random_unavailable.cnf
+@@ -0,0 +1,7 @@
++nodejs_conf = nodejs_init
++
++[nodejs_init]
++random = random_sect
++
++[random_sect]
++random = NO-SUCH-DRBG
+diff --git a/test/parallel/test-crypto-startup-entropy.js b/test/parallel/test-crypto-startup-entropy.js
+new file mode 100644
+index 000000000000..70b91ab5d561
+--- /dev/null
++++ b/test/parallel/test-crypto-startup-entropy.js
+@@ -0,0 +1,121 @@
++'use strict';
++
++const common = require('../common');
++if (!common.hasCrypto)
++  common.skip('missing crypto');
++
++const {
++  hasOpenSSL,
++  isBoringSSL,
++} = require('../common/crypto');
++
++if (common.isAIX)
++  common.skip('AIX retains OpenSSL for V8 entropy');
++
++if (isBoringSSL)
++  common.skip('BoringSSL does not have OpenSSL providers');
++
++if (!hasOpenSSL(3))
++  common.skip('this test requires OpenSSL 3.x');
++
++const crypto = require('node:crypto');
++if (crypto.getFips())
++  common.skip('this test cannot be run in FIPS mode');
++
++const assert = require('node:assert/strict');
++const { spawnSync } = require('node:child_process');
++const fixtures = require('../common/fixtures');
++
++const timeout = common.platformTimeout(10_000);
++
++function runSecureHeapWorkers() {
++  const { Worker } = require('node:worker_threads');
++  const workers = 8;
++
++  for (let i = 0; i < workers; i++) {
++    const worker = new Worker(`
++      const { parentPort } = require('node:worker_threads');
++      try {
++        require('node:crypto').randomBytes(4);
++        parentPort.postMessage({ ok: true });
++      } catch (err) {
++        if (err.code !== 'ERR_OSSL_CRYPTO_SECURE_MALLOC_FAILURE') throw err;
++        parentPort.postMessage({ error: err.code });
++      }
++    `, { eval: true });
++
++    worker.on('error', common.mustNotCall());
++    worker.on('message', common.mustCall((message) => {
++      assert(message.ok === true ||
++             message.error === 'ERR_OSSL_CRYPTO_SECURE_MALLOC_FAILURE');
++    }));
++    worker.on('exit', common.mustCall((code) => {
++      assert.strictEqual(code, 0);
++    }));
++  }
++}
++
++if (process.argv[2] === 'secure-heap-workers') {
++  runSecureHeapWorkers();
++  return;
++}
++
++function run(args) {
++  const child = spawnSync(process.execPath, args, {
++    encoding: 'utf8',
++    timeout,
++  });
++  assert.ifError(child.error);
++  assert.strictEqual(child.signal, null,
++                     `child timed out or crashed: ${child.stderr}`);
++  return child;
++}
++
++function assertHash(args, expected) {
++  const includeMd4 = Object.hasOwn(expected, 'md4');
++  const child = run([...args, '-e', `
++    const crypto = require('node:crypto');
++    const result = {
++      sha256: crypto.createHash('sha256').update('abc').digest('hex'),
++    };
++    if (${includeMd4})
++      result.md4 = crypto.createHash('md4').update('abc').digest('hex');
++    process.stdout.write(JSON.stringify(result));
++  `]);
++  assert.strictEqual(child.status, 0, child.stderr);
++  assert.deepStrictEqual(JSON.parse(child.stdout), expected);
++}
++
++// Crypto remains available after entropy is supplied to V8 from the OS.
++assertHash([], {
++  sha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
++});
++
++// Explicitly loading the legacy provider must not hide the default provider.
++assertHash(['--openssl-legacy-provider'], {
++  sha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
++  md4: 'a448017aaf21d8525fc10ae87aa6729d',
++});
++
++{
++  // An unfetchable DRBG must not abort before JavaScript or hang. The deferred
++  // OpenSSL crypto call reports the provider error instead.
++  const randomConf = fixtures.path('openssl3-conf', 'random_unavailable.cnf');
++  const child = run([`--openssl-config=${randomConf}`, '-e', `
++    process.stdout.write('started\\n');
++    require('node:crypto').randomBytes(8);
++  `]);
++  assert.strictEqual(child.status, 1, child.stderr);
++  assert.match(child.stdout, /^started$/m);
++  assert.match(child.stderr, /unable to fetch drbg/i);
++}
++
++if (!common.isWindows && !common.isASan) {
++  const child = run([
++    '--secure-heap=1024',
++    '--secure-heap-min=4',
++    __filename,
++    'secure-heap-workers',
++  ]);
++  assert.strictEqual(child.status, 0, child.stderr);
++}

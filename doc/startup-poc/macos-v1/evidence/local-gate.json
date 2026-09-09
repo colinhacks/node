@@ -1,0 +1,26 @@
+{
+  "baseline_reproduced_timeout": false,
+  "binary_sha256": "f7845d078891ed853f9cdc0e7d38f105bd7bec9c7ac9d16a5978f6bc7a469d42",
+  "build_manifest_sha256": "e0a3ed7b1fa90b81c0b4920d68b2121526eb50ec6f61e5e138e9e0740d1176ec",
+  "full_failures": [],
+  "full_passed": true,
+  "full_plan": 6173,
+  "full_selection": [
+    "default",
+    "pummel",
+    "addons",
+    "ffi",
+    "js-native-api",
+    "node-api",
+    "embedding",
+    "benchmark",
+    "sqlite",
+    "sea"
+  ],
+  "passed": true,
+  "remaining_gates_passed": true,
+  "scope": "Local macOS release gates, not the complete cross-platform Node CI matrix.",
+  "skip_parser_correction": "Counted case-insensitive TAP directives from unchanged full.log; the initial uppercase-only parser missed lowercase # skip directives.",
+  "skipped": 370,
+  "todos": 11
+}

@@ -1,0 +1,83 @@
+diff --git a/common.gypi b/common.gypi
+index 47c1d0c..a5bd335 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -208,6 +208,10 @@
+               'LLVM_LTO': 'YES',
+             },
+           }],
++          ['OS=="linux" and clang==1 and configuring_node==1 and enable_thin_lto=="true"', {
++            'cflags': ['-flto=thin'],
++            'ldflags': ['-flto=thin', '-fuse-ld=lld'],
++          }],
+           ['OS=="linux" or OS=="openharmony"', {
+             'conditions': [
+               ['node_section_ordering_info!=""', {
+diff --git a/configure.py b/configure.py
+index 99ce932..fb758ce 100755
+--- a/configure.py
++++ b/configure.py
+@@ -229,7 +229,7 @@ parser.add_argument("--enable-thin-lto",
+     dest="enable_thin_lto",
+     default=None,
+     help="Enable compiling with thin lto of a binary. This feature is only available "
+-         "on windows.")
++         "on Windows, macOS, and Linux with Clang and LLD.")
+ 
+ parser.add_argument("--lto-jobs",
+     action="store",
+@@ -1860,6 +1860,28 @@ def gcc_version_ge(version_checked):
+       return False
+   return True
+ 
++def linux_clang_20_or_newer():
++  version_checked = (20, 1, 0)
++  for compiler, language in ((CC, 'c'), (CXX, 'c++')):
++    available, is_clang, clang_version, _1, _2 = (
++      try_check_compiler(compiler, language)
++    )
++    if not available or not is_clang or clang_version < version_checked:
++      return False
++  return True
++
++
++def linux_lld_works():
++  try:
++    result = subprocess.run(
++      shlex.split(CXX) + ['-fuse-ld=lld', '-x', 'c++', '-', '-o', os.devnull],
++      input=b'int main() { return 0; }', stdout=subprocess.PIPE,
++      stderr=subprocess.PIPE, check=False)
++  except OSError:
++    return False
++  return result.returncode == 0
++
++
+ def configure_node_lib_files(o):
+   o['variables']['node_library_files'] = SearchFiles('lib', 'js')
+ 
+@@ -2026,12 +2048,22 @@ def configure_node(o):
+         '\n  '.join(candidates) +
+         '\nEnsure the ClangCL toolset is installed.')
+ 
+-  if flavor != 'win' and options.enable_thin_lto:
++  if flavor not in ('win', 'mac', 'linux') and options.enable_thin_lto:
+     raise Exception(
+-      'Use --enable-lto instead.')
++      'Use --enable-lto instead, or Linux Clang and LLD.')
++
++  if flavor == 'linux' and options.enable_thin_lto:
++    if not linux_clang_20_or_newer():
++      raise Exception(
++        'Linux ThinLTO requires Clang 20.1.0 or newer for both CC and CXX.')
++    if not linux_lld_works():
++      raise Exception('Linux ThinLTO requires a working LLD selected by -fuse-ld=lld.')
++
++  if flavor != 'win' and options.lto_jobs is not None:
++    raise Exception('--lto-jobs is only supported on Windows.')
+ 
+   # LTO mutual exclusion
+-  if flavor == 'win':
++  if flavor in ('win', 'mac', 'linux'):
+     lto_options = []
+     if options.enable_lto:
+       lto_options.append('--enable-lto')

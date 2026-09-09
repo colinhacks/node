@@ -1,0 +1,787 @@
+{
+  "actual_gyp_cases": [
+    {
+      "commands": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "<workspace>/node/tools/gyp/gyp_main.py",
+        "-f",
+        "ninja",
+        "--depth=.",
+        "-I",
+        "<temporary>",
+        "-I",
+        "<workspace>/artifacts/defensible-source-preparation-v2/source/common.gypi",
+        "-Dconfiguring_node=0",
+        "probe.gyp"
+      ],
+      "configuring_node": 0,
+      "enabled": false,
+      "files": {
+        "abseil": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/abseil.main.o: cxx ../../main.cc\n\nbuild libabseil.a: alink obj/abseil.main.o\n",
+        "icui18n": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/icui18n.main.o: cxx ../../main.cc\n\nbuild libicui18n.a: alink obj/icui18n.main.o\n",
+        "lief": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/lief.main.o: cxx ../../main.cc\n\nbuild liblief.a: alink obj/lief.main.o\n",
+        "node_base": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/node_base.main.o: cxx ../../main.cc\n\nbuild libnode_base.a: alink obj/node_base.main.o\n",
+        "v8_probe": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/v8_probe.main.o: cxx ../../main.cc\n\nbuild libv8_probe.a: alink obj/v8_probe.main.o\n"
+      },
+      "targets_with_wpd": []
+    },
+    {
+      "commands": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "<workspace>/node/tools/gyp/gyp_main.py",
+        "-f",
+        "ninja",
+        "--depth=.",
+        "-I",
+        "<temporary>",
+        "-I",
+        "<workspace>/artifacts/defensible-source-preparation-v2/source/common.gypi",
+        "-Dconfiguring_node=1",
+        "probe.gyp"
+      ],
+      "configuring_node": 1,
+      "enabled": false,
+      "files": {
+        "abseil": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions -flto=thin\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/abseil.main.o: cxx ../../main.cc\n\nbuild libabseil.a: alink obj/abseil.main.o\n",
+        "icui18n": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions -flto=thin\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/icui18n.main.o: cxx ../../main.cc\n\nbuild libicui18n.a: alink obj/icui18n.main.o\n",
+        "lief": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions -flto=thin\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/lief.main.o: cxx ../../main.cc\n\nbuild liblief.a: alink obj/lief.main.o\n",
+        "node_base": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions -flto=thin\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/node_base.main.o: cxx ../../main.cc\n\nbuild libnode_base.a: alink obj/node_base.main.o\n",
+        "v8_probe": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions -flto=thin\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/v8_probe.main.o: cxx ../../main.cc\n\nbuild libv8_probe.a: alink obj/v8_probe.main.o\n"
+      },
+      "targets_with_wpd": []
+    },
+    {
+      "commands": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "<workspace>/node/tools/gyp/gyp_main.py",
+        "-f",
+        "ninja",
+        "--depth=.",
+        "-I",
+        "<temporary>",
+        "-I",
+        "<workspace>/artifacts/defensible-source-preparation-v2/source/common.gypi",
+        "-Dconfiguring_node=0",
+        "probe.gyp"
+      ],
+      "configuring_node": 0,
+      "enabled": true,
+      "files": {
+        "abseil": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/abseil.main.o: cxx ../../main.cc\n\nbuild libabseil.a: alink obj/abseil.main.o\n",
+        "icui18n": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/icui18n.main.o: cxx ../../main.cc\n\nbuild libicui18n.a: alink obj/icui18n.main.o\n",
+        "lief": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/lief.main.o: cxx ../../main.cc\n\nbuild liblief.a: alink obj/lief.main.o\n",
+        "node_base": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/node_base.main.o: cxx ../../main.cc\n\nbuild libnode_base.a: alink obj/node_base.main.o\n",
+        "v8_probe": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = \ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/v8_probe.main.o: cxx ../../main.cc\n\nbuild libv8_probe.a: alink obj/v8_probe.main.o\n"
+      },
+      "targets_with_wpd": []
+    },
+    {
+      "commands": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "<workspace>/node/tools/gyp/gyp_main.py",
+        "-f",
+        "ninja",
+        "--depth=.",
+        "-I",
+        "<temporary>",
+        "-I",
+        "<workspace>/artifacts/defensible-source-preparation-v2/source/common.gypi",
+        "-Dconfiguring_node=1",
+        "probe.gyp"
+      ],
+      "configuring_node": 1,
+      "enabled": true,
+      "files": {
+        "abseil": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions $\n    -flto=thin -fwhole-program-vtables\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/abseil.main.o: cxx ../../main.cc\n\nbuild libabseil.a: alink obj/abseil.main.o\n",
+        "icui18n": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions -flto=thin\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/icui18n.main.o: cxx ../../main.cc\n\nbuild libicui18n.a: alink obj/icui18n.main.o\n",
+        "lief": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions -flto=thin\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/lief.main.o: cxx ../../main.cc\n\nbuild liblief.a: alink obj/lief.main.o\n",
+        "node_base": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions $\n    -flto=thin -fwhole-program-vtables\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/node_base.main.o: cxx ../../main.cc\n\nbuild libnode_base.a: alink obj/node_base.main.o\n",
+        "v8_probe": "defines = -DNODE_OPENSSL_CONF_NAME=nodejs_conf -DICU_NO_USER_DATA_OVERRIDE $\n    -D_GLIBCXX_USE_CXX11_ABI=1 -D_FILE_OFFSET_BITS=64 $\n    -DV8_DISALLOW_JS_IN_API_INTERRUPTS_IS_CHECKED $\n    -D_DARWIN_USE_64_BIT_INODE=1 -DOPENSSL_NO_PINSHARED -DOPENSSL_THREADS\nincludes = \ncflags = -O3 -gdwarf-2 -fno-strict-aliasing -mmacosx-version-min=13.5 -arch $\n    arm64 -Wall -Wendif-labels -W -Wno-unused-parameter\ncflags_c = -flto=thin\ncflags_cc = -std=gnu++20 -stdlib=libc++ -fno-rtti -fno-exceptions $\n    -flto=thin -fwhole-program-vtables\ncflags_objc = $cflags_c\ncflags_objcc = $cflags_cc\narflags = \n\nbuild obj/v8_probe.main.o: cxx ../../main.cc\n\nbuild libv8_probe.a: alink obj/v8_probe.main.o\n"
+      },
+      "targets_with_wpd": [
+        "node_base",
+        "v8_probe",
+        "abseil"
+      ]
+    }
+  ],
+  "passed": true,
+  "policy_cases": [
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": true,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "mac",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "linux",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": false
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "false",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "false",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-generic.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "tools/icu/icu-system.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "bundled_v8": "true",
+      "enabled": false,
+      "flavor": "win",
+      "icu": "custom.gyp",
+      "shared": "true",
+      "thin": true
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_zlib"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_http_parser"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_libuv"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_abseil"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_ada"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_simdjson"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_simdutf"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_brotli"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_cares"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_gtest"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_hdr_histogram"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_highway"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_merve"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_nbytes"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_nghttp2"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_nghttp3"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_ngtcp2"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_lief"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_sqlite"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_ffi"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_temporal_capi"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_uvwasi"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_zstd"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_openssl"
+    },
+    {
+      "enabled": false,
+      "shared_dependency": "node_shared_future_dependency"
+    }
+  ]
+}

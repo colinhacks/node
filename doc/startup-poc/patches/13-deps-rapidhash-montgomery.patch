@@ -1,0 +1,219 @@
+diff --git a/deps/v8/third_party/rapidhash-v8/secret.h b/deps/v8/third_party/rapidhash-v8/secret.h
+index ecd964e4..27536394 100644
+--- a/deps/v8/third_party/rapidhash-v8/secret.h
++++ b/deps/v8/third_party/rapidhash-v8/secret.h
+@@ -115,6 +115,71 @@ static inline unsigned long long pow_mod(unsigned long long a,
+   return r;
+ }
+ 
++#if defined(__SIZEOF_INT128__)
++class MontgomeryMod {
++ public:
++  explicit MontgomeryMod(uint64_t modulus)
++      : modulus_(modulus),
++        negative_inverse_(NegativeInverse(modulus)),
++        one_(static_cast<uint64_t>((static_cast<__uint128_t>(1) << 64) %
++                                   modulus)),
++        r_squared_(static_cast<uint64_t>(
++            (static_cast<__uint128_t>(one_) * one_) % modulus)) {}
++
++  uint64_t one() const { return one_; }
++
++  uint64_t ToMontgomery(uint64_t value) const {
++    return Multiply(value % modulus_, r_squared_);
++  }
++
++  uint64_t FromMontgomery(uint64_t value) const { return Multiply(value, 1); }
++
++  uint64_t Multiply(uint64_t a, uint64_t b) const {
++    const __uint128_t product = static_cast<__uint128_t>(a) * b;
++    const uint64_t product_low = static_cast<uint64_t>(product);
++    const uint64_t product_high = static_cast<uint64_t>(product >> 64);
++    const uint64_t multiplier = product_low * negative_inverse_;
++    const __uint128_t adjustment =
++        static_cast<__uint128_t>(multiplier) * modulus_;
++    const uint64_t sum_low = product_low + static_cast<uint64_t>(adjustment);
++    const uint64_t carry = sum_low < product_low;
++    const uint64_t sum_high = product_high +
++                              static_cast<uint64_t>(adjustment >> 64);
++    const bool overflow = sum_high < product_high;
++    const uint64_t result = sum_high + carry;
++    if (overflow || result < sum_high || result >= modulus_) {
++      return result - modulus_;
++    }
++    return result;
++  }
++
++  uint64_t Power(uint64_t base, uint64_t exponent) const {
++    uint64_t result = one_;
++    base = ToMontgomery(base);
++    while (exponent) {
++      if (exponent & 1) result = Multiply(result, base);
++      exponent >>= 1;
++      if (exponent) base = Multiply(base, base);
++    }
++    return result;
++  }
++
++ private:
++  static uint64_t NegativeInverse(uint64_t modulus) {
++    uint64_t inverse = modulus;
++    for (int i = 0; i < 6; ++i) {
++      inverse *= 2 - modulus * inverse;
++    }
++    return 0 - inverse;
++  }
++
++  uint64_t modulus_;
++  uint64_t negative_inverse_;
++  uint64_t one_;
++  uint64_t r_squared_;
++};
++#endif
++
+ static unsigned sprp(unsigned long long n, unsigned long long a) {
+   unsigned long long d = n - 1;
+   unsigned char s = 0;
+@@ -134,13 +199,27 @@ static unsigned sprp(unsigned long long n, unsigned long long a) {
+     d >>= 1;
+     s += 1;
+   }
++#if defined(__SIZEOF_INT128__)
++  // is_prime only reaches sprp with an odd n, as required by Montgomery form.
++  const MontgomeryMod modulus(n);
++  unsigned long long b = modulus.Power(a, d);
++  const unsigned long long negative_one = n - modulus.one();
++  if ((b == modulus.one()) || (b == negative_one)) return 1;
++#else
+   unsigned long long b = pow_mod(a, d, n);
+   if ((b == 1) || (b == (n - 1))) return 1;
++#endif
+   unsigned char r;
+   for (r = 1; r < s; r++) {
++#if defined(__SIZEOF_INT128__)
++    b = modulus.Multiply(b, b);
++    if (b == 0 || b == modulus.one()) return 0;
++    if (b == negative_one) return 1;
++#else
+     b = mul_mod(b, b, n);
+     if (b <= 1) return 0;
+     if (b == (n - 1)) return 1;
++#endif
+   }
+   return 0;
+ }
+diff --git a/test/cctest/test_hash_montgomery.cc b/test/cctest/test_hash_montgomery.cc
+new file mode 100644
+index 00000000..649d1fb9
+--- /dev/null
++++ b/test/cctest/test_hash_montgomery.cc
+@@ -0,0 +1,109 @@
++#include <cstdint>
++
++#include "third_party/rapidhash-v8/secret.h"
++
++#include "gtest/gtest.h"
++
++#if !V8_USE_DEFAULT_HASHER_SECRET && defined(__SIZEOF_INT128__)
++namespace {
++
++uint64_t Next(uint64_t* state) {
++  *state += UINT64_C(0x9e3779b97f4a7c15);
++  uint64_t value = *state;
++  value = (value ^ (value >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
++  value = (value ^ (value >> 27)) * UINT64_C(0x94d049bb133111eb);
++  return value ^ (value >> 31);
++}
++
++uint64_t MultiplyReference(uint64_t a, uint64_t b, uint64_t modulus) {
++  return static_cast<uint64_t>((static_cast<__uint128_t>(a) * b) % modulus);
++}
++
++unsigned GenericSprp(uint64_t n, uint64_t a) {
++  uint64_t d = n - 1;
++  unsigned char s = 0;
++  while (!(d & 1)) {
++    d >>= 1;
++    ++s;
++  }
++  uint64_t value = detail::pow_mod(a, d, n);
++  if (value == 1 || value == n - 1) return 1;
++  for (unsigned char r = 1; r < s; ++r) {
++    value = detail::mul_mod(value, value, n);
++    if (value <= 1) return 0;
++    if (value == n - 1) return 1;
++  }
++  return 0;
++}
++
++bool IsSmallPrime(uint64_t n) {
++  if (n < 2) return false;
++  for (uint64_t divisor = 2; divisor <= n / divisor; ++divisor) {
++    if (n % divisor == 0) return false;
++  }
++  return true;
++}
++
++void CheckMultiply(uint64_t a, uint64_t b, uint64_t modulus) {
++  const detail::MontgomeryMod montgomery(modulus);
++  const uint64_t actual = montgomery.FromMontgomery(montgomery.Multiply(
++      montgomery.ToMontgomery(a), montgomery.ToMontgomery(b)));
++  EXPECT_EQ(actual, MultiplyReference(a, b, modulus));
++}
++
++TEST(RapidhashMontgomery, HandlesOverflowEdges) {
++  CheckMultiply(0, 0, 3);
++  CheckMultiply(UINT64_MAX, UINT64_MAX, 3);
++  CheckMultiply(UINT64_MAX - 1, UINT64_MAX - 2, UINT64_MAX);
++  CheckMultiply(UINT64_C(1) << 63, UINT64_MAX, (UINT64_C(1) << 63) | 1);
++  CheckMultiply(UINT64_MAX - 1, UINT64_MAX - 1, UINT64_MAX - 58);
++}
++
++TEST(RapidhashMontgomery, MatchesReferenceArithmetic) {
++  for (uint64_t modulus = 3; modulus < 128; modulus += 2) {
++    for (uint64_t a = 0; a < modulus; ++a) {
++      for (uint64_t b = 0; b < modulus; ++b) {
++        CheckMultiply(a, b, modulus);
++      }
++    }
++  }
++
++  uint64_t state = UINT64_C(0x0123456789abcdef);
++  for (size_t i = 0; i < 4096; ++i) {
++    const uint64_t modulus = Next(&state) | 1;
++    CheckMultiply(Next(&state), Next(&state), modulus);
++  }
++}
++
++TEST(RapidhashMontgomery, MatchesGenericPower) {
++  uint64_t state = UINT64_C(0xfedcba9876543210);
++  for (size_t i = 0; i < 4096; ++i) {
++    const uint64_t modulus = Next(&state) | 1;
++    const uint64_t base = Next(&state);
++    const uint64_t exponent = Next(&state);
++    const detail::MontgomeryMod montgomery(modulus);
++    const uint64_t actual =
++        montgomery.FromMontgomery(montgomery.Power(base, exponent));
++    EXPECT_EQ(actual, detail::pow_mod(base, exponent, modulus));
++  }
++}
++
++TEST(RapidhashMontgomery, MatchesGenericMillerRabin) {
++  constexpr uint64_t bases[] = {2, 3, 5, 37};
++  for (uint64_t n = 3; n < 4096; n += 2) {
++    EXPECT_EQ(detail::is_prime(n), IsSmallPrime(n));
++    for (uint64_t base : bases) {
++      EXPECT_EQ(detail::sprp(n, base), GenericSprp(n, base));
++    }
++  }
++
++  uint64_t state = UINT64_C(0xa5a5a5a5a5a5a5a5);
++  for (size_t i = 0; i < 1024; ++i) {
++    const uint64_t n = Next(&state) | 1;
++    const uint64_t base = Next(&state);
++    EXPECT_EQ(detail::sprp(n, base), GenericSprp(n, base));
++  }
++}
++
++}  // namespace
++#endif  // !V8_USE_DEFAULT_HASHER_SECRET && defined(__SIZEOF_INT128__)

@@ -1,0 +1,3187 @@
+diff --git a/common.gypi b/common.gypi
+index 47c1d0c0..3be1aee3 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -12,6 +12,11 @@
+     'msvs_multi_core_compile': '0',   # we do enable multicore compiles, but not using the V8 way
+     'enable_pgo_generate%': '0',
+     'enable_pgo_use%': '0',
++    'node_pgo_profile%': '',
++    'node_whole_program_vtables%': 'false',
++    'node_darwin_order_file%': '',
++    'node_darwin_order_file_input%': '',
++    'node_use_darwin_order_file%': 'false',
+     'clang_profile_lib%': '',
+     'python%': 'python',
+     'emulator%': [],
+@@ -208,6 +213,41 @@
+               'LLVM_LTO': 'YES',
+             },
+           }],
++          ['OS=="linux" and clang==1 and configuring_node==1 and enable_thin_lto=="true"', {
++            'cflags': ['-flto=thin'],
++            'ldflags': ['-flto=thin', '-fuse-ld=lld'],
++          }],
++          ['OS=="mac" and configuring_node==1 and enable_thin_lto=="true"', {
++            'xcode_settings': {
++              'OTHER_CFLAGS': ['-flto=thin'],
++            },
++          }],
++          ['OS=="mac" and configuring_node==1 and node_whole_program_vtables=="true"', {
++            'target_conditions': [
++              ['_target_name.startswith("v8_") or _target_name in ["node", "libnode", "node_base", "node_mksnapshot", "node_js2c", "cctest", "embedtest", "mksnapshot", "torque_generated_definitions", "torque_generated_initializers", "torque_base", "torque_ls_base", "torque", "torque-language-server", "bytecode_builtins_list_generator", "gen-regexp-special-case", "abseil", "simdutf", "highway"]', {
++                'xcode_settings': {
++                  'OTHER_CPLUSPLUSFLAGS': ['$(inherited)', '-fwhole-program-vtables'],
++                },
++              }],
++            ],
++          }],
++          ['OS=="mac" and configuring_node==1 and enable_pgo_generate=="true"', {
++            'xcode_settings': {
++              'OTHER_CFLAGS': ['-fprofile-generate', '-fprofile-update=atomic'],
++            },
++            'target_conditions': [
++              ['_type!="static_library"', {
++                'xcode_settings': {
++                  'OTHER_LDFLAGS': ['-fprofile-generate'],
++                },
++              }],
++            ],
++          }],
++          ['OS=="mac" and configuring_node==1 and enable_pgo_use=="true"', {
++            'xcode_settings': {
++              'OTHER_CFLAGS': ['-fprofile-use=<(node_pgo_profile)'],
++            },
++          }],
+           ['OS=="linux" or OS=="openharmony"', {
+             'conditions': [
+               ['node_section_ordering_info!=""', {
+@@ -250,7 +290,7 @@
+           },],
+           ['OS=="win"', {
+             'conditions': [
+-              ['enable_lto=="true"', {
++              ['configuring_node==1 and enable_lto=="true"', {
+                 'msvs_settings': {
+                   'VCCLCompilerTool': {
+                     'AdditionalOptions': ['-flto=full'],
+@@ -263,7 +303,7 @@
+                   },
+                 },
+               },],
+-              ['enable_thin_lto=="true"', {
++              ['configuring_node==1 and enable_thin_lto=="true"', {
+                 'msvs_settings': {
+                   'VCCLCompilerTool': {
+                     'AdditionalOptions': ['-flto=thin'],
+@@ -276,7 +316,7 @@
+                   },
+                 },
+               },],
+-              ['(enable_thin_lto=="true" or enable_lto=="true") and lto_jobs!=""', {
++              ['configuring_node==1 and (enable_thin_lto=="true" or enable_lto=="true") and lto_jobs!=""', {
+                 'msvs_settings': {
+                   'VCLinkerTool': {
+                     'AdditionalOptions': ['/opt:lldltojobs=<(lto_jobs)'],
+diff --git a/configure.py b/configure.py
+index 99ce9326..5be2bfce 100755
+--- a/configure.py
++++ b/configure.py
+@@ -208,14 +208,20 @@ parser.add_argument("--enable-pgo-generate",
+     dest="enable_pgo_generate",
+     default=None,
+     help="Enable profiling with pgo of a binary. This feature is only available "
+-         "on linux with gcc and g++ 5.4.1 or newer and on windows.")
++         "on linux with gcc and g++ 5.4.1 or newer, on macOS with Clang and Ninja, "
++         "and on windows.")
+ 
+ parser.add_argument("--enable-pgo-use",
+     action="store_true",
+     dest="enable_pgo_use",
+     default=None,
+     help="Enable use of the profile generated with --enable-pgo-generate. This "
+-         "feature is only available on linux with gcc and g++ 5.4.1 or newer and on windows.")
++         "feature is available on linux with gcc and g++ 5.4.1 or newer, "
++         "on macOS with Clang and Ninja, and on windows.")
++
++parser.add_argument("--pgo-profile",
++    help="Path to the merged LLVM profile for macOS --enable-pgo-use "
++         "(default: node.profdata in the source directory).")
+ 
+ parser.add_argument("--enable-lto",
+     action="store_true",
+@@ -229,7 +235,7 @@ parser.add_argument("--enable-thin-lto",
+     dest="enable_thin_lto",
+     default=None,
+     help="Enable compiling with thin lto of a binary. This feature is only available "
+-         "on windows.")
++         "on Windows, macOS, and Linux with Clang and LLD.")
+ 
+ parser.add_argument("--lto-jobs",
+     action="store",
+@@ -237,7 +243,8 @@ parser.add_argument("--lto-jobs",
+     default=None,
+     help="Set the number of parallel LTO code generation jobs during linking. "
+          "Defaults to the number of CPU cores. Lower values reduce peak memory "
+-         "usage at the cost of longer link times. Only effective with LTO enabled.")
++         "usage at the cost of longer link times. Only supported on Windows "
++         "with LTO enabled.")
+ 
+ parser.add_argument("--link-module",
+     action="append",
+@@ -938,6 +945,12 @@ parser.add_argument('--use-section-ordering-file',
+          'Node.js be linked using the gold linker. The gold linker must have ' +
+          'version 1.2 or greater.')
+ 
++parser.add_argument('--use-darwin-order-file',
++    action='store',
++    dest='node_darwin_order_file',
++    default='',
++    help='Pass an order file to the static macOS Node.js CLI linker.')
++
+ intl_optgroup.add_argument('--with-intl',
+     action='store',
+     dest='with_intl',
+@@ -1860,6 +1873,28 @@ def gcc_version_ge(version_checked):
+       return False
+   return True
+ 
++def linux_clang_20_or_newer():
++  version_checked = (20, 1, 0)
++  for compiler, language in ((CC, 'c'), (CXX, 'c++')):
++    available, is_clang, clang_version, _1, _2 = (
++      try_check_compiler(compiler, language)
++    )
++    if not available or not is_clang or clang_version < version_checked:
++      return False
++  return True
++
++
++def linux_lld_works():
++  try:
++    result = subprocess.run(
++      shlex.split(CXX) + ['-fuse-ld=lld', '-x', 'c++', '-', '-o', os.devnull],
++      input=b'int main() { return 0; }', stdout=subprocess.PIPE,
++      stderr=subprocess.PIPE, check=False)
++  except OSError:
++    return False
++  return result.returncode == 0
++
++
+ def configure_node_lib_files(o):
+   o['variables']['node_library_files'] = SearchFiles('lib', 'js')
+ 
+@@ -1868,6 +1903,19 @@ def configure_node_cctest_sources(o):
+     SearchFiles('test/cctest', 'cc') + \
+     SearchFiles('test/cctest', 'h')
+ 
++def configure_whole_program_vtables(o):
++  variables = o['variables']
++  # Hidden virtual hierarchies must stay inside the LTO unit. External and custom
++  # dependency builds keep ordinary virtual dispatch until separately validated.
++  variables['node_whole_program_vtables'] = b(
++    flavor == 'mac' and options.enable_thin_lto and
++    variables.get('node_shared') == 'false' and
++    variables.get('node_use_bundled_v8') == 'true' and
++    variables.get('icu_gyp_path') == 'tools/icu/icu-generic.gyp' and
++    not any(name.startswith('node_shared_') and value == 'true'
++            for name, value in variables.items()))
++
++
+ def configure_node(o):
+   if options.dest_os == 'android':
+     o['variables']['OS'] = 'android'
+@@ -1974,9 +2022,52 @@ def configure_node(o):
+   else:
+     o['variables']['node_enable_v8_vtunejit'] = 'false'
+ 
+-  if (flavor != 'linux' and flavor != 'win') and (options.enable_pgo_generate or options.enable_pgo_use):
++  if flavor not in ('linux', 'win', 'mac') and (options.enable_pgo_generate or options.enable_pgo_use):
+     raise Exception(
+-      'The pgo option is supported only on linux and windows.')
++      'The pgo option is supported only on linux, macOS, and windows.')
++
++  if options.pgo_profile and (flavor != 'mac' or not options.enable_pgo_use):
++    raise Exception('--pgo-profile requires macOS --enable-pgo-use.')
++
++  if flavor == 'mac' and (options.enable_pgo_generate or options.enable_pgo_use):
++    if not options.use_ninja:
++      raise Exception('The macOS pgo options require --ninja.')
++    for compiler, language in ((CC, 'c'), (CXX, 'c++')):
++      if not try_check_compiler(compiler, language)[1]:
++        raise Exception('The macOS pgo options require Clang for both CC and CXX.')
++
++  o['variables']['node_pgo_profile'] = ''
++  if flavor == 'mac' and options.enable_pgo_use:
++    profile = Path(options.pgo_profile or 'node.profdata').resolve()
++    if not profile.is_file():
++      raise Exception(f'PGO profile not found: {profile}')
++    if '\n' in str(profile) or '\r' in str(profile):
++      raise Exception('PGO profile paths must not contain newlines.')
++    # Ninja expands dollar signs before the shell parses the compiler flags.
++    o['variables']['node_pgo_profile'] = shlex.quote(str(profile)).replace('$', '$$')
++
++  o['variables']['node_darwin_order_file'] = ''
++  o['variables']['node_darwin_order_file_input'] = ''
++  o['variables']['node_use_darwin_order_file'] = 'false'
++  if options.node_darwin_order_file:
++    if flavor != 'mac':
++      raise Exception('--use-darwin-order-file is only supported on macOS.')
++    if options.shared:
++      raise Exception('--use-darwin-order-file does not support --shared.')
++    if not options.use_ninja:
++      raise Exception('--use-darwin-order-file requires --ninja.')
++    order_file = Path(options.node_darwin_order_file).resolve()
++    if not order_file.is_file():
++      raise Exception(f'Darwin order file not found: {order_file}')
++    if '\n' in str(order_file) or '\r' in str(order_file):
++      raise Exception('Darwin order file paths must not contain newlines.')
++    # Ninja expands dollar signs before the shell parses the linker flags.
++    o['variables']['node_darwin_order_file'] = \
++      shlex.quote(str(order_file)).replace('$', '$$')
++    # $!PRODUCT_DIR lets GYP pass an absolute Ninja input containing '$'.
++    o['variables']['node_darwin_order_file_input'] = \
++      '$!PRODUCT_DIR/' + str(order_file).replace('$', '$$')
++    o['variables']['node_use_darwin_order_file'] = 'true'
+ 
+   if flavor == 'linux':
+     if options.enable_pgo_generate or options.enable_pgo_use:
+@@ -2026,12 +2117,22 @@ def configure_node(o):
+         '\n  '.join(candidates) +
+         '\nEnsure the ClangCL toolset is installed.')
+ 
+-  if flavor != 'win' and options.enable_thin_lto:
++  if flavor not in ('win', 'mac', 'linux') and options.enable_thin_lto:
+     raise Exception(
+-      'Use --enable-lto instead.')
++      'Use --enable-lto instead, or Linux Clang and LLD.')
++
++  if flavor == 'linux' and options.enable_thin_lto:
++    if not linux_clang_20_or_newer():
++      raise Exception(
++        'Linux ThinLTO requires Clang 20.1.0 or newer for both CC and CXX.')
++    if not linux_lld_works():
++      raise Exception('Linux ThinLTO requires a working LLD selected by -fuse-ld=lld.')
++
++  if flavor != 'win' and options.lto_jobs is not None:
++    raise Exception('--lto-jobs is only supported on Windows.')
+ 
+   # LTO mutual exclusion
+-  if flavor == 'win':
++  if flavor in ('win', 'mac', 'linux'):
+     lto_options = []
+     if options.enable_lto:
+       lto_options.append('--enable-lto')
+@@ -2950,6 +3051,7 @@ configure_intl(output)
+ configure_static(output)
+ configure_inspector(output)
+ configure_section_file(output)
++configure_whole_program_vtables(output)
+ 
+ # remove builtins that have been disabled
+ if options.without_amaro:
+diff --git a/deps/ada/ada.gyp b/deps/ada/ada.gyp
+index 30054e63..4dbee7a4 100644
+--- a/deps/ada/ada.gyp
++++ b/deps/ada/ada.gyp
+@@ -19,7 +19,15 @@
+       'dependencies': [
+         '../../tools/v8_gypfiles/v8.gyp:simdutf',
+       ],
+-      'sources': [ '<@(ada_sources)' ]
++      'sources': [ '<@(ada_sources)' ],
++      'conditions': [
++        ['OS=="mac" and node_shared=="false"', {
++          'xcode_settings': {
++            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
++            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
++          },
++        }],
++      ],
+     },
+   ]
+ }
+diff --git a/deps/openssl/openssl/crypto/init.c b/deps/openssl/openssl/crypto/init.c
+index ea29645b..4660c54b 100644
+--- a/deps/openssl/openssl/crypto/init.c
++++ b/deps/openssl/openssl/crypto/init.c
+@@ -89,6 +89,17 @@ err:
+ }
+ 
+ static CRYPTO_ONCE register_atexit = CRYPTO_ONCE_STATIC_INIT;
++#if defined(__APPLE__) && !defined(OPENSSL_NO_ATEXIT)
++/* Avoid atexit's dladdr() lookup while retaining DSO-scoped exit cleanup. */
++extern void *__dso_handle;
++extern int __cxa_atexit(void (*func)(void *), void *arg, void *dso);
++
++static void cleanup_at_exit(void *unused)
++{
++    (void)unused;
++    OPENSSL_cleanup();
++}
++#endif
+ #if !defined(OPENSSL_SYS_UEFI) && defined(_WIN32)
+ static int win32atexit(void)
+ {
+@@ -108,6 +119,9 @@ DEFINE_RUN_ONCE_STATIC(ossl_init_register_atexit)
+     /* We use _onexit() in preference because it gets called on DLL unload */
+     if (_onexit(win32atexit) == NULL)
+         return 0;
++#elif defined(__APPLE__)
++    if (__cxa_atexit(cleanup_at_exit, NULL, &__dso_handle) != 0)
++        return 0;
+ #else
+     if (atexit(OPENSSL_cleanup) != 0)
+         return 0;
+diff --git a/deps/v8/include/cppgc/custom-space.h b/deps/v8/include/cppgc/custom-space.h
+index 757c4fde..5c72f5ce 100644
+--- a/deps/v8/include/cppgc/custom-space.h
++++ b/deps/v8/include/cppgc/custom-space.h
+@@ -7,6 +7,8 @@
+ 
+ #include <stddef.h>
+ 
++#include "v8config.h"  // NOLINT(build/include_directory)
++
+ namespace cppgc {
+ 
+ /**
+@@ -21,7 +23,7 @@ struct CustomSpaceIndex {
+  * Top-level base class for custom spaces. Users must inherit from CustomSpace
+  * below.
+  */
+-class CustomSpaceBase {
++class V8_LTO_VISIBILITY_PUBLIC CustomSpaceBase {
+  public:
+   virtual ~CustomSpaceBase() = default;
+   virtual CustomSpaceIndex GetCustomSpaceIndex() const = 0;
+diff --git a/deps/v8/include/cppgc/garbage-collected.h b/deps/v8/include/cppgc/garbage-collected.h
+index dfd758a3..55bbb42e 100644
+--- a/deps/v8/include/cppgc/garbage-collected.h
++++ b/deps/v8/include/cppgc/garbage-collected.h
+@@ -9,6 +9,7 @@
+ #include "cppgc/platform.h"
+ #include "cppgc/trace-trait.h"
+ #include "cppgc/type-traits.h"
++#include "v8config.h"  // NOLINT(build/include_directory)
+ 
+ namespace cppgc {
+ 
+@@ -90,7 +91,7 @@ class GarbageCollected {
+  * };
+  * \endcode
+  */
+-class GarbageCollectedMixin {
++class V8_LTO_VISIBILITY_PUBLIC GarbageCollectedMixin {
+  public:
+   using IsGarbageCollectedMixinTypeMarker = void;
+ 
+diff --git a/deps/v8/include/cppgc/heap.h b/deps/v8/include/cppgc/heap.h
+index 02ee12ea..667a4fef 100644
+--- a/deps/v8/include/cppgc/heap.h
++++ b/deps/v8/include/cppgc/heap.h
+@@ -32,7 +32,7 @@ namespace internal {
+ class Heap;
+ }  // namespace internal
+ 
+-class V8_EXPORT Heap {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Heap {
+  public:
+   /**
+    * Specifies the stack state the embedder is in.
+diff --git a/deps/v8/include/cppgc/name-provider.h b/deps/v8/include/cppgc/name-provider.h
+index 849176fd..e5ae1d0c 100644
+--- a/deps/v8/include/cppgc/name-provider.h
++++ b/deps/v8/include/cppgc/name-provider.h
+@@ -23,7 +23,7 @@ namespace cppgc {
+  * Depending on the build configuration, Oilpan may hide names, i.e., represent
+  * them with kHiddenName, of case b. to avoid exposing internal details.
+  */
+-class V8_EXPORT NameProvider {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT NameProvider {
+  public:
+   /**
+    * Name that is used when hiding internals.
+diff --git a/deps/v8/include/cppgc/platform.h b/deps/v8/include/cppgc/platform.h
+index 8e19272f..02816730 100644
+--- a/deps/v8/include/cppgc/platform.h
++++ b/deps/v8/include/cppgc/platform.h
+@@ -28,7 +28,7 @@ using TracingController = v8::TracingController;
+ /**
+  * Platform interface used by Heap. Contains allocators and executors.
+  */
+-class V8_EXPORT Platform {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Platform {
+  public:
+   virtual ~Platform() = default;
+ 
+diff --git a/deps/v8/include/cppgc/visitor.h b/deps/v8/include/cppgc/visitor.h
+index 29c29eb9..35bda50c 100644
+--- a/deps/v8/include/cppgc/visitor.h
++++ b/deps/v8/include/cppgc/visitor.h
+@@ -72,7 +72,7 @@ struct EphemeronPair {
+  * };
+  * \endcode
+  */
+-class V8_EXPORT Visitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Visitor {
+  public:
+   class Key {
+    private:
+@@ -468,7 +468,7 @@ void EphemeronPair<K, V>::Trace(Visitor* visitor) const {
+ 
+ namespace internal {
+ 
+-class V8_EXPORT RootVisitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT RootVisitor {
+  public:
+   explicit RootVisitor(Visitor::Key) {}
+ 
+diff --git a/deps/v8/include/libplatform/v8-tracing.h b/deps/v8/include/libplatform/v8-tracing.h
+index 9d05949c..e432fd04 100644
+--- a/deps/v8/include/libplatform/v8-tracing.h
++++ b/deps/v8/include/libplatform/v8-tracing.h
+@@ -114,7 +114,7 @@ class V8_PLATFORM_EXPORT TraceObject {
+   void operator=(const TraceObject&) = delete;
+ };
+ 
+-class V8_PLATFORM_EXPORT TraceWriter {
++class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TraceWriter {
+  public:
+   TraceWriter() = default;
+   virtual ~TraceWriter() = default;
+@@ -157,7 +157,7 @@ class V8_PLATFORM_EXPORT TraceBufferChunk {
+   void operator=(const TraceBufferChunk&) = delete;
+ };
+ 
+-class V8_PLATFORM_EXPORT TraceBuffer {
++class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TraceBuffer {
+  public:
+   TraceBuffer() = default;
+   virtual ~TraceBuffer() = default;
+@@ -239,7 +239,7 @@ class V8_PLATFORM_EXPORT TraceConfig {
+  * Will become obsolete in Perfetto build
+  * (v8_use_perfetto_json_export = true).
+  */
+-class V8_PLATFORM_EXPORT TracingController
++class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TracingController
+     : public V8_PLATFORM_NON_EXPORTED_BASE(v8::TracingController) {
+  public:
+   TracingController();
+diff --git a/deps/v8/include/v8-array-buffer.h b/deps/v8/include/v8-array-buffer.h
+index f70c6dd5..a73bae89 100644
+--- a/deps/v8/include/v8-array-buffer.h
++++ b/deps/v8/include/v8-array-buffer.h
+@@ -150,7 +150,7 @@ class V8_EXPORT ArrayBuffer : public Object {
+    * Note that it is unsafe to call back into V8 from any of the allocator
+    * functions.
+    */
+-  class V8_EXPORT Allocator {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Allocator {
+    public:
+     virtual ~Allocator() = default;
+ 
+diff --git a/deps/v8/include/v8-context.h b/deps/v8/include/v8-context.h
+index 21137f62..4819cb7b 100644
+--- a/deps/v8/include/v8-context.h
++++ b/deps/v8/include/v8-context.h
+@@ -223,7 +223,7 @@ class V8_EXPORT Context : public Data {
+    * Delegate to help with Deep freezing embedder-specific objects (such as
+    * JSApiObjects) that can not be frozen natively.
+    */
+-  class DeepFreezeDelegate {
++  class V8_LTO_VISIBILITY_PUBLIC DeepFreezeDelegate {
+    public:
+     /**
+      * Performs embedder-specific operations to freeze the provided embedder
+diff --git a/deps/v8/include/v8-cppgc.h b/deps/v8/include/v8-cppgc.h
+index aa3813b9..dd72fe01 100644
+--- a/deps/v8/include/v8-cppgc.h
++++ b/deps/v8/include/v8-cppgc.h
+@@ -62,7 +62,7 @@ struct V8_EXPORT CppHeapCreateParams {
+  * time. The heap may be used from different threads using the
+  * v8::Locker/v8::Unlocker APIs which is different from generic Oilpan.
+  */
+-class V8_EXPORT CppHeap {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT CppHeap {
+  public:
+   static std::unique_ptr<CppHeap> Create(v8::Platform* platform,
+                                          const CppHeapCreateParams& params);
+@@ -137,7 +137,7 @@ class V8_EXPORT CppHeap {
+   friend class internal::CppHeap;
+ };
+ 
+-class JSVisitor : public cppgc::Visitor {
++class V8_LTO_VISIBILITY_PUBLIC JSVisitor : public cppgc::Visitor {
+  public:
+   explicit JSVisitor(cppgc::Visitor::Key key) : cppgc::Visitor(key) {}
+   ~JSVisitor() override = default;
+@@ -158,7 +158,7 @@ class JSVisitor : public cppgc::Visitor {
+  *
+  * Its method is invoked with the results of the statistic collection.
+  */
+-class CustomSpaceStatisticsReceiver {
++class V8_LTO_VISIBILITY_PUBLIC CustomSpaceStatisticsReceiver {
+  public:
+   virtual ~CustomSpaceStatisticsReceiver() = default;
+   /**
+diff --git a/deps/v8/include/v8-embedder-heap.h b/deps/v8/include/v8-embedder-heap.h
+index 929b3c39..3433b4cd 100644
+--- a/deps/v8/include/v8-embedder-heap.h
++++ b/deps/v8/include/v8-embedder-heap.h
+@@ -19,7 +19,7 @@ class Value;
+ /**
+  * Handler for embedder roots on non-unified heap garbage collections.
+  */
+-class V8_EXPORT EmbedderRootsHandler {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT EmbedderRootsHandler {
+  public:
+   virtual ~EmbedderRootsHandler() = default;
+ 
+diff --git a/deps/v8/include/v8-extension.h b/deps/v8/include/v8-extension.h
+index d0056cb2..e47bff91 100644
+--- a/deps/v8/include/v8-extension.h
++++ b/deps/v8/include/v8-extension.h
+@@ -20,7 +20,7 @@ class FunctionTemplate;
+ /**
+  * Ignore
+  */
+-class V8_EXPORT Extension {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Extension {
+  public:
+   // Note that the strings passed into this constructor must live as long
+   // as the Extension itself.
+diff --git a/deps/v8/include/v8-inspector.h b/deps/v8/include/v8-inspector.h
+index 9eb9b213..19a29477 100644
+--- a/deps/v8/include/v8-inspector.h
++++ b/deps/v8/include/v8-inspector.h
+@@ -75,7 +75,7 @@ class V8_EXPORT StringView {
+   };
+ };
+ 
+-class V8_EXPORT StringBuffer {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT StringBuffer {
+  public:
+   virtual ~StringBuffer() = default;
+   virtual StringView string() const = 0;
+@@ -143,7 +143,7 @@ struct V8_EXPORT V8StackFrame {
+   int scriptId;
+ };
+ 
+-class V8_EXPORT V8StackTrace {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8StackTrace {
+  public:
+   virtual StringView firstNonEmptySourceURL() const = 0;
+   virtual bool isEmpty() const = 0;
+@@ -164,12 +164,12 @@ class V8_EXPORT V8StackTrace {
+   virtual std::vector<V8StackFrame> frames() const = 0;
+ };
+ 
+-class V8_EXPORT V8InspectorSession {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8InspectorSession {
+  public:
+   virtual ~V8InspectorSession() = default;
+ 
+   // Cross-context inspectable values (DOM nodes in different worlds, etc.).
+-  class V8_EXPORT Inspectable {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Inspectable {
+    public:
+     virtual v8::Local<v8::Value> get(v8::Local<v8::Context>) = 0;
+     virtual ~Inspectable() = default;
+@@ -249,7 +249,7 @@ struct V8_EXPORT DeepSerializationResult {
+   bool isSuccess;
+ };
+ 
+-class V8_EXPORT V8InspectorClient {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8InspectorClient {
+  public:
+   virtual ~V8InspectorClient() = default;
+ 
+@@ -364,7 +364,7 @@ struct V8_EXPORT V8StackTraceId {
+   std::unique_ptr<StringBuffer> ToString();
+ };
+ 
+-class V8_EXPORT V8Inspector {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8Inspector {
+  public:
+   static std::unique_ptr<V8Inspector> create(v8::Isolate*, V8InspectorClient*);
+   virtual ~V8Inspector() = default;
+@@ -408,7 +408,7 @@ class V8_EXPORT V8Inspector {
+                                       v8::Local<v8::Value> value) = 0;
+ 
+   // Connection.
+-  class V8_EXPORT Channel {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Channel {
+    public:
+     virtual ~Channel() = default;
+     virtual void sendResponse(int callId,
+@@ -417,7 +417,7 @@ class V8_EXPORT V8Inspector {
+     virtual void flushProtocolNotifications() = 0;
+   };
+ 
+-  class V8_EXPORT ManagedChannel
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ManagedChannel
+       : public cppgc::GarbageCollected<ManagedChannel>,
+         public Channel {
+    public:
+diff --git a/deps/v8/include/v8-metrics.h b/deps/v8/include/v8-metrics.h
+index b67196c3..aa6e3e9e 100644
+--- a/deps/v8/include/v8-metrics.h
++++ b/deps/v8/include/v8-metrics.h
+@@ -178,7 +178,7 @@ struct WasmModulesPerIsolate {
+  * providing its implementation and have the virtual methods overwritten
+  * for the events it cares about.
+  */
+-class V8_EXPORT Recorder {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Recorder {
+  public:
+   // A unique identifier for a context in this Isolate.
+   // It is guaranteed to not be reused throughout the lifetime of the Isolate.
+diff --git a/deps/v8/include/v8-microtask-queue.h b/deps/v8/include/v8-microtask-queue.h
+index 135dfb06..8dc14230 100644
+--- a/deps/v8/include/v8-microtask-queue.h
++++ b/deps/v8/include/v8-microtask-queue.h
+@@ -37,7 +37,7 @@ class MicrotaskQueue;
+  * other synchronously. E.g. for Web embedding, use the same instance for all
+  * origins that share the same URL scheme and eTLD+1.
+  */
+-class V8_EXPORT MicrotaskQueue {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT MicrotaskQueue {
+  public:
+   /**
+    * Creates an empty MicrotaskQueue instance.
+diff --git a/deps/v8/include/v8-object.h b/deps/v8/include/v8-object.h
+index 634aebb5..0b6b37b0 100644
+--- a/deps/v8/include/v8-object.h
++++ b/deps/v8/include/v8-object.h
+@@ -581,8 +581,9 @@ class V8_EXPORT Object : public Value {
+   //
+   // Note that v8::Object::Wrappable` inherits from `NameProvider` and provides
+   // `GetWrapperTypeInfo` to allow subclasses to have smaller object sizes.
+-  class Wrappable : public cppgc::GarbageCollected<Wrappable>,
+-                    public cppgc::NameProvider {
++  class V8_LTO_VISIBILITY_PUBLIC Wrappable
++      : public cppgc::GarbageCollected<Wrappable>,
++        public cppgc::NameProvider {
+    public:
+     virtual const WrapperTypeInfo* GetWrapperTypeInfo() const {
+       return nullptr;
+diff --git a/deps/v8/include/v8-persistent-handle.h b/deps/v8/include/v8-persistent-handle.h
+index aae1f83e..dd020d8e 100644
+--- a/deps/v8/include/v8-persistent-handle.h
++++ b/deps/v8/include/v8-persistent-handle.h
+@@ -413,7 +413,7 @@ using UniquePersistent = Global<T>;
+ /**
+  * Interface for iterating through all the persistent handles in the heap.
+  */
+-class V8_EXPORT PersistentHandleVisitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT PersistentHandleVisitor {
+  public:
+   virtual ~PersistentHandleVisitor() = default;
+   virtual void VisitPersistentHandle(Persistent<Value>* value,
+diff --git a/deps/v8/include/v8-platform.h b/deps/v8/include/v8-platform.h
+index 3484e988..4f0a0330 100644
+--- a/deps/v8/include/v8-platform.h
++++ b/deps/v8/include/v8-platform.h
+@@ -47,7 +47,7 @@ enum class TaskPriority : uint8_t {
+ /**
+  * A Task represents a unit of work.
+  */
+-class Task {
++class V8_LTO_VISIBILITY_PUBLIC Task {
+  public:
+   virtual ~Task() = default;
+ 
+@@ -60,7 +60,7 @@ class Task {
+  * seconds returned by MonotonicallyIncreasingTime().
+  * The idle task is expected to complete by this deadline.
+  */
+-class IdleTask {
++class V8_LTO_VISIBILITY_PUBLIC IdleTask {
+  public:
+   virtual ~IdleTask() = default;
+   virtual void Run(double deadline_in_seconds) = 0;
+@@ -72,7 +72,7 @@ class IdleTask {
+  * executed anymore. All tasks posted to a given TaskRunner will be invoked in
+  * sequence. Tasks can be posted from any thread.
+  */
+-class TaskRunner {
++class V8_LTO_VISIBILITY_PUBLIC TaskRunner {
+  public:
+   /**
+    * Schedules a task to be invoked by this TaskRunner. The TaskRunner
+@@ -202,7 +202,7 @@ class TaskRunner {
+  * Delegate that's passed to Job's worker task, providing an entry point to
+  * communicate with the scheduler.
+  */
+-class JobDelegate {
++class V8_LTO_VISIBILITY_PUBLIC JobDelegate {
+  public:
+   /**
+    * Returns true if this thread *must* return from the worker task on the
+@@ -237,7 +237,7 @@ class JobDelegate {
+  * Handle returned when posting a Job. Provides methods to control execution of
+  * the posted Job.
+  */
+-class JobHandle {
++class V8_LTO_VISIBILITY_PUBLIC JobHandle {
+  public:
+   virtual ~JobHandle() = default;
+ 
+@@ -296,7 +296,7 @@ class JobHandle {
+ /**
+  * A JobTask represents work to run in parallel from Platform::PostJob().
+  */
+-class JobTask {
++class V8_LTO_VISIBILITY_PUBLIC JobTask {
+  public:
+   virtual ~JobTask() = default;
+ 
+@@ -319,7 +319,7 @@ class JobTask {
+ // Allows a thread to temporarily boost another thread's priority to match its
+ // own priority. The priority is reset when the object is destroyed, which must
+ // happens on the boosted thread.
+-class ScopedBoostablePriority {
++class V8_LTO_VISIBILITY_PUBLIC ScopedBoostablePriority {
+  public:
+   ScopedBoostablePriority() = default;
+   virtual ~ScopedBoostablePriority() = default;
+@@ -366,7 +366,7 @@ enum class BlockingType {
+  * CPU usage should be minimal within that scope. ScopedBlockingCalls can be
+  * nested.
+  */
+-class ScopedBlockingCall {
++class V8_LTO_VISIBILITY_PUBLIC ScopedBlockingCall {
+  public:
+   virtual ~ScopedBlockingCall() = default;
+ };
+@@ -374,7 +374,7 @@ class ScopedBlockingCall {
+ /**
+  * The interface represents complex arguments to trace events.
+  */
+-class ConvertableToTraceFormat {
++class V8_LTO_VISIBILITY_PUBLIC ConvertableToTraceFormat {
+  public:
+   virtual ~ConvertableToTraceFormat() = default;
+ 
+@@ -394,7 +394,7 @@ class ConvertableToTraceFormat {
+  *
+  * Will become obsolete in Perfetto build (v8_use_perfetto = true).
+  */
+-class TracingController {
++class V8_LTO_VISIBILITY_PUBLIC TracingController {
+  public:
+   virtual ~TracingController() = default;
+ 
+@@ -449,7 +449,7 @@ class TracingController {
+                                         const char* name, uint64_t handle) {}
+ #endif  // !defined(V8_USE_PERFETTO)
+ 
+-  class TraceStateObserver {
++  class V8_LTO_VISIBILITY_PUBLIC TraceStateObserver {
+    public:
+     virtual ~TraceStateObserver() = default;
+     virtual void OnTraceEnabled() = 0;
+@@ -545,7 +545,7 @@ static constexpr PlatformSharedMemoryHandle kInvalidSharedMemoryHandle =
+  *
+  * Can be implemented by an embedder to manage large host OS allocations.
+  */
+-class PageAllocator {
++class V8_LTO_VISIBILITY_PUBLIC PageAllocator {
+  public:
+   virtual ~PageAllocator() = default;
+ 
+@@ -709,7 +709,7 @@ class PageAllocator {
+    * INTERNAL ONLY: This interface has not been stabilised and may change
+    * without notice from one release to another without being deprecated first.
+    */
+-  class SharedMemoryMapping {
++  class V8_LTO_VISIBILITY_PUBLIC SharedMemoryMapping {
+    public:
+     // Implementations are expected to free the shared memory mapping in the
+     // destructor.
+@@ -721,7 +721,7 @@ class PageAllocator {
+    * INTERNAL ONLY: This interface has not been stabilised and may change
+    * without notice from one release to another without being deprecated first.
+    */
+-  class SharedMemory {
++  class V8_LTO_VISIBILITY_PUBLIC SharedMemory {
+    public:
+     // Implementations are expected to free the shared memory in the destructor.
+     virtual ~SharedMemory() = default;
+@@ -777,7 +777,7 @@ class PageAllocator {
+  * INTERNAL ONLY: This interface has not been stabilised and may change
+  * without notice from one release to another without being deprecated first.
+  */
+-class ThreadIsolatedAllocator {
++class V8_LTO_VISIBILITY_PUBLIC ThreadIsolatedAllocator {
+  public:
+   virtual ~ThreadIsolatedAllocator() = default;
+ 
+@@ -846,7 +846,7 @@ inline constexpr bool IsSubset(PagePermissions lhs, PagePermissions rhs) {
+  *
+  * This API is not yet stable and may change without notice!
+  */
+-class VirtualAddressSpace {
++class V8_LTO_VISIBILITY_PUBLIC VirtualAddressSpace {
+  public:
+   using Address = uintptr_t;
+ 
+@@ -1209,7 +1209,7 @@ class VirtualAddressSpace {
+  * Observer used by V8 to notify the embedder about entering/leaving sections
+  * with high throughput of malloc/free operations.
+  */
+-class HighAllocationThroughputObserver {
++class V8_LTO_VISIBILITY_PUBLIC HighAllocationThroughputObserver {
+  public:
+   virtual void EnterSection() {}
+   virtual void LeaveSection() {}
+@@ -1221,7 +1221,7 @@ class HighAllocationThroughputObserver {
+  * The embedder has to provide an implementation of this interface before
+  * initializing the rest of V8.
+  */
+-class Platform {
++class V8_LTO_VISIBILITY_PUBLIC Platform {
+  public:
+   virtual ~Platform() = default;
+ 
+diff --git a/deps/v8/include/v8-primitive.h b/deps/v8/include/v8-primitive.h
+index 457a8838..4949e1e0 100644
+--- a/deps/v8/include/v8-primitive.h
++++ b/deps/v8/include/v8-primitive.h
+@@ -240,7 +240,7 @@ class V8_EXPORT String : public Name {
+    */
+   Local<String> InternalizeString(Isolate* isolate);
+ 
+-  class V8_EXPORT ExternalStringResourceBase {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalStringResourceBase {
+    public:
+     virtual ~ExternalStringResourceBase() = default;
+ 
+@@ -272,7 +272,7 @@ class V8_EXPORT String : public Name {
+     }
+     static constexpr size_t kDefaultMemoryEstimate = static_cast<size_t>(-1);
+ 
+-    class V8_EXPORT SharedMemoryUsageRecorder {
++    class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT SharedMemoryUsageRecorder {
+      public:
+       /**
+        * Record that a shared allocation at the given location has the given
+@@ -335,7 +335,7 @@ class V8_EXPORT String : public Name {
+    * ExternalStringResource to manage the life cycle of the underlying
+    * buffer.  Note that the string data must be immutable.
+    */
+-  class V8_EXPORT ExternalStringResource : public ExternalStringResourceBase {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalStringResource : public ExternalStringResourceBase {
+    public:
+     /**
+      * Override the destructor to manage the life cycle of the underlying
+@@ -389,7 +389,7 @@ class V8_EXPORT String : public Name {
+    * indexing.  Use String::New or convert to 16 bit data for non-Latin1.
+    */
+ 
+-  class V8_EXPORT ExternalOneByteStringResource
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalOneByteStringResource
+       : public ExternalStringResourceBase {
+    public:
+     /**
+@@ -714,7 +714,7 @@ inline V8_WARN_UNUSED_RESULT Local<String> String::NewFromUtf8Literal(
+ /**
+  * Interface for iterating through all external resources in the heap.
+  */
+-class V8_EXPORT ExternalResourceVisitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalResourceVisitor {
+  public:
+   virtual ~ExternalResourceVisitor() = default;
+   virtual void VisitExternalString(Local<String> string) {}
+diff --git a/deps/v8/include/v8-profiler.h b/deps/v8/include/v8-profiler.h
+index 927fa12e..0c2cf5fc 100644
+--- a/deps/v8/include/v8-profiler.h
++++ b/deps/v8/include/v8-profiler.h
+@@ -15,6 +15,7 @@
+ #include "v8-local-handle.h"       // NOLINT(build/include_directory)
+ #include "v8-message.h"            // NOLINT(build/include_directory)
+ #include "v8-persistent-handle.h"  // NOLINT(build/include_directory)
++#include "v8config.h"              // NOLINT(build/include_directory)
+ 
+ /**
+  * Profiler support for the V8 JavaScript engine.
+@@ -198,7 +199,7 @@ class V8_EXPORT CpuProfileNode {
+ /**
+  * An interface for exporting data from V8, using "push" model.
+  */
+-class V8_EXPORT OutputStream {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT OutputStream {
+  public:
+   enum WriteResult { kContinue = 0, kAbort = 1 };
+   virtual ~OutputStream() = default;
+@@ -354,7 +355,7 @@ struct CpuProfilingResult {
+ /**
+  * Delegate for when max samples reached and samples are discarded.
+  */
+-class V8_EXPORT DiscardedSamplesDelegate {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT DiscardedSamplesDelegate {
+  public:
+   DiscardedSamplesDelegate() = default;
+ 
+@@ -717,7 +718,7 @@ class V8_EXPORT HeapSnapshot {
+  * An interface for reporting progress and controlling long-running
+  * activities.
+  */
+-class V8_EXPORT ActivityControl {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ActivityControl {
+  public:
+   enum ControlOption {
+     kContinue = 0,
+@@ -735,7 +736,7 @@ class V8_EXPORT ActivityControl {
+  * AllocationProfile is a sampled profile of allocations done by the program.
+  * This is structured as a call-graph.
+  */
+-class V8_EXPORT AllocationProfile {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT AllocationProfile {
+  public:
+   struct Allocation {
+     /**
+@@ -866,9 +867,9 @@ class V8_EXPORT AllocationProfile {
+  * 4) To represent references from/to V8 object, construct V8 nodes using
+  *    graph->V8Node(value).
+  */
+-class V8_EXPORT EmbedderGraph {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT EmbedderGraph {
+  public:
+-  class Node {
++  class V8_LTO_VISIBILITY_PUBLIC Node {
+    public:
+     /**
+      * Detachedness specifies whether an object is attached or detached from the
+@@ -981,7 +982,7 @@ class V8_EXPORT EmbedderGraph {
+   virtual ~EmbedderGraph() = default;
+ };
+ 
+-class QueryObjectPredicate {
++class V8_LTO_VISIBILITY_PUBLIC QueryObjectPredicate {
+  public:
+   virtual ~QueryObjectPredicate() = default;
+   virtual bool Filter(v8::Local<v8::Object> object) = 0;
+@@ -1069,7 +1070,7 @@ class V8_EXPORT HeapProfiler {
+    *
+    * This interface will soon be deprecated in favour of ContextNameResolver.
+    */
+-  class ObjectNameResolver {
++  class V8_LTO_VISIBILITY_PUBLIC ObjectNameResolver {
+    public:
+     /**
+      * Returns name to be used in the heap snapshot for given node. Returned
+@@ -1085,7 +1086,7 @@ class V8_EXPORT HeapProfiler {
+    * Callback interface for retrieving user friendly names of a V8::Context
+    * objects.
+    */
+-  class ContextNameResolver {
++  class V8_LTO_VISIBILITY_PUBLIC ContextNameResolver {
+    public:
+     /**
+      * Returns name to be used in the heap snapshot for given node. Returned
+@@ -1376,7 +1377,7 @@ class V8_EXPORT CodeEvent {
+ /**
+  * Interface to listen to code creation and code relocation events.
+  */
+-class V8_EXPORT CodeEventHandler {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT CodeEventHandler {
+  public:
+   /**
+    * Creates a new listener for the |isolate|. The isolate must be initialized.
+diff --git a/deps/v8/include/v8-script.h b/deps/v8/include/v8-script.h
+index c3a2274d..6971b79f 100644
+--- a/deps/v8/include/v8-script.h
++++ b/deps/v8/include/v8-script.h
+@@ -589,7 +589,7 @@ class V8_EXPORT ScriptCompiler {
+    * For streaming incomplete script data to V8. The embedder should implement a
+    * subclass of this class.
+    */
+-  class V8_EXPORT ExternalSourceStream {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalSourceStream {
+    public:
+     virtual ~ExternalSourceStream() = default;
+ 
+diff --git a/deps/v8/include/v8-statistics.h b/deps/v8/include/v8-statistics.h
+index 2dc10e0f..58dd6f0c 100644
+--- a/deps/v8/include/v8-statistics.h
++++ b/deps/v8/include/v8-statistics.h
+@@ -52,7 +52,7 @@ enum class MeasureMemoryExecution { kDefault, kEager, kLazy };
+  * Each implementation of this class should hence implement only one of them,
+  * and leave the other empty.
+  */
+-class V8_EXPORT MeasureMemoryDelegate {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT MeasureMemoryDelegate {
+  public:
+   virtual ~MeasureMemoryDelegate() = default;
+ 
+diff --git a/deps/v8/include/v8-value-serializer.h b/deps/v8/include/v8-value-serializer.h
+index 0cb3e045..717cf156 100644
+--- a/deps/v8/include/v8-value-serializer.h
++++ b/deps/v8/include/v8-value-serializer.h
+@@ -62,9 +62,9 @@ class V8_EXPORT SharedValueConveyor final {
+  * Value serialization compatible with the HTML structured clone algorithm.
+  * The format is backward-compatible (i.e. safe to store to disk).
+  */
+-class V8_EXPORT ValueSerializer {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ValueSerializer {
+  public:
+-  class V8_EXPORT Delegate {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Delegate {
+    public:
+     virtual ~Delegate() = default;
+ 
+@@ -212,9 +212,9 @@ class V8_EXPORT ValueSerializer {
+  * Deserializes values from data written with ValueSerializer, or a compatible
+  * implementation.
+  */
+-class V8_EXPORT ValueDeserializer {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ValueDeserializer {
+  public:
+-  class V8_EXPORT Delegate {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Delegate {
+    public:
+     virtual ~Delegate() = default;
+ 
+diff --git a/deps/v8/include/v8-wasm.h b/deps/v8/include/v8-wasm.h
+index 550cdfb3..ebe41642 100644
+--- a/deps/v8/include/v8-wasm.h
++++ b/deps/v8/include/v8-wasm.h
+@@ -135,7 +135,7 @@ class V8_EXPORT WasmStreaming final {
+       internal::kWasmWasmStreamingTag;
+   class WasmStreamingImpl;
+ 
+-  class ModuleCachingInterface {
++  class V8_LTO_VISIBILITY_PUBLIC ModuleCachingInterface {
+    public:
+     // Get the full wire bytes, to check against the cached version.
+     virtual MemorySpan<const uint8_t> GetWireBytes() const = 0;
+diff --git a/deps/v8/include/v8config.h b/deps/v8/include/v8config.h
+index d8978c28..8ec21e35 100644
+--- a/deps/v8/include/v8config.h
++++ b/deps/v8/include/v8config.h
+@@ -822,6 +822,17 @@ path. Add it with -I<path> to the command line
+ #define V8_CLANG_NO_SANITIZE(what)
+ #endif
+ 
++// Public polymorphic interfaces may be implemented by embedders in a separate
++// linkage unit. Keep their class hierarchies open to LTO devirtualization.
++#if defined(__clang__) && defined(__has_attribute)
++#if __has_attribute(lto_visibility_public)
++#define V8_LTO_VISIBILITY_PUBLIC [[clang::lto_visibility_public]]
++#endif
++#endif
++#if !defined(V8_LTO_VISIBILITY_PUBLIC)
++#define V8_LTO_VISIBILITY_PUBLIC
++#endif
++
+ // Exposing private symbols requires exposing public symbols too.
+ #ifdef BUILDING_V8_SHARED_PRIVATE
+ #define BUILDING_V8_SHARED
+diff --git a/deps/v8/src/snapshot/deserializer.cc b/deps/v8/src/snapshot/deserializer.cc
+index 217b4789..27ec2cba 100644
+--- a/deps/v8/src/snapshot/deserializer.cc
++++ b/deps/v8/src/snapshot/deserializer.cc
+@@ -985,6 +985,23 @@ constexpr uint8_t VerifyBytecodeCount(uint8_t bytecode) {
+     case SpaceEncoder<bytecode>::Encode(SnapshotSpace::kTrusted)
+ // clang-format on
+ 
++template <typename IsolateT>
++template <typename SlotAccessor>
++V8_INLINE int Deserializer<IsolateT>::CopyFixedRawData(
++    int size_in_tagged, SlotAccessor slot_accessor) {
++  using TSlot = decltype(slot_accessor.slot());
++
++  static_assert(TSlot::kSlotDataSize == kTaggedSize ||
++                TSlot::kSlotDataSize == 2 * kTaggedSize);
++  int size_in_slots = size_in_tagged / (TSlot::kSlotDataSize / kTaggedSize);
++  // kFixedRawData can have kTaggedSize != TSlot::kSlotDataSize when
++  // serializing Smi roots in pointer-compressed builds. In this case, the
++  // size in bytes is unconditionally the (full) slot size.
++  DCHECK_IMPLIES(kTaggedSize != TSlot::kSlotDataSize, size_in_slots == 1);
++  source_.CopySlots(slot_accessor.slot().location(), size_in_slots);
++  return size_in_slots;
++}
++
+ template <typename IsolateT>
+ void Deserializer<IsolateT>::ReadData(Handle<HeapObject> object,
+                                       int start_slot_index,
+@@ -992,8 +1009,15 @@ void Deserializer<IsolateT>::ReadData(Handle<HeapObject> object,
+   int current = start_slot_index;
+   while (current < end_slot_index) {
+     uint8_t data = source_.Get();
+-    current += ReadSingleBytecodeData(
+-        data, SlotAccessorForHeapObject::ForSlotIndex(object, current));
++    auto slot_accessor =
++        SlotAccessorForHeapObject::ForSlotIndex(object, current);
++    if (V8_LIKELY(!v8_flags.trace_deserialization) && data >= kFixedRawData &&
++        data < kFixedRawData + kFixedRawDataCount) {
++      current +=
++          CopyFixedRawData(FixedRawDataWithSize::Decode(data), slot_accessor);
++    } else {
++      current += ReadSingleBytecodeData(data, slot_accessor);
++    }
+   }
+   CHECK_EQ(current, end_slot_index);
+ }
+@@ -1004,7 +1028,14 @@ void Deserializer<IsolateT>::ReadData(FullMaybeObjectSlot start,
+   FullMaybeObjectSlot current = start;
+   while (current < end) {
+     uint8_t data = source_.Get();
+-    current += ReadSingleBytecodeData(data, SlotAccessorForRootSlots(current));
++    auto slot_accessor = SlotAccessorForRootSlots(current);
++    if (V8_LIKELY(!v8_flags.trace_deserialization) && data >= kFixedRawData &&
++        data < kFixedRawData + kFixedRawDataCount) {
++      current +=
++          CopyFixedRawData(FixedRawDataWithSize::Decode(data), slot_accessor);
++    } else {
++      current += ReadSingleBytecodeData(data, slot_accessor);
++    }
+   }
+   CHECK_EQ(current, end);
+ }
+@@ -1611,17 +1642,8 @@ template <typename IsolateT>
+ template <typename SlotAccessor>
+ int Deserializer<IsolateT>::ReadFixedRawData(uint8_t data,
+                                              SlotAccessor slot_accessor) {
+-  using TSlot = decltype(slot_accessor.slot());
+-
+   // Deserialize raw data of fixed length from 1 to 32 times kTaggedSize.
+   int size_in_tagged = FixedRawDataWithSize::Decode(data);
+-  static_assert(TSlot::kSlotDataSize == kTaggedSize ||
+-                TSlot::kSlotDataSize == 2 * kTaggedSize);
+-  int size_in_slots = size_in_tagged / (TSlot::kSlotDataSize / kTaggedSize);
+-  // kFixedRawData can have kTaggedSize != TSlot::kSlotDataSize when
+-  // serializing Smi roots in pointer-compressed builds. In this case, the
+-  // size in bytes is unconditionally the (full) slot size.
+-  DCHECK_IMPLIES(kTaggedSize != TSlot::kSlotDataSize, size_in_slots == 1);
+   if (v8_flags.trace_deserialization) {
+     PrintF("%*sFixedRawData [%u] :", depth_, "", size_in_tagged);
+     for (int i = 0; i < size_in_tagged; ++i) {
+@@ -1632,8 +1654,7 @@ int Deserializer<IsolateT>::ReadFixedRawData(uint8_t data,
+   }
+   // TODO(leszeks): Only copy slots when there are Smis in the serialized
+   // data.
+-  source_.CopySlots(slot_accessor.slot().location(), size_in_slots);
+-  return size_in_slots;
++  return CopyFixedRawData(size_in_tagged, slot_accessor);
+ }
+ 
+ template <typename IsolateT>
+diff --git a/deps/v8/src/snapshot/deserializer.h b/deps/v8/src/snapshot/deserializer.h
+index c9f24ebf..b6259215 100644
+--- a/deps/v8/src/snapshot/deserializer.h
++++ b/deps/v8/src/snapshot/deserializer.h
+@@ -250,6 +250,9 @@ class Deserializer : public SerializerDeserializer {
+   template <typename SlotAccessor>
+   int ReadFixedRawData(uint8_t data, SlotAccessor slot_accessor);
+   template <typename SlotAccessor>
++  V8_INLINE int CopyFixedRawData(int size_in_tagged,
++                                 SlotAccessor slot_accessor);
++  template <typename SlotAccessor>
+   int ReadFixedRepeatRoot(uint8_t data, SlotAccessor slot_accessor);
+ 
+   // A helper function for ReadData for reading external references.
+diff --git a/deps/v8/third_party/abseil-cpp/absl/time/internal/cctz/src/time_zone_lookup.cc b/deps/v8/third_party/abseil-cpp/absl/time/internal/cctz/src/time_zone_lookup.cc
+index d1078de4..67c0cb9d 100644
+--- a/deps/v8/third_party/abseil-cpp/absl/time/internal/cctz/src/time_zone_lookup.cc
++++ b/deps/v8/third_party/abseil-cpp/absl/time/internal/cctz/src/time_zone_lookup.cc
+@@ -21,6 +21,9 @@
+ 
+ #if defined(__APPLE__)
+ #include <CoreFoundation/CFTimeZone.h>
++#include <TargetConditionals.h>
++
++#include <dlfcn.h>
+ 
+ #include <vector>
+ #endif
+@@ -50,6 +53,68 @@ ABSL_NAMESPACE_BEGIN
+ namespace time_internal {
+ namespace cctz {
+ 
++#if defined(__APPLE__)
++class CoreFoundationTimeZoneApi {
++ private:
++  // Retain the image while any resolved pointer can be called.
++  void* handle_;
++
++ public:
++  static const CoreFoundationTimeZoneApi& Get() {
++    static const CoreFoundationTimeZoneApi api;
++    return api;
++  }
++
++  decltype(&::CFRelease) CFRelease;
++  decltype(&::CFStringGetCString) CFStringGetCString;
++  decltype(&::CFStringGetLength) CFStringGetLength;
++  decltype(&::CFStringGetMaximumSizeForEncoding)
++      CFStringGetMaximumSizeForEncoding;
++  decltype(&::CFTimeZoneCopyDefault) CFTimeZoneCopyDefault;
++  decltype(&::CFTimeZoneGetName) CFTimeZoneGetName;
++
++ private:
++  static void* OpenFramework() {
++    void* handle = dlopen(
++#if TARGET_OS_OSX
++        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/"
++        "CoreFoundation",
++#else
++        "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
++#endif
++        RTLD_LAZY | RTLD_LOCAL);
++    if (handle == nullptr) std::abort();
++    return handle;
++  }
++
++  template <typename T>
++  static T LoadFunction(void* handle, const char* name) {
++    void* symbol = dlsym(handle, name);
++    if (symbol == nullptr) std::abort();
++    static_assert(sizeof(T) == sizeof(symbol));
++    T result;
++    std::memcpy(&result, &symbol, sizeof(result));
++    return result;
++  }
++
++  CoreFoundationTimeZoneApi()
++      : handle_(OpenFramework()),
++        CFRelease(LoadFunction<decltype(CFRelease)>(handle_, "CFRelease")),
++        CFStringGetCString(LoadFunction<decltype(CFStringGetCString)>(
++            handle_, "CFStringGetCString")),
++        CFStringGetLength(LoadFunction<decltype(CFStringGetLength)>(
++            handle_, "CFStringGetLength")),
++        CFStringGetMaximumSizeForEncoding(
++            LoadFunction<decltype(CFStringGetMaximumSizeForEncoding)>(
++                handle_, "CFStringGetMaximumSizeForEncoding")),
++        CFTimeZoneCopyDefault(LoadFunction<decltype(CFTimeZoneCopyDefault)>(
++            handle_, "CFTimeZoneCopyDefault")),
++        CFTimeZoneGetName(LoadFunction<decltype(CFTimeZoneGetName)>(
++            handle_, "CFTimeZoneGetName")) {}
++
++};
++#endif
++
+ std::string time_zone::name() const { return effective_impl().Name(); }
+ 
+ time_zone::absolute_lookup time_zone::lookup(
+@@ -110,17 +175,19 @@ time_zone local_time_zone() {
+ #endif
+ #if defined(__APPLE__)
+   std::vector<char> buffer;
+-  CFTimeZoneRef tz_default = CFTimeZoneCopyDefault();
+-  if (CFStringRef tz_name = CFTimeZoneGetName(tz_default)) {
++  const CoreFoundationTimeZoneApi& cf = CoreFoundationTimeZoneApi::Get();
++  CFTimeZoneRef tz_default = cf.CFTimeZoneCopyDefault();
++  if (CFStringRef tz_name = cf.CFTimeZoneGetName(tz_default)) {
+     CFStringEncoding encoding = kCFStringEncodingUTF8;
+-    CFIndex length = CFStringGetLength(tz_name);
+-    CFIndex max_size = CFStringGetMaximumSizeForEncoding(length, encoding) + 1;
++    CFIndex length = cf.CFStringGetLength(tz_name);
++    CFIndex max_size =
++        cf.CFStringGetMaximumSizeForEncoding(length, encoding) + 1;
+     buffer.resize(static_cast<size_t>(max_size));
+-    if (CFStringGetCString(tz_name, &buffer[0], max_size, encoding)) {
++    if (cf.CFStringGetCString(tz_name, &buffer[0], max_size, encoding)) {
+       zone = &buffer[0];
+     }
+   }
+-  CFRelease(tz_default);
++  cf.CFRelease(tz_default);
+ #endif
+ #if defined(__Fuchsia__)
+   std::string primary_tz;
+diff --git a/deps/v8/third_party/rapidhash-v8/secret.h b/deps/v8/third_party/rapidhash-v8/secret.h
+index 021125bc..27536394 100644
+--- a/deps/v8/third_party/rapidhash-v8/secret.h
++++ b/deps/v8/third_party/rapidhash-v8/secret.h
+@@ -81,6 +81,10 @@ static inline uint64_t wyrand(uint64_t* seed) {
+ static inline unsigned long long mul_mod(unsigned long long a,
+                                          unsigned long long b,
+                                          unsigned long long m) {
++#if defined(__SIZEOF_INT128__)
++  return static_cast<unsigned long long>(
++      (static_cast<__uint128_t>(a) * b) % m);
++#else
+   unsigned long long r = 0;
+   while (b) {
+     if (b & 1) {
+@@ -96,6 +100,7 @@ static inline unsigned long long mul_mod(unsigned long long a,
+     }
+   }
+   return r;
++#endif
+ }
+ 
+ static inline unsigned long long pow_mod(unsigned long long a,
+@@ -110,6 +115,71 @@ static inline unsigned long long pow_mod(unsigned long long a,
+   return r;
+ }
+ 
++#if defined(__SIZEOF_INT128__)
++class MontgomeryMod {
++ public:
++  explicit MontgomeryMod(uint64_t modulus)
++      : modulus_(modulus),
++        negative_inverse_(NegativeInverse(modulus)),
++        one_(static_cast<uint64_t>((static_cast<__uint128_t>(1) << 64) %
++                                   modulus)),
++        r_squared_(static_cast<uint64_t>(
++            (static_cast<__uint128_t>(one_) * one_) % modulus)) {}
++
++  uint64_t one() const { return one_; }
++
++  uint64_t ToMontgomery(uint64_t value) const {
++    return Multiply(value % modulus_, r_squared_);
++  }
++
++  uint64_t FromMontgomery(uint64_t value) const { return Multiply(value, 1); }
++
++  uint64_t Multiply(uint64_t a, uint64_t b) const {
++    const __uint128_t product = static_cast<__uint128_t>(a) * b;
++    const uint64_t product_low = static_cast<uint64_t>(product);
++    const uint64_t product_high = static_cast<uint64_t>(product >> 64);
++    const uint64_t multiplier = product_low * negative_inverse_;
++    const __uint128_t adjustment =
++        static_cast<__uint128_t>(multiplier) * modulus_;
++    const uint64_t sum_low = product_low + static_cast<uint64_t>(adjustment);
++    const uint64_t carry = sum_low < product_low;
++    const uint64_t sum_high = product_high +
++                              static_cast<uint64_t>(adjustment >> 64);
++    const bool overflow = sum_high < product_high;
++    const uint64_t result = sum_high + carry;
++    if (overflow || result < sum_high || result >= modulus_) {
++      return result - modulus_;
++    }
++    return result;
++  }
++
++  uint64_t Power(uint64_t base, uint64_t exponent) const {
++    uint64_t result = one_;
++    base = ToMontgomery(base);
++    while (exponent) {
++      if (exponent & 1) result = Multiply(result, base);
++      exponent >>= 1;
++      if (exponent) base = Multiply(base, base);
++    }
++    return result;
++  }
++
++ private:
++  static uint64_t NegativeInverse(uint64_t modulus) {
++    uint64_t inverse = modulus;
++    for (int i = 0; i < 6; ++i) {
++      inverse *= 2 - modulus * inverse;
++    }
++    return 0 - inverse;
++  }
++
++  uint64_t modulus_;
++  uint64_t negative_inverse_;
++  uint64_t one_;
++  uint64_t r_squared_;
++};
++#endif
++
+ static unsigned sprp(unsigned long long n, unsigned long long a) {
+   unsigned long long d = n - 1;
+   unsigned char s = 0;
+@@ -129,13 +199,27 @@ static unsigned sprp(unsigned long long n, unsigned long long a) {
+     d >>= 1;
+     s += 1;
+   }
++#if defined(__SIZEOF_INT128__)
++  // is_prime only reaches sprp with an odd n, as required by Montgomery form.
++  const MontgomeryMod modulus(n);
++  unsigned long long b = modulus.Power(a, d);
++  const unsigned long long negative_one = n - modulus.one();
++  if ((b == modulus.one()) || (b == negative_one)) return 1;
++#else
+   unsigned long long b = pow_mod(a, d, n);
+   if ((b == 1) || (b == (n - 1))) return 1;
++#endif
+   unsigned char r;
+   for (r = 1; r < s; r++) {
++#if defined(__SIZEOF_INT128__)
++    b = modulus.Multiply(b, b);
++    if (b == 0 || b == modulus.one()) return 0;
++    if (b == negative_one) return 1;
++#else
+     b = mul_mod(b, b, n);
+     if (b <= 1) return 0;
+     if (b == (n - 1)) return 1;
++#endif
+   }
+   return 0;
+ }
+@@ -143,6 +227,12 @@ static unsigned sprp(unsigned long long n, unsigned long long a) {
+ static unsigned is_prime(unsigned long long n) {
+   if (n < 2 || !(n & 1)) return 0;
+   if (n < 4) return 1;
++  if (n >= 2047 &&
++      (n % 3 == 0 || n % 5 == 0 || n % 7 == 0 || n % 11 == 0 ||
++       n % 13 == 0 || n % 17 == 0 || n % 19 == 0 || n % 23 == 0 ||
++       n % 29 == 0 || n % 31 == 0 || n % 37 == 0)) {
++    return 0;
++  }
+   if (!sprp(n, 2)) return 0;
+   if (n < 2047) return 1;
+   if (!sprp(n, 3)) return 0;
+diff --git a/lib/internal/encoding/single-byte.js b/lib/internal/encoding/single-byte.js
+index abce7171..b37b3070 100644
+--- a/lib/internal/encoding/single-byte.js
++++ b/lib/internal/encoding/single-byte.js
+@@ -4,13 +4,12 @@
+ 'use strict';
+ 
+ const {
+-  Array,
+-  ArrayPrototypeFill,
+   ObjectKeys,
+   ObjectPrototypeHasOwnProperty,
+   SafeArrayIterator,
+   SafeMap,
+   SafeSet,
++  StringPrototypeCharCodeAt,
+   StringPrototypeIncludes,
+   TypedArrayFrom,
+   TypedArrayOf,
+@@ -35,46 +34,41 @@ const it = (x) => new SafeArrayIterator(x);
+ /* fallback/single-byte.encodings.js */
+ 
+ const r = 0xfffd;
+-const e = (x) => it(ArrayPrototypeFill(new Array(x), 1));
+-const h = (x) => it(ArrayPrototypeFill(new Array(x), r));
+ 
+ /* eslint-disable @stylistic/js/max-len */
+ 
+ // Index tables from https://encoding.spec.whatwg.org/#legacy-single-byte-encodings
+-// Each table in the spec lists only mapping from byte 0x80 onwards, as below that they are all ASCII and mapped as identity
+-// Here, 0xfffd (replacement charcode) designates a hole (unmapped offset), as not all encodings map all offsets
+-// All other numbers are deltas from the last seen mapped value, starting with 0x7f (127, highest ASCII)
+-// Thus, [0x80, 0x81, , 0x83] is stored as [1, 1, r, 2]
+-// Truncation (length < 128) means that all remaining ones are mapped as identity (offset i => codepoint i), not unmapped
++// Each string stores the Unicode mapping for bytes 0x80 through 0xff.
++// ASCII maps to itself. Unmapped bytes use the replacement character.
+ const encodings = {
+   '__proto__': null,
+-  'ibm866': [913, ...e(47), 8530, 1, 1, -145, 34, 61, 1, -12, -1, 14, -18, 6, 6, -1, -1, -75, 4, 32, -8, -16, -28, 60, 34, 1, -5, -6, 21, -3, -6, -16, 28, -5, 1, -4, 1, -12, -1, -6, 1, 24, -1, -82, -12, 124, -4, 8, 4, -16, -8512, ...e(15), -78, 80, -77, 80, -77, 80, -73, 80, -942, 8553, -8546, 8547, -260, -8306, 9468, -9472],
+-  'iso-8859-10': [...e(33), 100, 14, 16, 8, -2, 14, -143, 148, -43, 80, 6, 23, -208, 189, -32, -154, 85, 14, 16, 8, -2, 14, -128, 133, -43, 80, 6, 23, 7831, -7850, -32, -75, -63, ...e(5), 104, -34, -67, 79, -77, 75, -73, 1, 1, 1, 117, 7, -121, 1, 1, 1, 146, -144, 154, -152, ...e(5), 34, -32, ...e(5), 73, -34, -36, 48, -46, 44, -42, 1, 1, 1, 86, 7, -90, 1, 1, 1, 115, -113, 123, -121, 1, 1, 1, 1, 58],
+-  'iso-8859-13': [...e(33), 8061, -8059, 1, 1, 8058, -8056, 1, 49, -47, 173, -171, 1, 1, 1, 24, -22, 1, 1, 1, 8041, -8039, 1, 1, 65, -63, 158, -156, 1, 1, 1, 40, 30, 42, -46, 6, -66, 1, 83, -6, -6, -67, 176, -99, 12, 20, -12, 17, 37, -29, 2, -114, 121, -119, 1, 1, 155, -49, 25, 16, -142, 159, 2, -158, 38, 42, -46, 6, -35, 1, 52, -6, -6, -36, 145, -99, 12, 20, -12, 17, 37, -29, 2, -83, 90, -88, 1, 1, 124, -49, 25, 16, -111, 128, 2, 7835],
+-  'iso-8859-14': [...e(33), 7522, 1, -7520, 103, 1, 7423, -7523, 7641, -7639, 7641, -119, 231, -7749, 1, 202, 7334, 1, -7423, 1, 7455, 1, -7563, 7584, 43, -42, 44, -35, 147, -111, 1, -36, -7585, ...e(15), 165, -163, ...e(5), 7572, -7570, ...e(5), 153, -151, ...e(16), 134, -132, ...e(5), 7541, -7539, ...e(5), 122],
+-  'iso-8859-15': [...e(33), 1, 1, 1, 8201, -8199, 187, -185, 186, -184, ...e(10), 202, -200, 1, 1, 199, -197, 1, 1, 151, 1, 37],
+-  'iso-8859-16': [...e(33), 100, 1, 60, 8043, -142, -7870, -185, 186, -184, 367, -365, 206, -204, 205, 1, -203, 1, 91, 54, 59, 7840, -8039, 1, 199, -113, 268, -350, 151, 1, 37, 4, -188, 1, 1, 64, -62, 66, -64, ...e(9), 65, 51, -113, 1, 1, 124, -122, 132, 22, -151, 1, 1, 1, 60, 258, -315, 1, 1, 1, 33, -31, 35, -33, ...e(9), 34, 51, -82, 1, 1, 93, -91, 101, 22, -120, 1, 1, 1, 29, 258],
+-  'iso-8859-2': [...e(33), 100, 468, -407, -157, 153, 29, -179, 1, 184, -2, 6, 21, -204, 208, -2, -203, 85, 470, -409, -142, 138, 29, 364, -527, 169, -2, 6, 21, 355, -351, -2, -40, -147, 1, 64, -62, 117, -51, -63, 69, -67, 79, -77, 79, -77, 1, 64, 2, 51, 4, -116, 1, 124, -122, 1, 129, 22, -148, 150, -148, 1, 133, -131, 118, -116, 1, 33, -31, 86, -51, -32, 38, -36, 48, -46, 48, -46, 1, 33, 2, 51, 4, -85, 1, 93, -91, 1, 98, 22, -117, 119, -117, 1, 102, 374],
+-  'iso-8859-3': [...e(33), 134, 434, -565, 1, r, 128, -125, 1, 136, 46, -64, 22, -135, r, 206, -203, 119, -117, 1, 1, 1, 112, -110, 1, 121, 46, -64, 22, -120, r, 191, -188, 1, 1, r, 2, 70, -2, -65, ...e(8), r, 2, 1, 1, 1, 76, -74, 1, 69, -67, 1, 1, 1, 144, -16, -125, 1, 1, 1, r, 2, 39, -2, -34, ...e(8), r, 2, 1, 1, 1, 45, -43, 1, 38, -36, 1, 1, 1, 113, -16, 380],
+-  'iso-8859-4': [...e(33), 100, 52, 30, -178, 132, 19, -148, 1, 184, -78, 16, 68, -185, 208, -206, 1, 85, 470, -388, -163, 117, 19, 395, -527, 169, -78, 16, 68, -29, 52, -51, -75, -63, ...e(5), 104, -34, -67, 79, -77, 75, -73, 1, 92, -26, 53, 7, -22, -98, 1, 1, 1, 1, 154, -152, 1, 1, 140, 2, -139, 34, -32, ...e(5), 73, -34, -36, 48, -46, 44, -42, 1, 61, -26, 53, 7, -22, -67, 1, 1, 1, 1, 123, -121, 1, 1, 109, 2, 366],
+-  'iso-8859-5': [...e(33), 865, ...e(11), -863, 865, ...e(65), 7367, -7365, ...e(11), -949, 951, 1],
+-  'iso-8859-6': [...e(33), r, r, r, 4, ...h(7), 1384, -1375, ...h(13), 1390, r, r, r, 4, r, 2, ...e(25), r, r, r, r, r, 6, ...e(18), ...h(13)],
+-  'iso-8859-7': [...e(33), 8056, 1, -8054, 8201, 3, -8201, 1, 1, 1, 721, -719, 1, 1, r, 8040, -8037, 1, 1, 1, 721, 1, 1, -719, 721, 1, 1, -719, 721, -719, 721, ...e(19), r, 2, ...e(43), r],
+-  'iso-8859-8': [...e(33), r, 2, ...e(7), 46, -44, ...e(14), 62, -60, 1, 1, 1, ...h(32), 8025, -6727, ...e(26), r, r, 6692, 1, r],
+-  'koi8-r': [9345, 2, 10, 4, 4, 4, 4, 8, 8, 8, 8, 68, 4, 4, 4, 4, 1, 1, 1, -627, 640, -903, 1, 46, 28, 1, -8645, 8833, -8817, 2, 5, 64, 9305, 1, 1, -8449, 8450, ...e(14), -8544, 8545, ...e(10), -9411, 933, -30, 1, 21, -18, 1, 15, -17, 18, -13, ...e(7), 16, -15, 1, 1, 1, -13, -4, 26, -1, -20, 17, 5, -4, -2, 3, -28, -30, 1, 21, -18, 1, 15, -17, 18, -13, ...e(7), 16, -15, 1, 1, 1, -13, -4, 26, -1, -20, 17, 5, -4, -2, 3],
+-  'koi8-u': [9345, 2, 10, 4, 4, 4, 4, 8, 8, 8, 8, 68, 4, 4, 4, 4, 1, 1, 1, -627, 640, -903, 1, 46, 28, 1, -8645, 8833, -8817, 2, 5, 64, 9305, 1, 1, -8449, 3, 8448, -8446, 1, 8448, 1, 1, 1, 1, -8394, -51, 8448, 1, 1, 1, -8544, 3, 8543, -8541, 1, 8543, 1, 1, 1, 1, -8410, -130, -869, 933, -30, 1, 21, -18, 1, 15, -17, 18, -13, ...e(7), 16, -15, 1, 1, 1, -13, -4, 26, -1, -20, 17, 5, -4, -2, 3, -28, -30, 1, 21, -18, 1, 15, -17, 18, -13, ...e(7), 16, -15, 1, 1, 1, -13, -4, 26, -1, -20, 17, 5, -4, -2, 3],
+-  'macintosh': [69, 1, 2, 2, 8, 5, 6, 5, -1, 2, 2, -1, 2, 2, 2, -1, 2, 1, 2, -1, 2, 1, 2, 2, -1, 2, 2, -1, 5, -1, 2, 1, 7972, -8048, -14, 1, 4, 8059, -8044, 41, -49, -5, 8313, -8302, -12, 8632, -8602, 18, 8518, -8557, 8627, 1, -8640, 16, 8525, 15, -2, -7759, 7787, -8577, 16, 751, -707, 18, -57, -30, 11, 8558, -8328, 8374, -66, -8539, 16, 8043, -8070, 32, 3, 18, 125, 1, 7872, 1, 8, 1, -5, 1, -7970, 9427, -9419, 121, 7884, 104, -115, 1, 56007, 1, -56033, -8042, 8035, 4, 18, -8046, 8, -9, 10, -3, 5, 1, 1, -3, 7, 1, 63531, -63533, 8, 1, -2, 88, 405, 22, -557, 553, 1, 1, -546, 549, -2, -20],
+-  'windows-1250': [8237, -8235, 8089, -8087, 8091, 8, -6, 1, -8089, 8104, -7888, 7897, -7903, 10, 25, -4, -233, 8072, 1, 3, 1, 5, -15, 1, -8060, 8330, -8129, 7897, -7903, 10, 25, -4, -218, 551, 17, -407, -157, 96, -94, 1, 1, 1, 181, -179, 1, 1, 1, 205, -203, 1, 554, -409, -142, 1, 1, 1, 1, 77, 90, -164, 130, 416, -415, 62, -40, -147, 1, 64, -62, 117, -51, -63, 69, -67, 79, -77, 79, -77, 1, 64, 2, 51, 4, -116, 1, 124, -122, 1, 129, 22, -148, 150, -148, 1, 133, -131, 118, -116, 1, 33, -31, 86, -51, -32, 38, -36, 48, -46, 48, -46, 1, 33, 2, 51, 4, -85, 1, 93, -91, 1, 98, 22, -117, 119, -117, 1, 102, 374],
+-  'windows-1251': [899, 1, 7191, -7111, 7115, 8, -6, 1, 139, -124, -7207, 7216, -7215, 2, -1, 4, 67, 7110, 1, 3, 1, 5, -15, 1, -8060, 8330, -7369, 7137, -7136, 2, -1, 4, -959, 878, 80, -86, -868, 1004, -1002, 1, 858, -856, 859, -857, 1, 1, 1, 857, -855, 1, 853, 80, 59, -988, 1, 1, 922, 7365, -7362, -921, 925, -83, 80, 2, -71, ...e(63)],
+-  'windows-1252': [8237, -8235, 8089, -7816, 7820, 8, -6, 1, -7515, 7530, -7888, 7897, -7911, -197, 240, -238, 1, 8072, 1, 3, 1, 5, -15, 1, -7480, 7750, -8129, 7897, -7911, -182, 225, -6],
+-  'windows-1253': [8237, -8235, 8089, -7816, 7820, 8, -6, 1, -8089, 8104, -8102, 8111, -8109, 1, 1, 1, 1, 8072, 1, 3, 1, 5, -15, 1, -8060, 8330, -8328, 8096, -8094, 1, 1, 1, 1, 741, 1, -739, 1, 1, 1, 1, 1, 1, r, 2, 1, 1, 1, 8039, -8037, 1, 1, 1, 721, -719, 1, 1, 721, 1, 1, -719, 721, -719, 721, ...e(19), r, 2, ...e(43), r],
+-  'windows-1254': [8237, -8235, 8089, -7816, 7820, 8, -6, 1, -7515, 7530, -7888, 7897, -7911, -197, 1, 1, 1, 8072, 1, 3, 1, 5, -15, 1, -7480, 7750, -8129, 7897, -7911, -182, 1, 218, -216, ...e(47), 79, -77, ...e(11), 84, 46, -127, ...e(16), 48, -46, ...e(11), 53, 46],
+-  'windows-1255': [8237, -8235, 8089, -7816, 7820, 8, -6, 1, -7515, 7530, -8102, 8111, -8109, 1, 1, 1, 1, 8072, 1, 3, 1, 5, -15, 1, -7480, 7750, -8328, 8096, -8094, ...e(7), 8199, -8197, 1, 1, 1, 1, 46, -44, ...e(14), 62, -60, 1, 1, 1, 1, 1265, ...e(19), 45, 1, 1, 1, 1, ...h(7), -36, ...e(26), r, r, 6692, 1, r],
+-  'windows-1256': [8237, -6702, 6556, -7816, 7820, 8, -6, 1, -7515, 7530, -6583, 6592, -7911, 1332, 18, -16, 39, 6505, 1, 3, 1, 5, -15, 1, -6507, 6777, -6801, 6569, -7911, 7865, 1, -6483, -1562, 1388, -1386, ...e(7), 1557, -1555, ...e(14), 1378, -1376, 1, 1, 1, 1377, 162, -160, ...e(21), -1375, 1376, 1, 1, 1, 6, 1, 1, 1, -1379, 1380, -1378, 1379, 1, 1, 1, -1377, 1, 1, 1, 1, 1374, 1, -1372, 1, 1372, 1, 1, 1, -1370, 1371, 1, -1369, 1370, -1368, 1369, -1367, 1, 7954, 1, -6461],
+-  'windows-1257': [8237, -8235, 8089, -8087, 8091, 8, -6, 1, -8089, 8104, -8102, 8111, -8109, 28, 543, -527, -40, 8072, 1, 3, 1, 5, -15, 1, -8060, 8330, -8328, 8096, -8094, 19, 556, -572, 1, r, 2, 1, 1, r, 2, 1, 49, -47, 173, -171, 1, 1, 1, 24, -22, ...e(5), 1, 1, 65, -63, 158, -156, 1, 1, 1, 40, 30, 42, -46, 6, -66, 1, 83, -6, -6, -67, 176, -99, 12, 20, -12, 17, 37, -29, 2, -114, 121, -119, 1, 1, 155, -49, 25, 16, -142, 159, 2, -158, 38, 42, -46, 6, -35, 1, 52, -6, -6, -36, 145, -99, 12, 20, -12, 17, 37, -29, 2, -83, 90, -88, 1, 1, 124, -49, 25, 16, -111, 128, 2, 347],
+-  'windows-1258': [8237, -8235, 8089, -7816, 7820, 8, -6, 1, -7515, 7530, -8102, 8111, -7911, -197, 1, 1, 1, 8072, 1, 3, 1, 5, -15, 1, -7480, 7750, -8328, 8096, -7911, -182, 1, 218, -216, ...e(34), 64, -62, ...e(7), 565, -563, 1, 1, 65, -63, 568, -566, 1, 204, -202, 1, 1, 1, 1, 1, 1, 211, 340, -548, 1, 1, 1, 33, -31, ...e(7), 534, -532, 1, 1, 34, -32, 562, -560, 1, 173, -171, 1, 1, 1, 1, 1, 1, 180, 7931],
+-  'windows-874': [8237, -8235, 1, 1, 1, 8098, -8096, ...e(10), 8072, 1, 3, 1, 5, -15, 1, -8060, ...e(8), 3425, ...e(57), r, r, r, r, 5, ...e(28), r, r, r, r],
+-  'x-mac-cyrillic': [913, ...e(31), 7153, -8048, 992, -1005, 4, 8059, -8044, 848, -856, -5, 8313, -7456, 80, 7694, -7773, 80, 7627, -8557, 8627, 1, -7695, -929, 988, -137, -4, 80, -77, 80, -78, 80, -79, 80, -2, -83, -857, 8558, -8328, 8374, -66, -8539, 16, 8043, -8070, 875, 80, -79, 80, -7, 7102, 1, 8, 1, -5, 1, -7970, 7975, -7184, 80, -79, 80, 7351, -7445, 80, -2, -31, ...e(30), 7262],
++  'ibm866': '\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042a\u042b\u042c\u042d\u042e\u042f\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044a\u044b\u044c\u044d\u044e\u044f\u0401\u0451\u0404\u0454\u0407\u0457\u040e\u045e\u00b0\u2219\u00b7\u221a\u2116\u00a4\u25a0\u00a0',
++  'iso-8859-10': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u0104\u0112\u0122\u012a\u0128\u0136\u00a7\u013b\u0110\u0160\u0166\u017d\u00ad\u016a\u014a\u00b0\u0105\u0113\u0123\u012b\u0129\u0137\u00b7\u013c\u0111\u0161\u0167\u017e\u2015\u016b\u014b\u0100\u00c1\u00c2\u00c3\u00c4\u00c5\u00c6\u012e\u010c\u00c9\u0118\u00cb\u0116\u00cd\u00ce\u00cf\u00d0\u0145\u014c\u00d3\u00d4\u00d5\u00d6\u0168\u00d8\u0172\u00da\u00db\u00dc\u00dd\u00de\u00df\u0101\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u012f\u010d\u00e9\u0119\u00eb\u0117\u00ed\u00ee\u00ef\u00f0\u0146\u014d\u00f3\u00f4\u00f5\u00f6\u0169\u00f8\u0173\u00fa\u00fb\u00fc\u00fd\u00fe\u0138',
++  'iso-8859-13': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u201d\u00a2\u00a3\u00a4\u201e\u00a6\u00a7\u00d8\u00a9\u0156\u00ab\u00ac\u00ad\u00ae\u00c6\u00b0\u00b1\u00b2\u00b3\u201c\u00b5\u00b6\u00b7\u00f8\u00b9\u0157\u00bb\u00bc\u00bd\u00be\u00e6\u0104\u012e\u0100\u0106\u00c4\u00c5\u0118\u0112\u010c\u00c9\u0179\u0116\u0122\u0136\u012a\u013b\u0160\u0143\u0145\u00d3\u014c\u00d5\u00d6\u00d7\u0172\u0141\u015a\u016a\u00dc\u017b\u017d\u00df\u0105\u012f\u0101\u0107\u00e4\u00e5\u0119\u0113\u010d\u00e9\u017a\u0117\u0123\u0137\u012b\u013c\u0161\u0144\u0146\u00f3\u014d\u00f5\u00f6\u00f7\u0173\u0142\u015b\u016b\u00fc\u017c\u017e\u2019',
++  'iso-8859-14': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u1e02\u1e03\u00a3\u010a\u010b\u1e0a\u00a7\u1e80\u00a9\u1e82\u1e0b\u1ef2\u00ad\u00ae\u0178\u1e1e\u1e1f\u0120\u0121\u1e40\u1e41\u00b6\u1e56\u1e81\u1e57\u1e83\u1e60\u1ef3\u1e84\u1e85\u1e61\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cc\u00cd\u00ce\u00cf\u0174\u00d1\u00d2\u00d3\u00d4\u00d5\u00d6\u1e6a\u00d8\u00d9\u00da\u00db\u00dc\u00dd\u0176\u00df\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u0175\u00f1\u00f2\u00f3\u00f4\u00f5\u00f6\u1e6b\u00f8\u00f9\u00fa\u00fb\u00fc\u00fd\u0177\u00ff',
++  'iso-8859-15': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u00a1\u00a2\u00a3\u20ac\u00a5\u0160\u00a7\u0161\u00a9\u00aa\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u017d\u00b5\u00b6\u00b7\u017e\u00b9\u00ba\u00bb\u0152\u0153\u0178\u00bf\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cc\u00cd\u00ce\u00cf\u00d0\u00d1\u00d2\u00d3\u00d4\u00d5\u00d6\u00d7\u00d8\u00d9\u00da\u00db\u00dc\u00dd\u00de\u00df\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u00f0\u00f1\u00f2\u00f3\u00f4\u00f5\u00f6\u00f7\u00f8\u00f9\u00fa\u00fb\u00fc\u00fd\u00fe\u00ff',
++  'iso-8859-16': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u0104\u0105\u0141\u20ac\u201e\u0160\u00a7\u0161\u00a9\u0218\u00ab\u0179\u00ad\u017a\u017b\u00b0\u00b1\u010c\u0142\u017d\u201d\u00b6\u00b7\u017e\u010d\u0219\u00bb\u0152\u0153\u0178\u017c\u00c0\u00c1\u00c2\u0102\u00c4\u0106\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cc\u00cd\u00ce\u00cf\u0110\u0143\u00d2\u00d3\u00d4\u0150\u00d6\u015a\u0170\u00d9\u00da\u00db\u00dc\u0118\u021a\u00df\u00e0\u00e1\u00e2\u0103\u00e4\u0107\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u0111\u0144\u00f2\u00f3\u00f4\u0151\u00f6\u015b\u0171\u00f9\u00fa\u00fb\u00fc\u0119\u021b\u00ff',
++  'iso-8859-2': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u0104\u02d8\u0141\u00a4\u013d\u015a\u00a7\u00a8\u0160\u015e\u0164\u0179\u00ad\u017d\u017b\u00b0\u0105\u02db\u0142\u00b4\u013e\u015b\u02c7\u00b8\u0161\u015f\u0165\u017a\u02dd\u017e\u017c\u0154\u00c1\u00c2\u0102\u00c4\u0139\u0106\u00c7\u010c\u00c9\u0118\u00cb\u011a\u00cd\u00ce\u010e\u0110\u0143\u0147\u00d3\u00d4\u0150\u00d6\u00d7\u0158\u016e\u00da\u0170\u00dc\u00dd\u0162\u00df\u0155\u00e1\u00e2\u0103\u00e4\u013a\u0107\u00e7\u010d\u00e9\u0119\u00eb\u011b\u00ed\u00ee\u010f\u0111\u0144\u0148\u00f3\u00f4\u0151\u00f6\u00f7\u0159\u016f\u00fa\u0171\u00fc\u00fd\u0163\u02d9',
++  'iso-8859-3': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u0126\u02d8\u00a3\u00a4\ufffd\u0124\u00a7\u00a8\u0130\u015e\u011e\u0134\u00ad\ufffd\u017b\u00b0\u0127\u00b2\u00b3\u00b4\u00b5\u0125\u00b7\u00b8\u0131\u015f\u011f\u0135\u00bd\ufffd\u017c\u00c0\u00c1\u00c2\ufffd\u00c4\u010a\u0108\u00c7\u00c8\u00c9\u00ca\u00cb\u00cc\u00cd\u00ce\u00cf\ufffd\u00d1\u00d2\u00d3\u00d4\u0120\u00d6\u00d7\u011c\u00d9\u00da\u00db\u00dc\u016c\u015c\u00df\u00e0\u00e1\u00e2\ufffd\u00e4\u010b\u0109\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\ufffd\u00f1\u00f2\u00f3\u00f4\u0121\u00f6\u00f7\u011d\u00f9\u00fa\u00fb\u00fc\u016d\u015d\u02d9',
++  'iso-8859-4': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u0104\u0138\u0156\u00a4\u0128\u013b\u00a7\u00a8\u0160\u0112\u0122\u0166\u00ad\u017d\u00af\u00b0\u0105\u02db\u0157\u00b4\u0129\u013c\u02c7\u00b8\u0161\u0113\u0123\u0167\u014a\u017e\u014b\u0100\u00c1\u00c2\u00c3\u00c4\u00c5\u00c6\u012e\u010c\u00c9\u0118\u00cb\u0116\u00cd\u00ce\u012a\u0110\u0145\u014c\u0136\u00d4\u00d5\u00d6\u00d7\u00d8\u0172\u00da\u00db\u00dc\u0168\u016a\u00df\u0101\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u012f\u010d\u00e9\u0119\u00eb\u0117\u00ed\u00ee\u012b\u0111\u0146\u014d\u0137\u00f4\u00f5\u00f6\u00f7\u00f8\u0173\u00fa\u00fb\u00fc\u0169\u016b\u02d9',
++  'iso-8859-5': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u0401\u0402\u0403\u0404\u0405\u0406\u0407\u0408\u0409\u040a\u040b\u040c\u00ad\u040e\u040f\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042a\u042b\u042c\u042d\u042e\u042f\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044a\u044b\u044c\u044d\u044e\u044f\u2116\u0451\u0452\u0453\u0454\u0455\u0456\u0457\u0458\u0459\u045a\u045b\u045c\u00a7\u045e\u045f',
++  'iso-8859-6': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\ufffd\ufffd\ufffd\u00a4\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u060c\u00ad\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u061b\ufffd\ufffd\ufffd\u061f\ufffd\u0621\u0622\u0623\u0624\u0625\u0626\u0627\u0628\u0629\u062a\u062b\u062c\u062d\u062e\u062f\u0630\u0631\u0632\u0633\u0634\u0635\u0636\u0637\u0638\u0639\u063a\ufffd\ufffd\ufffd\ufffd\ufffd\u0640\u0641\u0642\u0643\u0644\u0645\u0646\u0647\u0648\u0649\u064a\u064b\u064c\u064d\u064e\u064f\u0650\u0651\u0652\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd',
++  'iso-8859-7': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u2018\u2019\u00a3\u20ac\u20af\u00a6\u00a7\u00a8\u00a9\u037a\u00ab\u00ac\u00ad\ufffd\u2015\u00b0\u00b1\u00b2\u00b3\u0384\u0385\u0386\u00b7\u0388\u0389\u038a\u00bb\u038c\u00bd\u038e\u038f\u0390\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039a\u039b\u039c\u039d\u039e\u039f\u03a0\u03a1\ufffd\u03a3\u03a4\u03a5\u03a6\u03a7\u03a8\u03a9\u03aa\u03ab\u03ac\u03ad\u03ae\u03af\u03b0\u03b1\u03b2\u03b3\u03b4\u03b5\u03b6\u03b7\u03b8\u03b9\u03ba\u03bb\u03bc\u03bd\u03be\u03bf\u03c0\u03c1\u03c2\u03c3\u03c4\u03c5\u03c6\u03c7\u03c8\u03c9\u03ca\u03cb\u03cc\u03cd\u03ce\ufffd',
++  'iso-8859-8': '\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\ufffd\u00a2\u00a3\u00a4\u00a5\u00a6\u00a7\u00a8\u00a9\u00d7\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00b8\u00b9\u00f7\u00bb\u00bc\u00bd\u00be\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u2017\u05d0\u05d1\u05d2\u05d3\u05d4\u05d5\u05d6\u05d7\u05d8\u05d9\u05da\u05db\u05dc\u05dd\u05de\u05df\u05e0\u05e1\u05e2\u05e3\u05e4\u05e5\u05e6\u05e7\u05e8\u05e9\u05ea\ufffd\ufffd\u200e\u200f\ufffd',
++  'koi8-r': '\u2500\u2502\u250c\u2510\u2514\u2518\u251c\u2524\u252c\u2534\u253c\u2580\u2584\u2588\u258c\u2590\u2591\u2592\u2593\u2320\u25a0\u2219\u221a\u2248\u2264\u2265\u00a0\u2321\u00b0\u00b2\u00b7\u00f7\u2550\u2551\u2552\u0451\u2553\u2554\u2555\u2556\u2557\u2558\u2559\u255a\u255b\u255c\u255d\u255e\u255f\u2560\u2561\u0401\u2562\u2563\u2564\u2565\u2566\u2567\u2568\u2569\u256a\u256b\u256c\u00a9\u044e\u0430\u0431\u0446\u0434\u0435\u0444\u0433\u0445\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u044f\u0440\u0441\u0442\u0443\u0436\u0432\u044c\u044b\u0437\u0448\u044d\u0449\u0447\u044a\u042e\u0410\u0411\u0426\u0414\u0415\u0424\u0413\u0425\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u042f\u0420\u0421\u0422\u0423\u0416\u0412\u042c\u042b\u0417\u0428\u042d\u0429\u0427\u042a',
++  'koi8-u': '\u2500\u2502\u250c\u2510\u2514\u2518\u251c\u2524\u252c\u2534\u253c\u2580\u2584\u2588\u258c\u2590\u2591\u2592\u2593\u2320\u25a0\u2219\u221a\u2248\u2264\u2265\u00a0\u2321\u00b0\u00b2\u00b7\u00f7\u2550\u2551\u2552\u0451\u0454\u2554\u0456\u0457\u2557\u2558\u2559\u255a\u255b\u0491\u045e\u255e\u255f\u2560\u2561\u0401\u0404\u2563\u0406\u0407\u2566\u2567\u2568\u2569\u256a\u0490\u040e\u00a9\u044e\u0430\u0431\u0446\u0434\u0435\u0444\u0433\u0445\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u044f\u0440\u0441\u0442\u0443\u0436\u0432\u044c\u044b\u0437\u0448\u044d\u0449\u0447\u044a\u042e\u0410\u0411\u0426\u0414\u0415\u0424\u0413\u0425\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u042f\u0420\u0421\u0422\u0423\u0416\u0412\u042c\u042b\u0417\u0428\u042d\u0429\u0427\u042a',
++  'macintosh': '\u00c4\u00c5\u00c7\u00c9\u00d1\u00d6\u00dc\u00e1\u00e0\u00e2\u00e4\u00e3\u00e5\u00e7\u00e9\u00e8\u00ea\u00eb\u00ed\u00ec\u00ee\u00ef\u00f1\u00f3\u00f2\u00f4\u00f6\u00f5\u00fa\u00f9\u00fb\u00fc\u2020\u00b0\u00a2\u00a3\u00a7\u2022\u00b6\u00df\u00ae\u00a9\u2122\u00b4\u00a8\u2260\u00c6\u00d8\u221e\u00b1\u2264\u2265\u00a5\u00b5\u2202\u2211\u220f\u03c0\u222b\u00aa\u00ba\u03a9\u00e6\u00f8\u00bf\u00a1\u00ac\u221a\u0192\u2248\u2206\u00ab\u00bb\u2026\u00a0\u00c0\u00c3\u00d5\u0152\u0153\u2013\u2014\u201c\u201d\u2018\u2019\u00f7\u25ca\u00ff\u0178\u2044\u20ac\u2039\u203a\ufb01\ufb02\u2021\u00b7\u201a\u201e\u2030\u00c2\u00ca\u00c1\u00cb\u00c8\u00cd\u00ce\u00cf\u00cc\u00d3\u00d4\uf8ff\u00d2\u00da\u00db\u00d9\u0131\u02c6\u02dc\u00af\u02d8\u02d9\u02da\u00b8\u02dd\u02db\u02c7',
++  'windows-1250': '\u20ac\u0081\u201a\u0083\u201e\u2026\u2020\u2021\u0088\u2030\u0160\u2039\u015a\u0164\u017d\u0179\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u0098\u2122\u0161\u203a\u015b\u0165\u017e\u017a\u00a0\u02c7\u02d8\u0141\u00a4\u0104\u00a6\u00a7\u00a8\u00a9\u015e\u00ab\u00ac\u00ad\u00ae\u017b\u00b0\u00b1\u02db\u0142\u00b4\u00b5\u00b6\u00b7\u00b8\u0105\u015f\u00bb\u013d\u02dd\u013e\u017c\u0154\u00c1\u00c2\u0102\u00c4\u0139\u0106\u00c7\u010c\u00c9\u0118\u00cb\u011a\u00cd\u00ce\u010e\u0110\u0143\u0147\u00d3\u00d4\u0150\u00d6\u00d7\u0158\u016e\u00da\u0170\u00dc\u00dd\u0162\u00df\u0155\u00e1\u00e2\u0103\u00e4\u013a\u0107\u00e7\u010d\u00e9\u0119\u00eb\u011b\u00ed\u00ee\u010f\u0111\u0144\u0148\u00f3\u00f4\u0151\u00f6\u00f7\u0159\u016f\u00fa\u0171\u00fc\u00fd\u0163\u02d9',
++  'windows-1251': '\u0402\u0403\u201a\u0453\u201e\u2026\u2020\u2021\u20ac\u2030\u0409\u2039\u040a\u040c\u040b\u040f\u0452\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u0098\u2122\u0459\u203a\u045a\u045c\u045b\u045f\u00a0\u040e\u045e\u0408\u00a4\u0490\u00a6\u00a7\u0401\u00a9\u0404\u00ab\u00ac\u00ad\u00ae\u0407\u00b0\u00b1\u0406\u0456\u0491\u00b5\u00b6\u00b7\u0451\u2116\u0454\u00bb\u0458\u0405\u0455\u0457\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042a\u042b\u042c\u042d\u042e\u042f\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044a\u044b\u044c\u044d\u044e\u044f',
++  'windows-1252': '\u20ac\u0081\u201a\u0192\u201e\u2026\u2020\u2021\u02c6\u2030\u0160\u2039\u0152\u008d\u017d\u008f\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u02dc\u2122\u0161\u203a\u0153\u009d\u017e\u0178\u00a0\u00a1\u00a2\u00a3\u00a4\u00a5\u00a6\u00a7\u00a8\u00a9\u00aa\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00b8\u00b9\u00ba\u00bb\u00bc\u00bd\u00be\u00bf\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cc\u00cd\u00ce\u00cf\u00d0\u00d1\u00d2\u00d3\u00d4\u00d5\u00d6\u00d7\u00d8\u00d9\u00da\u00db\u00dc\u00dd\u00de\u00df\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u00f0\u00f1\u00f2\u00f3\u00f4\u00f5\u00f6\u00f7\u00f8\u00f9\u00fa\u00fb\u00fc\u00fd\u00fe\u00ff',
++  'windows-1253': '\u20ac\u0081\u201a\u0192\u201e\u2026\u2020\u2021\u0088\u2030\u008a\u2039\u008c\u008d\u008e\u008f\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u0098\u2122\u009a\u203a\u009c\u009d\u009e\u009f\u00a0\u0385\u0386\u00a3\u00a4\u00a5\u00a6\u00a7\u00a8\u00a9\ufffd\u00ab\u00ac\u00ad\u00ae\u2015\u00b0\u00b1\u00b2\u00b3\u0384\u00b5\u00b6\u00b7\u0388\u0389\u038a\u00bb\u038c\u00bd\u038e\u038f\u0390\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039a\u039b\u039c\u039d\u039e\u039f\u03a0\u03a1\ufffd\u03a3\u03a4\u03a5\u03a6\u03a7\u03a8\u03a9\u03aa\u03ab\u03ac\u03ad\u03ae\u03af\u03b0\u03b1\u03b2\u03b3\u03b4\u03b5\u03b6\u03b7\u03b8\u03b9\u03ba\u03bb\u03bc\u03bd\u03be\u03bf\u03c0\u03c1\u03c2\u03c3\u03c4\u03c5\u03c6\u03c7\u03c8\u03c9\u03ca\u03cb\u03cc\u03cd\u03ce\ufffd',
++  'windows-1254': '\u20ac\u0081\u201a\u0192\u201e\u2026\u2020\u2021\u02c6\u2030\u0160\u2039\u0152\u008d\u008e\u008f\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u02dc\u2122\u0161\u203a\u0153\u009d\u009e\u0178\u00a0\u00a1\u00a2\u00a3\u00a4\u00a5\u00a6\u00a7\u00a8\u00a9\u00aa\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00b8\u00b9\u00ba\u00bb\u00bc\u00bd\u00be\u00bf\u00c0\u00c1\u00c2\u00c3\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cc\u00cd\u00ce\u00cf\u011e\u00d1\u00d2\u00d3\u00d4\u00d5\u00d6\u00d7\u00d8\u00d9\u00da\u00db\u00dc\u0130\u015e\u00df\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u011f\u00f1\u00f2\u00f3\u00f4\u00f5\u00f6\u00f7\u00f8\u00f9\u00fa\u00fb\u00fc\u0131\u015f\u00ff',
++  'windows-1255': '\u20ac\u0081\u201a\u0192\u201e\u2026\u2020\u2021\u02c6\u2030\u008a\u2039\u008c\u008d\u008e\u008f\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u02dc\u2122\u009a\u203a\u009c\u009d\u009e\u009f\u00a0\u00a1\u00a2\u00a3\u20aa\u00a5\u00a6\u00a7\u00a8\u00a9\u00d7\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00b8\u00b9\u00f7\u00bb\u00bc\u00bd\u00be\u00bf\u05b0\u05b1\u05b2\u05b3\u05b4\u05b5\u05b6\u05b7\u05b8\u05b9\u05ba\u05bb\u05bc\u05bd\u05be\u05bf\u05c0\u05c1\u05c2\u05c3\u05f0\u05f1\u05f2\u05f3\u05f4\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u05d0\u05d1\u05d2\u05d3\u05d4\u05d5\u05d6\u05d7\u05d8\u05d9\u05da\u05db\u05dc\u05dd\u05de\u05df\u05e0\u05e1\u05e2\u05e3\u05e4\u05e5\u05e6\u05e7\u05e8\u05e9\u05ea\ufffd\ufffd\u200e\u200f\ufffd',
++  'windows-1256': '\u20ac\u067e\u201a\u0192\u201e\u2026\u2020\u2021\u02c6\u2030\u0679\u2039\u0152\u0686\u0698\u0688\u06af\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u06a9\u2122\u0691\u203a\u0153\u200c\u200d\u06ba\u00a0\u060c\u00a2\u00a3\u00a4\u00a5\u00a6\u00a7\u00a8\u00a9\u06be\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00b8\u00b9\u061b\u00bb\u00bc\u00bd\u00be\u061f\u06c1\u0621\u0622\u0623\u0624\u0625\u0626\u0627\u0628\u0629\u062a\u062b\u062c\u062d\u062e\u062f\u0630\u0631\u0632\u0633\u0634\u0635\u0636\u00d7\u0637\u0638\u0639\u063a\u0640\u0641\u0642\u0643\u00e0\u0644\u00e2\u0645\u0646\u0647\u0648\u00e7\u00e8\u00e9\u00ea\u00eb\u0649\u064a\u00ee\u00ef\u064b\u064c\u064d\u064e\u00f4\u064f\u0650\u00f7\u0651\u00f9\u0652\u00fb\u00fc\u200e\u200f\u06d2',
++  'windows-1257': '\u20ac\u0081\u201a\u0083\u201e\u2026\u2020\u2021\u0088\u2030\u008a\u2039\u008c\u00a8\u02c7\u00b8\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u0098\u2122\u009a\u203a\u009c\u00af\u02db\u009f\u00a0\ufffd\u00a2\u00a3\u00a4\ufffd\u00a6\u00a7\u00d8\u00a9\u0156\u00ab\u00ac\u00ad\u00ae\u00c6\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00f8\u00b9\u0157\u00bb\u00bc\u00bd\u00be\u00e6\u0104\u012e\u0100\u0106\u00c4\u00c5\u0118\u0112\u010c\u00c9\u0179\u0116\u0122\u0136\u012a\u013b\u0160\u0143\u0145\u00d3\u014c\u00d5\u00d6\u00d7\u0172\u0141\u015a\u016a\u00dc\u017b\u017d\u00df\u0105\u012f\u0101\u0107\u00e4\u00e5\u0119\u0113\u010d\u00e9\u017a\u0117\u0123\u0137\u012b\u013c\u0161\u0144\u0146\u00f3\u014d\u00f5\u00f6\u00f7\u0173\u0142\u015b\u016b\u00fc\u017c\u017e\u02d9',
++  'windows-1258': '\u20ac\u0081\u201a\u0192\u201e\u2026\u2020\u2021\u02c6\u2030\u008a\u2039\u0152\u008d\u008e\u008f\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u02dc\u2122\u009a\u203a\u0153\u009d\u009e\u0178\u00a0\u00a1\u00a2\u00a3\u00a4\u00a5\u00a6\u00a7\u00a8\u00a9\u00aa\u00ab\u00ac\u00ad\u00ae\u00af\u00b0\u00b1\u00b2\u00b3\u00b4\u00b5\u00b6\u00b7\u00b8\u00b9\u00ba\u00bb\u00bc\u00bd\u00be\u00bf\u00c0\u00c1\u00c2\u0102\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u0300\u00cd\u00ce\u00cf\u0110\u00d1\u0309\u00d3\u00d4\u01a0\u00d6\u00d7\u00d8\u00d9\u00da\u00db\u00dc\u01af\u0303\u00df\u00e0\u00e1\u00e2\u0103\u00e4\u00e5\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u0301\u00ed\u00ee\u00ef\u0111\u00f1\u0323\u00f3\u00f4\u01a1\u00f6\u00f7\u00f8\u00f9\u00fa\u00fb\u00fc\u01b0\u20ab\u00ff',
++  'windows-874': '\u20ac\u0081\u0082\u0083\u0084\u2026\u0086\u0087\u0088\u0089\u008a\u008b\u008c\u008d\u008e\u008f\u0090\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u0098\u0099\u009a\u009b\u009c\u009d\u009e\u009f\u00a0\u0e01\u0e02\u0e03\u0e04\u0e05\u0e06\u0e07\u0e08\u0e09\u0e0a\u0e0b\u0e0c\u0e0d\u0e0e\u0e0f\u0e10\u0e11\u0e12\u0e13\u0e14\u0e15\u0e16\u0e17\u0e18\u0e19\u0e1a\u0e1b\u0e1c\u0e1d\u0e1e\u0e1f\u0e20\u0e21\u0e22\u0e23\u0e24\u0e25\u0e26\u0e27\u0e28\u0e29\u0e2a\u0e2b\u0e2c\u0e2d\u0e2e\u0e2f\u0e30\u0e31\u0e32\u0e33\u0e34\u0e35\u0e36\u0e37\u0e38\u0e39\u0e3a\ufffd\ufffd\ufffd\ufffd\u0e3f\u0e40\u0e41\u0e42\u0e43\u0e44\u0e45\u0e46\u0e47\u0e48\u0e49\u0e4a\u0e4b\u0e4c\u0e4d\u0e4e\u0e4f\u0e50\u0e51\u0e52\u0e53\u0e54\u0e55\u0e56\u0e57\u0e58\u0e59\u0e5a\u0e5b\ufffd\ufffd\ufffd\ufffd',
++  'x-mac-cyrillic': '\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042a\u042b\u042c\u042d\u042e\u042f\u2020\u00b0\u0490\u00a3\u00a7\u2022\u00b6\u0406\u00ae\u00a9\u2122\u0402\u0452\u2260\u0403\u0453\u221e\u00b1\u2264\u2265\u0456\u00b5\u0491\u0408\u0404\u0454\u0407\u0457\u0409\u0459\u040a\u045a\u0458\u0405\u00ac\u221a\u0192\u2248\u2206\u00ab\u00bb\u2026\u00a0\u040b\u045b\u040c\u045c\u0455\u2013\u2014\u201c\u201d\u2018\u2019\u00f7\u201e\u040e\u045e\u040f\u045f\u2116\u0401\u0451\u044f\u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044a\u044b\u044c\u044d\u044e\u20ac',
+ };
+ 
+ /* eslint-enable @stylistic/js/max-len */
+@@ -94,8 +88,10 @@ function getEncoding(encoding) {
+   }
+ 
+   const map = TypedArrayFrom(Uint16Array, l256, (_, i) => i); // Unicode subset
+-  let prev = 127;
+-  map.set(TypedArrayFrom(Uint16Array, it(encodings[encoding]), (x) => (x === r ? x : (prev += x))), 128);
++  const table = encodings[encoding];
++  for (let i = 0; i < table.length; i++) {
++    map[i + 128] = StringPrototypeCharCodeAt(table, i);
++  }
+   return map;
+ }
+ 
+diff --git a/node.gyp b/node.gyp
+index 7e1e4f21..496ca593 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -445,6 +445,8 @@
+       'src/crypto/crypto_x509.h',
+       'src/node_crypto.cc',
+       'src/node_crypto.h',
++      'src/node_darwin_frameworks.cc',
++      'src/node_darwin_frameworks.h',
+     ],
+     'node_tracing_perfetto_sources': [
+       'src/tracing/agent_perfetto.cc',
+@@ -544,13 +546,12 @@
+       ['clang==0 and OS!="win"', {
+         'cflags': [ '-Wno-restrict', ],
+       }],
+-      # TODO(joyeecheung): investigate if it breaks addons.
+-      # ['OS=="mac"', {
+-      #   'xcode_settings': {
+-      #     'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
+-      #     'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'  # -fvisibility-inlines-hidden
+-      #   },
+-      # }],
++      ['OS=="mac" and node_shared=="false"', {
++        'xcode_settings': {
++          'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
++          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'  # -fvisibility-inlines-hidden
++        },
++      }],
+       # ['OS!="win" or clang==1', {
+       #   'cflags': [
+       #     '-fvisibility=hidden',
+@@ -633,6 +634,26 @@
+       'msvs_disabled_warnings!': [4244],
+ 
+       'conditions': [
++        ['OS=="mac" and node_shared=="false"', {
++          'xcode_settings': {
++            'DEAD_CODE_STRIPPING': 'YES',
++            # Preserve public symbols that native addons resolve at runtime.
++            'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
++          },
++        }],
++        ['OS=="mac" and node_shared=="false" and node_use_darwin_order_file=="true"', {
++          'dependencies': [
++            'node_darwin_order_file',
++          ],
++          'xcode_settings': {
++            'OTHER_LDFLAGS': [
++              '-Xlinker',
++              '-order_file',
++              '-Xlinker',
++              '<(node_darwin_order_file)',
++            ],
++          },
++        }],
+         [ 'node_shared_hdr_histogram=="false"', {
+           'dependencies': [
+             'deps/histogram/histogram.gyp:histogram',
+@@ -1348,6 +1369,7 @@
+         'src',
+         'tools/msvs/genfiles',
+         'deps/v8/include',
++        'deps/v8',
+         'deps/cares/include',
+         'deps/uv/include',
+         'test/cctest',
+@@ -1362,6 +1384,12 @@
+       'sources': [ '<@(node_cctest_sources)' ],
+ 
+       'conditions': [
++        ['OS=="mac"', {
++          'xcode_settings': {
++            # Match the executable's dynamic exports for symbol-visibility tests.
++            'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
++          },
++        }],
+         [ 'node_shared_gtest=="false"', {
+           'dependencies': [
+             'deps/googletest/googletest.gyp:gtest',
+@@ -1643,9 +1671,6 @@
+         'src/builtin_info.cc',
+       ],
+       'conditions': [
+-        [ 'OS=="mac"', {
+-          'libraries': [ '-framework CoreFoundation -framework Security' ],
+-        }],
+         [ 'node_shared_simdutf=="false" and node_use_bundled_v8!="false"', {
+           'dependencies': [ 'tools/v8_gypfiles/v8.gyp:simdutf#host' ],
+         }],
+@@ -1767,6 +1792,26 @@
+   ], # end targets
+ 
+   'conditions': [
++    ['OS=="mac" and node_shared=="false" and node_use_darwin_order_file=="true"', {
++     'targets': [
++       {
++         'target_name': 'node_darwin_order_file',
++         'type': 'none',
++         'actions': [
++           {
++             'action_name': 'stamp_darwin_order_file',
++             'inputs': [ '<(node_darwin_order_file_input)', ],
++             'outputs': [ '<(SHARED_INTERMEDIATE_DIR)/node_darwin_order_file.stamp', ],
++             'action': [
++               '<(python)', '-c',
++               'from pathlib import Path; Path(__import__("sys").argv[1]).touch()',
++               '<@(_outputs)',
++             ],
++           },
++         ],
++       },
++     ],
++   }],
+     ['OS=="win" and node_shared=="true"', {
+      'targets': [
+        {
+diff --git a/node.gypi b/node.gypi
+index 104e884e..73a7fc7c 100644
+--- a/node.gypi
++++ b/node.gypi
+@@ -265,10 +265,6 @@
+     }],
+ 
+     [ 'OS=="mac"', {
+-      # linking Corefoundation is needed since certain macOS debugging tools
+-      # like Instruments require it for some features. Security is needed for
+-      # --use-system-ca.
+-      'libraries': [ '-framework CoreFoundation -framework Security' ],
+       'defines!': [
+         'NODE_PLATFORM="mac"',
+       ],
+diff --git a/src/crypto/crypto_context.cc b/src/crypto/crypto_context.cc
+index 9dc68f4d..e91f0c9b 100644
+--- a/src/crypto/crypto_context.cc
++++ b/src/crypto/crypto_context.cc
+@@ -9,6 +9,9 @@
+ #include "ncrypto.h"
+ #include "node.h"
+ #include "node_buffer.h"
++#ifdef __APPLE__
++#include "node_darwin_frameworks.h"
++#endif
+ #include "node_options.h"
+ #include "util.h"
+ #include "v8.h"
+@@ -19,10 +22,6 @@
+ #include <openssl/pkcs12.h>
+ #include <openssl/rand.h>
+ #include <openssl/x509.h>
+-#ifdef __APPLE__
+-#include <Security/Security.h>
+-#endif
+-
+ #ifdef _WIN32
+ #include <Windows.h>
+ #include <wincrypt.h>
+@@ -325,11 +324,15 @@ bool isSelfIssued(X509* cert) {
+ // See https://chromium.googlesource.com/chromium/src/+/HEAD/LICENSE for
+ // details.
+ #ifdef __APPLE__
+-TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+-                                              bool is_self_issued) {
++TrustStatus IsTrustDictionaryTrustedForPolicy(
++    const darwin::CoreFoundationApi& cf,
++    const darwin::SecurityApi& security,
++    CFDictionaryRef trust_dict,
++    bool is_self_issued) {
+   // Trust settings may be scoped to a single application
+   // skip as this is not supported
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsApplication)) {
++  if (cf.CFDictionaryContainsKey(trust_dict,
++                                 security.trust_settings_application)) {
+     return TrustStatus::UNSPECIFIED;
+   }
+ 
+@@ -338,7 +341,8 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+   // settings specific to a particular WiFi network.
+   // As this is not presently supported, skip any policy-specific trust
+   // settings.
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsPolicyString)) {
++  if (cf.CFDictionaryContainsKey(trust_dict,
++                                 security.trust_settings_policy_string)) {
+     return TrustStatus::UNSPECIFIED;
+   }
+ 
+@@ -346,22 +350,22 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+   // kSecTrustSettingsPolicy), ensure that the policy is the same policy as
+   // |kSecPolicyAppleSSL|. If there is no kSecTrustSettingsPolicy key, it's
+   // considered a match for all policies.
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsPolicy)) {
++  if (cf.CFDictionaryContainsKey(trust_dict, security.trust_settings_policy)) {
+     SecPolicyRef policy_ref = reinterpret_cast<SecPolicyRef>(const_cast<void*>(
+-        CFDictionaryGetValue(trust_dict, kSecTrustSettingsPolicy)));
++        cf.CFDictionaryGetValue(trust_dict, security.trust_settings_policy)));
+ 
+     if (!policy_ref) {
+       return TrustStatus::UNSPECIFIED;
+     }
+ 
+-    CFDictionaryRef policy_dict(SecPolicyCopyProperties(policy_ref));
++    CFDictionaryRef policy_dict(security.SecPolicyCopyProperties(policy_ref));
+ 
+     // kSecPolicyOid is guaranteed to be present in the policy dictionary.
+-    CFStringRef policy_oid = reinterpret_cast<CFStringRef>(
+-        const_cast<void*>(CFDictionaryGetValue(policy_dict, kSecPolicyOid)));
++    CFStringRef policy_oid = reinterpret_cast<CFStringRef>(const_cast<void*>(
++        cf.CFDictionaryGetValue(policy_dict, security.kSecPolicyOid)));
+ 
+-    bool matches_ssl = CFEqual(policy_oid, kSecPolicyAppleSSL);
+-    CFRelease(policy_dict);
++    bool matches_ssl = cf.CFEqual(policy_oid, security.kSecPolicyAppleSSL);
++    cf.CFRelease(policy_dict);
+ 
+     if (!matches_ssl) {
+       return TrustStatus::UNSPECIFIED;
+@@ -369,15 +373,15 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+   }
+ 
+   int trust_settings_result = kSecTrustSettingsResultTrustRoot;
+-  if (CFDictionaryContainsKey(trust_dict, kSecTrustSettingsResult)) {
++  if (cf.CFDictionaryContainsKey(trust_dict, security.trust_settings_result)) {
+     CFNumberRef trust_settings_result_ref =
+-        reinterpret_cast<CFNumberRef>(const_cast<void*>(
+-            CFDictionaryGetValue(trust_dict, kSecTrustSettingsResult)));
++        reinterpret_cast<CFNumberRef>(const_cast<void*>(cf.CFDictionaryGetValue(
++            trust_dict, security.trust_settings_result)));
+ 
+     if (!trust_settings_result_ref ||
+-        !CFNumberGetValue(trust_settings_result_ref,
+-                          kCFNumberIntType,
+-                          &trust_settings_result)) {
++        !cf.CFNumberGetValue(trust_settings_result_ref,
++                             kCFNumberIntType,
++                             &trust_settings_result)) {
+       return TrustStatus::UNSPECIFIED;
+     }
+   }
+@@ -420,22 +424,24 @@ TrustStatus IsTrustDictionaryTrustedForPolicy(CFDictionaryRef trust_dict,
+              : TrustStatus::UNSPECIFIED;
+ }
+ 
+-TrustStatus IsTrustSettingsTrustedForPolicy(CFArrayRef trust_settings,
++TrustStatus IsTrustSettingsTrustedForPolicy(const darwin::CoreFoundationApi& cf,
++                                            const darwin::SecurityApi& security,
++                                            CFArrayRef trust_settings,
+                                             bool is_self_issued) {
+   // The trust_settings parameter can return a valid but empty CFArrayRef.
+   // This empty trust-settings array means “always trust this certificate”
+   // with an overall trust setting for the certificate of
+   // kSecTrustSettingsResultTrustRoot
+-  if (CFArrayGetCount(trust_settings) == 0) {
++  if (cf.CFArrayGetCount(trust_settings) == 0) {
+     return is_self_issued ? TrustStatus::TRUSTED : TrustStatus::UNSPECIFIED;
+   }
+ 
+-  for (CFIndex i = 0; i < CFArrayGetCount(trust_settings); ++i) {
++  for (CFIndex i = 0; i < cf.CFArrayGetCount(trust_settings); ++i) {
+     CFDictionaryRef trust_dict = reinterpret_cast<CFDictionaryRef>(
+-        const_cast<void*>(CFArrayGetValueAtIndex(trust_settings, i)));
++        const_cast<void*>(cf.CFArrayGetValueAtIndex(trust_settings, i)));
+ 
+-    TrustStatus trust =
+-        IsTrustDictionaryTrustedForPolicy(trust_dict, is_self_issued);
++    TrustStatus trust = IsTrustDictionaryTrustedForPolicy(
++        cf, security, trust_dict, is_self_issued);
+ 
+     if (trust == TrustStatus::DISTRUSTED || trust == TrustStatus::TRUSTED) {
+       return trust;
+@@ -444,11 +450,13 @@ TrustStatus IsTrustSettingsTrustedForPolicy(CFArrayRef trust_settings,
+   return TrustStatus::UNSPECIFIED;
+ }
+ 
+-bool IsCertificateTrustValid(SecCertificateRef ref) {
++bool IsCertificateTrustValid(const darwin::CoreFoundationApi& cf,
++                             const darwin::SecurityApi& security,
++                             SecCertificateRef ref) {
+   SecTrustRef sec_trust = nullptr;
+   CFMutableArrayRef subj_certs =
+-      CFArrayCreateMutable(nullptr, 1, &kCFTypeArrayCallBacks);
+-  CFArraySetValueAtIndex(subj_certs, 0, ref);
++      cf.CFArrayCreateMutable(nullptr, 1, cf.kCFTypeArrayCallBacks);
++  cf.CFArraySetValueAtIndex(subj_certs, 0, ref);
+ 
+   // SecTrustEvaluateWithError is used to check whether an individual
+   // certificate is trusted by the system — not to validate it for a
+@@ -461,29 +469,32 @@ bool IsCertificateTrustValid(SecCertificateRef ref) {
+   // SecPolicyCreateSSL (both mark EKU optional):
+   //   server=true  -> BasicX509 + serverAuth + anyExtendedKeyUsage + SGC
+   //   server=false -> BasicX509 + clientAuth + anyExtendedKeyUsage
+-  SecPolicyRef policy = SecPolicyCreateSSL(false, nullptr);
++  SecPolicyRef policy = security.SecPolicyCreateSSL(false, nullptr);
+   OSStatus ortn =
+-      SecTrustCreateWithCertificates(subj_certs, policy, &sec_trust);
++      security.SecTrustCreateWithCertificates(subj_certs, policy, &sec_trust);
+   bool result = false;
+   if (ortn) {
+     /* should never happen */
+   } else {
+-    result = SecTrustEvaluateWithError(sec_trust, nullptr);
++    result = security.SecTrustEvaluateWithError(sec_trust, nullptr);
+   }
+ 
+   if (policy) {
+-    CFRelease(policy);
++    cf.CFRelease(policy);
+   }
+   if (sec_trust) {
+-    CFRelease(sec_trust);
++    cf.CFRelease(sec_trust);
+   }
+   if (subj_certs) {
+-    CFRelease(subj_certs);
++    cf.CFRelease(subj_certs);
+   }
+   return result;
+ }
+ 
+-bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
++bool IsCertificateTrustedForPolicy(const darwin::CoreFoundationApi& cf,
++                                   const darwin::SecurityApi& security,
++                                   X509* cert,
++                                   SecCertificateRef ref) {
+   OSStatus err;
+ 
+   bool trust_evaluated = false;
+@@ -494,7 +505,8 @@ bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
+   for (const auto& trust_domain :
+        {kSecTrustSettingsDomainUser, kSecTrustSettingsDomainAdmin}) {
+     CFArrayRef trust_settings = nullptr;
+-    err = SecTrustSettingsCopyTrustSettings(ref, trust_domain, &trust_settings);
++    err = security.SecTrustSettingsCopyTrustSettings(
++        ref, trust_domain, &trust_settings);
+ 
+     if (err != errSecSuccess && err != errSecItemNotFound) {
+       fprintf(stderr,
+@@ -504,10 +516,10 @@ bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
+     }
+ 
+     if (err == errSecSuccess && trust_settings != nullptr) {
+-      TrustStatus result =
+-          IsTrustSettingsTrustedForPolicy(trust_settings, is_self_issued);
++      TrustStatus result = IsTrustSettingsTrustedForPolicy(
++          cf, security, trust_settings, is_self_issued);
+       if (result != TrustStatus::UNSPECIFIED) {
+-        CFRelease(trust_settings);
++        cf.CFRelease(trust_settings);
+         return result == TrustStatus::TRUSTED;
+       }
+     }
+@@ -517,14 +529,14 @@ bool IsCertificateTrustedForPolicy(X509* cert, SecCertificateRef ref) {
+     // No trust-settings array means
+     // “this certificate must be verifiable using a known trusted certificate”.
+     if (trust_settings == nullptr && !trust_evaluated) {
+-      bool result = IsCertificateTrustValid(ref);
++      bool result = IsCertificateTrustValid(cf, security, ref);
+       if (result) {
+         return true;
+       }
+       // no point re-evaluating this in the admin domain
+       trust_evaluated = true;
+     } else if (trust_settings) {
+-      CFRelease(trust_settings);
++      cf.CFRelease(trust_settings);
+     }
+   }
+   return false;
+@@ -547,20 +559,25 @@ static bool IsCertificateExpired(X509* cert) {
+ 
+ void ReadMacOSKeychainCertificates(
+     std::vector<ncrypto::X509Pointer>* system_root_certificates_X509) {
+-  CFTypeRef search_keys[] = {kSecClass, kSecMatchLimit, kSecReturnRef};
+-  CFTypeRef search_values[] = {
+-      kSecClassCertificate, kSecMatchLimitAll, kCFBooleanTrue};
+-  CFDictionaryRef search = CFDictionaryCreate(kCFAllocatorDefault,
+-                                              search_keys,
+-                                              search_values,
+-                                              3,
+-                                              &kCFTypeDictionaryKeyCallBacks,
+-                                              &kCFTypeDictionaryValueCallBacks);
++  const darwin::CoreFoundationApi& cf = darwin::CoreFoundationApi::Get();
++  const darwin::SecurityApi& security = darwin::SecurityApi::Get();
++  CFTypeRef search_keys[] = {
++      security.kSecClass, security.kSecMatchLimit, security.kSecReturnRef};
++  CFTypeRef search_values[] = {security.kSecClassCertificate,
++                               security.kSecMatchLimitAll,
++                               cf.kCFBooleanTrue};
++  CFDictionaryRef search =
++      cf.CFDictionaryCreate(cf.kCFAllocatorDefault,
++                            search_keys,
++                            search_values,
++                            3,
++                            cf.kCFTypeDictionaryKeyCallBacks,
++                            cf.kCFTypeDictionaryValueCallBacks);
+ 
+   CFArrayRef curr_anchors = nullptr;
+-  OSStatus ortn =
+-      SecItemCopyMatching(search, reinterpret_cast<CFTypeRef*>(&curr_anchors));
+-  CFRelease(search);
++  OSStatus ortn = security.SecItemCopyMatching(
++      search, reinterpret_cast<CFTypeRef*>(&curr_anchors));
++  cf.CFRelease(search);
+ 
+   if (ortn) {
+     per_process::Debug(DebugCategory::CRYPTO,
+@@ -570,7 +587,7 @@ void ReadMacOSKeychainCertificates(
+     return;
+   }
+ 
+-  CFIndex count = CFArrayGetCount(curr_anchors);
++  CFIndex count = cf.CFArrayGetCount(curr_anchors);
+ 
+   // Track seen certificates to detect duplicates (same cert in multiple
+   // keychains). Non-owning set -- the vector owns the certs.
+@@ -581,20 +598,20 @@ void ReadMacOSKeychainCertificates(
+ 
+   for (int i = 0; i < count; ++i) {
+     SecCertificateRef cert_ref = reinterpret_cast<SecCertificateRef>(
+-        const_cast<void*>(CFArrayGetValueAtIndex(curr_anchors, i)));
++        const_cast<void*>(cf.CFArrayGetValueAtIndex(curr_anchors, i)));
+ 
+-    CFDataRef der_data = SecCertificateCopyData(cert_ref);
++    CFDataRef der_data = security.SecCertificateCopyData(cert_ref);
+     if (!der_data) {
+       per_process::Debug(DebugCategory::CRYPTO,
+                          "Skipping read of a system certificate "
+                          "because SecCertificateCopyData failed\n");
+       continue;
+     }
+-    auto data_buffer_pointer = CFDataGetBytePtr(der_data);
++    auto data_buffer_pointer = cf.CFDataGetBytePtr(der_data);
+ 
+     ncrypto::X509Pointer cert(
+-        d2i_X509(nullptr, &data_buffer_pointer, CFDataGetLength(der_data)));
+-    CFRelease(der_data);
++        d2i_X509(nullptr, &data_buffer_pointer, cf.CFDataGetLength(der_data)));
++    cf.CFRelease(der_data);
+ 
+     if (!cert) {
+       per_process::Debug(DebugCategory::CRYPTO,
+@@ -603,7 +620,8 @@ void ReadMacOSKeychainCertificates(
+       continue;
+     }
+ 
+-    bool is_valid = IsCertificateTrustedForPolicy(cert.get(), cert_ref);
++    bool is_valid =
++        IsCertificateTrustedForPolicy(cf, security, cert.get(), cert_ref);
+     if (!is_valid) {
+       continue;
+     }
+@@ -624,7 +642,7 @@ void ReadMacOSKeychainCertificates(
+ 
+     system_root_certificates_X509->emplace_back(std::move(cert));
+   }
+-  CFRelease(curr_anchors);
++  cf.CFRelease(curr_anchors);
+ }
+ #endif  // __APPLE__
+ 
+diff --git a/src/node.cc b/src/node.cc
+index a43eb28b..d8b2d362 100644
+--- a/src/node.cc
++++ b/src/node.cc
+@@ -49,6 +49,9 @@
+ 
+ #if HAVE_OPENSSL
+ #include "ncrypto.h"
++#if OPENSSL_VERSION_MAJOR >= 3
++#include <openssl/provider.h>
++#endif
+ #include "node_crypto.h"
+ #if OPENSSL_VERSION_MAJOR >= 3 && !defined(CONF_MFLAGS_IGNORE_MISSING_FILE)
+ // OpenSSL hides this deprecated macro under OPENSSL_NO_DEPRECATED, but the
+@@ -1259,15 +1262,50 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
+     }
+     crypto::InstallFipsIndicatorCallback();
+ 
+-    // Ensure CSPRNG is properly seeded.
+-    CHECK(ncrypto::CSPRNG(nullptr, 0));
++    // Activating the default provider here keeps --openssl-legacy-provider
++    // working. Its explicit load disables OpenSSL's fallback, and the eager
++    // CSPRNG check used to activate the provider as a side effect. Only
++    // check the seeding when that provider is missing or FIPS is on, so a
++    // configuration without a DRBG still aborts at startup instead of
++    // hanging at the first crypto call. Otherwise the DRBG is instantiated
++    // on first use.
++#if OPENSSL_VERSION_MAJOR >= 3
++    const bool check_csprng = ncrypto::isFipsEnabled() ||
++                              !OSSL_PROVIDER_available(nullptr, "default");
++#else
++    const bool check_csprng = true;
++#endif
++    if (check_csprng) {
++      CHECK(ncrypto::CSPRNG(nullptr, 0));
++    }
++#endif  // !defined(OPENSSL_IS_BORINGSSL)
++#endif  // HAVE_OPENSSL
++  }
++
++  if (!(flags & ProcessInitializationFlags::kNoInitializeV8)) {
++    // Disable absl deadlock detection in V8 as it reports false-positive cases.
++    // Set the policy before entropy/platform/cppgc setup allocates the graph.
++    // TODO(legendecas): Replace this global disablement with case suppressions.
++    // https://github.com/nodejs/node-v8/issues/301
++    absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kIgnore);
++  }
+ 
++#if HAVE_OPENSSL
++  if (!(flags & ProcessInitializationFlags::kNoInitOpenSSL)) {
++#ifndef OPENSSL_IS_BORINGSSL
++    // V8 uses the entropy for hash seeds, ASLR and Math.random(), none of
++    // it cryptographic. Going through OpenSSL would instantiate the DRBG
++    // and build the default provider's algorithm tables on every startup.
++    // V8 falls back to very weak entropy when the source fails, so abort
++    // instead.
+     V8::SetEntropySource([](unsigned char* buffer, size_t length) {
+-      // V8 falls back to very weak entropy when this function fails
+-      // and /dev/urandom isn't available. That wouldn't be so bad if
+-      // the entropy was only used for Math.random() but it's also used for
+-      // hash table and address space layout randomization. Better to abort.
++#ifdef _AIX
++      // uv_random() reads /dev/random on AIX, which blocks. OpenSSL seeds
++      // from /dev/urandom there.
+       CHECK(ncrypto::CSPRNG(buffer, length));
++#else
++      CHECK_EQ(uv_random(nullptr, nullptr, buffer, length, 0, nullptr), 0);
++#endif
+       return true;
+     });
+ #endif  // !defined(OPENSSL_IS_BORINGSSL)
+@@ -1276,8 +1314,8 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
+       if (credentials::SafeGetenv("NODE_EXTRA_CA_CERTS", &extra_ca_certs))
+         crypto::UseExtraCaCerts(extra_ca_certs);
+     }
+-#endif  // HAVE_OPENSSL
+   }
++#endif  // HAVE_OPENSSL
+ 
+   if (!(flags & ProcessInitializationFlags::kNoInitializeNodeV8Platform)) {
+     uv_thread_setname("node-MainThread");
+@@ -1300,11 +1338,6 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
+ 
+   if (!(flags & ProcessInitializationFlags::kNoInitializeV8)) {
+     V8::Initialize();
+-
+-    // Disable absl deadlock detection in V8 as it reports false-positive cases.
+-    // TODO(legendecas): Replace this global disablement with case suppressions.
+-    // https://github.com/nodejs/node-v8/issues/301
+-    absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kIgnore);
+   }
+ 
+ #if NODE_USE_V8_WASM_TRAP_HANDLER
+diff --git a/src/node.h b/src/node.h
+index 8e7d1e6a..02134a08 100644
+--- a/src/node.h
++++ b/src/node.h
+@@ -488,7 +488,7 @@ struct IsolateSettings {
+ // Snapshots are an *experimental* feature. In particular, the embedder API
+ // exposed through this class is subject to change or removal between Node.js
+ // versions, including possible API and ABI breakage.
+-class EmbedderSnapshotData {
++class NODE_EXTERN EmbedderSnapshotData {
+  public:
+   struct DeleteSnapshotData {
+     void operator()(const EmbedderSnapshotData*) const;
+@@ -687,7 +687,7 @@ struct SnapshotConfig {
+   const v8::StartupData* base_blob = nullptr;
+ };
+ 
+-struct InspectorParentHandle {
++struct V8_LTO_VISIBILITY_PUBLIC InspectorParentHandle {
+   virtual ~InspectorParentHandle() = default;
+ };
+ 
+@@ -1289,7 +1289,7 @@ NODE_EXTERN v8::Local<v8::Value> WinapiErrnoException(
+     const char* path = nullptr);
+ #endif
+ 
+-const char* signo_string(int errorno);
++NODE_EXTERN const char* signo_string(int errorno);
+ 
+ 
+ typedef void (*addon_register_func)(
+diff --git a/src/node_darwin_frameworks.cc b/src/node_darwin_frameworks.cc
+new file mode 100644
+index 00000000..dc132c46
+--- /dev/null
++++ b/src/node_darwin_frameworks.cc
+@@ -0,0 +1,151 @@
++#include "node_darwin_frameworks.h"
++
++#ifdef __APPLE__
++#include "util-inl.h"
++
++#include <dlfcn.h>
++
++#include <cstring>
++
++namespace node {
++namespace darwin {
++namespace {
++
++template <typename T>
++T LoadFunction(void* handle, const char* name) {
++  void* symbol = dlsym(handle, name);
++  CHECK_NOT_NULL(symbol);
++  static_assert(sizeof(T) == sizeof(symbol));
++  T result;
++  std::memcpy(&result, &symbol, sizeof(result));
++  return result;
++}
++
++template <typename T>
++T LoadData(void* handle, const char* name) {
++  void* symbol = dlsym(handle, name);
++  CHECK_NOT_NULL(symbol);
++  return *reinterpret_cast<const T*>(symbol);
++}
++
++template <typename T>
++const T* LoadStruct(void* handle, const char* name) {
++  void* symbol = dlsym(handle, name);
++  CHECK_NOT_NULL(symbol);
++  return static_cast<const T*>(symbol);
++}
++
++#if TARGET_OS_OSX
++constexpr char kCoreFoundationPath[] =
++    "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/"
++    "CoreFoundation";
++constexpr char kSecurityPath[] =
++    "/System/Library/Frameworks/Security.framework/Versions/A/Security";
++#else
++constexpr char kCoreFoundationPath[] =
++    "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
++constexpr char kSecurityPath[] =
++    "/System/Library/Frameworks/Security.framework/Security";
++#endif
++
++void* OpenFramework(const char* path) {
++  void* handle = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
++  CHECK_NOT_NULL(handle);
++  return handle;
++}
++
++CFStringRef CreateTrustSettingsKey(const char* key) {
++  const CoreFoundationApi& cf = CoreFoundationApi::Get();
++  CFStringRef result = cf.CFStringCreateWithCString(
++      cf.kCFAllocatorDefault, key, kCFStringEncodingUTF8);
++  CHECK_NOT_NULL(result);
++  return result;
++}
++
++}  // namespace
++
++const CoreFoundationApi& CoreFoundationApi::Get() {
++  static const CoreFoundationApi api;
++  return api;
++}
++
++CoreFoundationApi::CoreFoundationApi()
++    : handle_(OpenFramework(kCoreFoundationPath)),
++      CFArrayCreateMutable(LoadFunction<decltype(CFArrayCreateMutable)>(
++          handle_, "CFArrayCreateMutable")),
++      CFArrayGetCount(
++          LoadFunction<decltype(CFArrayGetCount)>(handle_, "CFArrayGetCount")),
++      CFArrayGetValueAtIndex(LoadFunction<decltype(CFArrayGetValueAtIndex)>(
++          handle_, "CFArrayGetValueAtIndex")),
++      CFArraySetValueAtIndex(LoadFunction<decltype(CFArraySetValueAtIndex)>(
++          handle_, "CFArraySetValueAtIndex")),
++      CFDataGetBytePtr(LoadFunction<decltype(CFDataGetBytePtr)>(
++          handle_, "CFDataGetBytePtr")),
++      CFDataGetLength(
++          LoadFunction<decltype(CFDataGetLength)>(handle_, "CFDataGetLength")),
++      CFDictionaryContainsKey(LoadFunction<decltype(CFDictionaryContainsKey)>(
++          handle_, "CFDictionaryContainsKey")),
++      CFDictionaryCreate(LoadFunction<decltype(CFDictionaryCreate)>(
++          handle_, "CFDictionaryCreate")),
++      CFDictionaryGetValue(LoadFunction<decltype(CFDictionaryGetValue)>(
++          handle_, "CFDictionaryGetValue")),
++      CFEqual(LoadFunction<decltype(CFEqual)>(handle_, "CFEqual")),
++      CFNumberGetValue(LoadFunction<decltype(CFNumberGetValue)>(
++          handle_, "CFNumberGetValue")),
++      CFRelease(LoadFunction<decltype(CFRelease)>(handle_, "CFRelease")),
++      CFStringCreateWithCString(
++          LoadFunction<decltype(CFStringCreateWithCString)>(
++              handle_, "CFStringCreateWithCString")),
++      kCFAllocatorDefault(
++          LoadData<CFAllocatorRef>(handle_, "kCFAllocatorDefault")),
++      kCFBooleanTrue(LoadData<CFBooleanRef>(handle_, "kCFBooleanTrue")),
++      kCFTypeArrayCallBacks(
++          LoadStruct<CFArrayCallBacks>(handle_, "kCFTypeArrayCallBacks")),
++      kCFTypeDictionaryKeyCallBacks(LoadStruct<CFDictionaryKeyCallBacks>(
++          handle_, "kCFTypeDictionaryKeyCallBacks")),
++      kCFTypeDictionaryValueCallBacks(LoadStruct<CFDictionaryValueCallBacks>(
++          handle_, "kCFTypeDictionaryValueCallBacks")) {}
++
++const SecurityApi& SecurityApi::Get() {
++  static const SecurityApi api;
++  return api;
++}
++
++SecurityApi::SecurityApi()
++    : handle_(OpenFramework(kSecurityPath)),
++      SecCertificateCopyData(LoadFunction<decltype(SecCertificateCopyData)>(
++          handle_, "SecCertificateCopyData")),
++      SecItemCopyMatching(LoadFunction<decltype(SecItemCopyMatching)>(
++          handle_, "SecItemCopyMatching")),
++      SecPolicyCopyProperties(LoadFunction<decltype(SecPolicyCopyProperties)>(
++          handle_, "SecPolicyCopyProperties")),
++      SecPolicyCreateSSL(LoadFunction<decltype(SecPolicyCreateSSL)>(
++          handle_, "SecPolicyCreateSSL")),
++      SecTrustCreateWithCertificates(
++          LoadFunction<decltype(SecTrustCreateWithCertificates)>(
++              handle_, "SecTrustCreateWithCertificates")),
++      SecTrustEvaluateWithError(
++          LoadFunction<decltype(SecTrustEvaluateWithError)>(
++              handle_, "SecTrustEvaluateWithError")),
++      SecTrustSettingsCopyTrustSettings(
++          LoadFunction<decltype(SecTrustSettingsCopyTrustSettings)>(
++              handle_, "SecTrustSettingsCopyTrustSettings")),
++      kSecClass(LoadData<CFStringRef>(handle_, "kSecClass")),
++      kSecClassCertificate(
++          LoadData<CFStringRef>(handle_, "kSecClassCertificate")),
++      kSecMatchLimit(LoadData<CFStringRef>(handle_, "kSecMatchLimit")),
++      kSecMatchLimitAll(LoadData<CFStringRef>(handle_, "kSecMatchLimitAll")),
++      kSecPolicyAppleSSL(LoadData<CFStringRef>(handle_, "kSecPolicyAppleSSL")),
++      kSecPolicyOid(LoadData<CFStringRef>(handle_, "kSecPolicyOid")),
++      kSecReturnRef(LoadData<CFStringRef>(handle_, "kSecReturnRef")),
++      trust_settings_application(
++          CreateTrustSettingsKey("kSecTrustSettingsApplication")),
++      trust_settings_policy(CreateTrustSettingsKey("kSecTrustSettingsPolicy")),
++      trust_settings_policy_string(
++          CreateTrustSettingsKey("kSecTrustSettingsPolicyString")),
++      trust_settings_result(CreateTrustSettingsKey("kSecTrustSettingsResult")) {
++}
++
++}  // namespace darwin
++}  // namespace node
++#endif  // __APPLE__
+diff --git a/src/node_darwin_frameworks.h b/src/node_darwin_frameworks.h
+new file mode 100644
+index 00000000..ec2f7ef8
+--- /dev/null
++++ b/src/node_darwin_frameworks.h
+@@ -0,0 +1,79 @@
++#ifndef SRC_NODE_DARWIN_FRAMEWORKS_H_
++#define SRC_NODE_DARWIN_FRAMEWORKS_H_
++
++#ifdef __APPLE__
++#include <CoreFoundation/CoreFoundation.h>
++#include <Security/Security.h>
++#include <TargetConditionals.h>
++
++namespace node {
++namespace darwin {
++
++class CoreFoundationApi {
++ private:
++  void* handle_;
++
++ public:
++  static const CoreFoundationApi& Get();
++
++  decltype(&::CFArrayCreateMutable) CFArrayCreateMutable;
++  decltype(&::CFArrayGetCount) CFArrayGetCount;
++  decltype(&::CFArrayGetValueAtIndex) CFArrayGetValueAtIndex;
++  decltype(&::CFArraySetValueAtIndex) CFArraySetValueAtIndex;
++  decltype(&::CFDataGetBytePtr) CFDataGetBytePtr;
++  decltype(&::CFDataGetLength) CFDataGetLength;
++  decltype(&::CFDictionaryContainsKey) CFDictionaryContainsKey;
++  decltype(&::CFDictionaryCreate) CFDictionaryCreate;
++  decltype(&::CFDictionaryGetValue) CFDictionaryGetValue;
++  decltype(&::CFEqual) CFEqual;
++  decltype(&::CFNumberGetValue) CFNumberGetValue;
++  decltype(&::CFRelease) CFRelease;
++  decltype(&::CFStringCreateWithCString) CFStringCreateWithCString;
++
++  CFAllocatorRef kCFAllocatorDefault;
++  CFBooleanRef kCFBooleanTrue;
++  const CFArrayCallBacks* kCFTypeArrayCallBacks;
++  const CFDictionaryKeyCallBacks* kCFTypeDictionaryKeyCallBacks;
++  const CFDictionaryValueCallBacks* kCFTypeDictionaryValueCallBacks;
++
++ private:
++  CoreFoundationApi();
++};
++
++class SecurityApi {
++ private:
++  void* handle_;
++
++ public:
++  static const SecurityApi& Get();
++
++  decltype(&::SecCertificateCopyData) SecCertificateCopyData;
++  decltype(&::SecItemCopyMatching) SecItemCopyMatching;
++  decltype(&::SecPolicyCopyProperties) SecPolicyCopyProperties;
++  decltype(&::SecPolicyCreateSSL) SecPolicyCreateSSL;
++  decltype(&::SecTrustCreateWithCertificates) SecTrustCreateWithCertificates;
++  decltype(&::SecTrustEvaluateWithError) SecTrustEvaluateWithError;
++  decltype(&::SecTrustSettingsCopyTrustSettings)
++      SecTrustSettingsCopyTrustSettings;
++
++  CFStringRef kSecClass;
++  CFStringRef kSecClassCertificate;
++  CFStringRef kSecMatchLimit;
++  CFStringRef kSecMatchLimitAll;
++  CFStringRef kSecPolicyAppleSSL;
++  CFStringRef kSecPolicyOid;
++  CFStringRef kSecReturnRef;
++  CFStringRef trust_settings_application;
++  CFStringRef trust_settings_policy;
++  CFStringRef trust_settings_policy_string;
++  CFStringRef trust_settings_result;
++
++ private:
++  SecurityApi();
++};
++
++}  // namespace darwin
++}  // namespace node
++#endif  // __APPLE__
++
++#endif  // SRC_NODE_DARWIN_FRAMEWORKS_H_
+diff --git a/src/node_object_wrap.h b/src/node_object_wrap.h
+index 0002c25e..39441301 100644
+--- a/src/node_object_wrap.h
++++ b/src/node_object_wrap.h
+@@ -30,7 +30,7 @@ namespace node {
+ // Legacy interface for tying C++ objects to JavaScript objects.
+ // This is not intended to be used by new code, and userland alternatives
+ // should be preferred.
+-class NODE_DEPRECATED(
++class V8_LTO_VISIBILITY_PUBLIC NODE_DEPRECATED(
+     "Use userland alternatives such as node-addon-api or nan instead",
+     ObjectWrap) {
+  public:
+diff --git a/src/node_options.cc b/src/node_options.cc
+index 9077325e..faafc66f 100644
+--- a/src/node_options.cc
++++ b/src/node_options.cc
+@@ -1758,7 +1758,7 @@ MapEnvOptionsFlagInputType() {
+         item.second.env_setting == kAllowedInEnvvar) {
+       const auto mapping_details = options_parser::OptionMappingDetails{
+           item.second.type,
+-          item.second.help_text,
++          std::string(item.second.help_text),
+       };
+       type_map[item.first] = mapping_details;
+     }
+@@ -1790,7 +1790,7 @@ MapOptionsByNamespace(std::string namespace_name) {
+         item.second.namespace_id == namespace_name) {
+       const auto mapping_details = options_parser::OptionMappingDetails{
+           item.second.type,
+-          item.second.help_text,
++          std::string(item.second.help_text),
+       };
+       type_map[item.first] = mapping_details;
+     }
+@@ -2085,7 +2085,7 @@ void GetEnvOptionsInputType(const FunctionCallbackInfo<Value>& args) {
+         item.second.env_setting == kAllowedInEnvvar) {
+       const auto mapping_details = options_parser::OptionMappingDetails{
+           item.second.type,
+-          item.second.help_text,
++          std::string(item.second.help_text),
+       };
+       if (!AddOptionTypeToObject(isolate,
+                                  context,
+diff --git a/src/node_options.h b/src/node_options.h
+index ffd76d70..61ffbda3 100644
+--- a/src/node_options.h
++++ b/src/node_options.h
+@@ -5,6 +5,7 @@
+ 
+ #include <memory>
+ #include <string>
++#include <string_view>
+ #include <unordered_map>
+ #include <vector>
+ #include "node_constants.h"
+@@ -522,6 +523,7 @@ class OptionsParser {
+   // These methods add a single option to the parser. Optionally, it can be
+   // specified whether the option should be allowed from environment variable
+   // sources (i.e. NODE_OPTIONS).
++  // Help text is borrowed and must have static storage duration.
+ 
+   // default_is_true is only a hint in printing help text, it does not
+   // affect the default value of the option. Set the default value in the
+@@ -702,7 +704,7 @@ class OptionsParser {
+     OptionType type;
+     std::shared_ptr<BaseOptionField> field;
+     OptionEnvvarSettings env_setting;
+-    std::string help_text;
++    std::string_view help_text;
+     bool default_is_true = false;
+     std::string namespace_id;
+     bool strict = false;
+diff --git a/src/node_postmortem_metadata.cc b/src/node_postmortem_metadata.cc
+index e40d82c0..da8099ad 100644
+--- a/src/node_postmortem_metadata.cc
++++ b/src/node_postmortem_metadata.cc
+@@ -36,12 +36,13 @@
+   V(ListNode_ReqWrap, next_, uintptr_t, ListNode<ReqWrapBase>::next_)
+ 
+ extern "C" {
+-int nodedbg_const_ContextEmbedderIndex__kEnvironment__int;
+-int nodedbg_const_BaseObject__kInternalFieldCount__int;
+-int nodedbg_const_HandleWrap__kInternalFieldCount__int;
+-int nodedbg_const_ReqWrap__kInternalFieldCount__int;
+-uintptr_t nodedbg_offset_ExternalString__data__uintptr_t;
+-uintptr_t nodedbg_offset_ReqWrap__req_wrap_queue___ListNode_ReqWrapQueue;
++NODE_EXTERN int nodedbg_const_ContextEmbedderIndex__kEnvironment__int;
++NODE_EXTERN int nodedbg_const_BaseObject__kInternalFieldCount__int;
++NODE_EXTERN int nodedbg_const_HandleWrap__kInternalFieldCount__int;
++NODE_EXTERN int nodedbg_const_ReqWrap__kInternalFieldCount__int;
++NODE_EXTERN uintptr_t nodedbg_offset_ExternalString__data__uintptr_t;
++NODE_EXTERN uintptr_t
++    nodedbg_offset_ReqWrap__req_wrap_queue___ListNode_ReqWrapQueue;
+ 
+ #define V(Class, Member, Type, Accessor)                                      \
+   NODE_EXTERN uintptr_t NODEDBG_OFFSET(Class, Member, Type);
+diff --git a/src/node_sea_bin.cc b/src/node_sea_bin.cc
+index 30197b9b..9e17e5d9 100644
+--- a/src/node_sea_bin.cc
++++ b/src/node_sea_bin.cc
+@@ -1,6 +1,16 @@
+ #include "node_sea.h"
+ 
+ #ifdef HAVE_LIEF
++// LIEF is compiled separately without LTO. Its imported class hierarchies
++// must remain open to whole-program devirtualization in this translation unit.
++#if defined(__APPLE__) && defined(__clang__)
++#pragma push_macro("LIEF_STATIC")
++#pragma push_macro("LIEF_IMPORT")
++#undef LIEF_STATIC
++#undef LIEF_IMPORT
++#define LIEF_IMPORT
++#endif
++
+ // Temporarily undefine DEBUG because LIEF uses it as an enum name.
+ #if defined(DEBUG)
+ #define SAVED_DEBUG_VALUE DEBUG
+@@ -11,6 +21,11 @@
+ #else  // defined(DEBUG)
+ #include "LIEF/LIEF.hpp"
+ #endif  // defined(DEBUG)
++
++#if defined(__APPLE__) && defined(__clang__)
++#pragma pop_macro("LIEF_IMPORT")
++#pragma pop_macro("LIEF_STATIC")
++#endif
+ #endif  // HAVE_LIEF
+ 
+ #include "debug_utils-inl.h"
+diff --git a/test/cctest/test_hash_montgomery.cc b/test/cctest/test_hash_montgomery.cc
+new file mode 100644
+index 00000000..649d1fb9
+--- /dev/null
++++ b/test/cctest/test_hash_montgomery.cc
+@@ -0,0 +1,109 @@
++#include <cstdint>
++
++#include "third_party/rapidhash-v8/secret.h"
++
++#include "gtest/gtest.h"
++
++#if !V8_USE_DEFAULT_HASHER_SECRET && defined(__SIZEOF_INT128__)
++namespace {
++
++uint64_t Next(uint64_t* state) {
++  *state += UINT64_C(0x9e3779b97f4a7c15);
++  uint64_t value = *state;
++  value = (value ^ (value >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
++  value = (value ^ (value >> 27)) * UINT64_C(0x94d049bb133111eb);
++  return value ^ (value >> 31);
++}
++
++uint64_t MultiplyReference(uint64_t a, uint64_t b, uint64_t modulus) {
++  return static_cast<uint64_t>((static_cast<__uint128_t>(a) * b) % modulus);
++}
++
++unsigned GenericSprp(uint64_t n, uint64_t a) {
++  uint64_t d = n - 1;
++  unsigned char s = 0;
++  while (!(d & 1)) {
++    d >>= 1;
++    ++s;
++  }
++  uint64_t value = detail::pow_mod(a, d, n);
++  if (value == 1 || value == n - 1) return 1;
++  for (unsigned char r = 1; r < s; ++r) {
++    value = detail::mul_mod(value, value, n);
++    if (value <= 1) return 0;
++    if (value == n - 1) return 1;
++  }
++  return 0;
++}
++
++bool IsSmallPrime(uint64_t n) {
++  if (n < 2) return false;
++  for (uint64_t divisor = 2; divisor <= n / divisor; ++divisor) {
++    if (n % divisor == 0) return false;
++  }
++  return true;
++}
++
++void CheckMultiply(uint64_t a, uint64_t b, uint64_t modulus) {
++  const detail::MontgomeryMod montgomery(modulus);
++  const uint64_t actual = montgomery.FromMontgomery(montgomery.Multiply(
++      montgomery.ToMontgomery(a), montgomery.ToMontgomery(b)));
++  EXPECT_EQ(actual, MultiplyReference(a, b, modulus));
++}
++
++TEST(RapidhashMontgomery, HandlesOverflowEdges) {
++  CheckMultiply(0, 0, 3);
++  CheckMultiply(UINT64_MAX, UINT64_MAX, 3);
++  CheckMultiply(UINT64_MAX - 1, UINT64_MAX - 2, UINT64_MAX);
++  CheckMultiply(UINT64_C(1) << 63, UINT64_MAX, (UINT64_C(1) << 63) | 1);
++  CheckMultiply(UINT64_MAX - 1, UINT64_MAX - 1, UINT64_MAX - 58);
++}
++
++TEST(RapidhashMontgomery, MatchesReferenceArithmetic) {
++  for (uint64_t modulus = 3; modulus < 128; modulus += 2) {
++    for (uint64_t a = 0; a < modulus; ++a) {
++      for (uint64_t b = 0; b < modulus; ++b) {
++        CheckMultiply(a, b, modulus);
++      }
++    }
++  }
++
++  uint64_t state = UINT64_C(0x0123456789abcdef);
++  for (size_t i = 0; i < 4096; ++i) {
++    const uint64_t modulus = Next(&state) | 1;
++    CheckMultiply(Next(&state), Next(&state), modulus);
++  }
++}
++
++TEST(RapidhashMontgomery, MatchesGenericPower) {
++  uint64_t state = UINT64_C(0xfedcba9876543210);
++  for (size_t i = 0; i < 4096; ++i) {
++    const uint64_t modulus = Next(&state) | 1;
++    const uint64_t base = Next(&state);
++    const uint64_t exponent = Next(&state);
++    const detail::MontgomeryMod montgomery(modulus);
++    const uint64_t actual =
++        montgomery.FromMontgomery(montgomery.Power(base, exponent));
++    EXPECT_EQ(actual, detail::pow_mod(base, exponent, modulus));
++  }
++}
++
++TEST(RapidhashMontgomery, MatchesGenericMillerRabin) {
++  constexpr uint64_t bases[] = {2, 3, 5, 37};
++  for (uint64_t n = 3; n < 4096; n += 2) {
++    EXPECT_EQ(detail::is_prime(n), IsSmallPrime(n));
++    for (uint64_t base : bases) {
++      EXPECT_EQ(detail::sprp(n, base), GenericSprp(n, base));
++    }
++  }
++
++  uint64_t state = UINT64_C(0xa5a5a5a5a5a5a5a5);
++  for (size_t i = 0; i < 1024; ++i) {
++    const uint64_t n = Next(&state) | 1;
++    const uint64_t base = Next(&state);
++    EXPECT_EQ(detail::sprp(n, base), GenericSprp(n, base));
++  }
++}
++
++}  // namespace
++#endif  // !V8_USE_DEFAULT_HASHER_SECRET && defined(__SIZEOF_INT128__)
+diff --git a/test/cctest/test_hash_secret.cc b/test/cctest/test_hash_secret.cc
+new file mode 100644
+index 00000000..0a66cf60
+--- /dev/null
++++ b/test/cctest/test_hash_secret.cc
+@@ -0,0 +1,84 @@
++#include <cstdint>
++#include <iterator>
++
++#include "third_party/rapidhash-v8/secret.h"
++
++#include "gtest/gtest.h"
++
++#if !V8_USE_DEFAULT_HASHER_SECRET
++namespace {
++
++struct MulModCase {
++  uint64_t a;
++  uint64_t b;
++  uint64_t modulus;
++  uint64_t expected;
++};
++
++TEST(RapidhashSecret, ModularMultiplication) {
++  constexpr MulModCase cases[] = {
++      {UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
++       UINT64_C(0x0000000000000001), UINT64_C(0x0000000000000000)},
++      {UINT64_C(0x0000000000000001), UINT64_C(0xffffffffffffffff),
++       UINT64_C(0x0000000000000002), UINT64_C(0x0000000000000001)},
++      {UINT64_C(0x0000000000000002), UINT64_C(0xffffffffffffffff),
++       UINT64_C(0x0000000000000003), UINT64_C(0x0000000000000000)},
++      {UINT64_C(0xfffffffffffffffe), UINT64_C(0xffffffffffffffff),
++       UINT64_C(0xffffffffffffffff), UINT64_C(0x0000000000000000)},
++      {UINT64_C(0xffffffffffffffc4), UINT64_C(0xfffffffffffffffd),
++       UINT64_C(0xffffffffffffffc5), UINT64_C(0xffffffffffffff8d)},
++      {UINT64_C(0x8000000000000000), UINT64_C(0x8000000000000000),
++       UINT64_C(0xffffffffffffffff), UINT64_C(0x4000000000000000)},
++      {UINT64_C(0x8000000000000000), UINT64_C(0xffffffffffffffff),
++       UINT64_C(0x8000000000000001), UINT64_C(0x0000000000000003)},
++      {UINT64_C(0x8000000000000000), UINT64_C(0xfffffffffffffffe),
++       UINT64_C(0x8000000000000001), UINT64_C(0x0000000000000004)},
++  };
++
++  for (const MulModCase& test : cases) {
++    EXPECT_EQ(detail::mul_mod(test.a, test.b, test.modulus), test.expected);
++  }
++}
++
++struct SecretCase {
++  uint64_t seed;
++  uint64_t secret[3];
++};
++
++TEST(RapidhashSecret, GeneratedSecrets) {
++  // These golden vectors were generated by the pre-optimization helper.
++  constexpr SecretCase cases[] = {
++      {UINT64_C(0x0000000000000000),
++       {UINT64_C(0x39d43c5c4e3a724b), UINT64_C(0x6596e14753cca38b),
++        UINT64_C(0xc68d954b2b339353)}},
++      {UINT64_C(0x0000000000000001),
++       {UINT64_C(0x0ff09999359563a5), UINT64_C(0x2d6c35b48de81b2b),
++        UINT64_C(0xd2ca93c527b49c2b)}},
++      {UINT64_C(0xffffffffffffffff),
++       {UINT64_C(0x550fc6c5d4aa6a95), UINT64_C(0xd16ce139c6e1b44d),
++        UINT64_C(0xb239d83c653c4ec5)}},
++      {UINT64_C(0x8000000000000000),
++       {UINT64_C(0x2b939a965c748e1b), UINT64_C(0x1e17c569d2666a0f),
++        UINT64_C(0x742db1ca39c5ca53)}},
++      {UINT64_C(0x0123456789abcdef),
++       {UINT64_C(0x65962e71a35369c3), UINT64_C(0x369c5cd26927aa2d),
++        UINT64_C(0x53d82d4b5c5655a9)}},
++      {UINT64_C(0x000000000000002a),
++       {UINT64_C(0x8b4be21b934dc6a3), UINT64_C(0x9a0f72f0e81b6969),
++        UINT64_C(0x99746a47f066331b)}},
++      {UINT64_C(0xdeadbeefcafebabe),
++       {UINT64_C(0x1d6a55e1e41bccb1), UINT64_C(0x59668e723caa1b53),
++        UINT64_C(0x3a1eb893d4c9d1c5)}},
++  };
++
++  for (const SecretCase& test : cases) {
++    uint64_t secret[3];
++    rapidhash_make_secret(test.seed, secret);
++    for (size_t i = 0; i < std::size(secret); ++i) {
++      EXPECT_EQ(secret[i], test.secret[i]);
++    }
++  }
++}
++
++}  // namespace
++#endif  // !V8_USE_DEFAULT_HASHER_SECRET
+diff --git a/test/cctest/test_hash_small_factors.cc b/test/cctest/test_hash_small_factors.cc
+new file mode 100644
+index 00000000..cf735dcb
+--- /dev/null
++++ b/test/cctest/test_hash_small_factors.cc
+@@ -0,0 +1,193 @@
++#include <array>
++#include <cinttypes>
++
++#include "third_party/rapidhash-v8/secret.h"
++
++#include "gtest/gtest.h"
++
++#if !V8_USE_DEFAULT_HASHER_SECRET
++namespace {
++namespace control {
++uint64_t mul_mod(uint64_t a, uint64_t b, uint64_t m) {
++#if defined(__SIZEOF_INT128__)
++  return static_cast<uint64_t>((static_cast<__uint128_t>(a) * b) % m);
++#else
++  uint64_t r = 0;
++  while (b) {
++    if (b & 1) {
++      uint64_t r2 = r + a;
++      if (r2 < r) r2 -= m;
++      r = r2 % m;
++    }
++    b >>= 1;
++    if (b) {
++      uint64_t a2 = a + a;
++      if (a2 < a) a2 -= m;
++      a = a2 % m;
++    }
++  }
++  return r;
++#endif
++}
++
++uint64_t pow_mod(uint64_t a, uint64_t b, uint64_t m) {
++  uint64_t r = 1;
++  while (b) {
++    if (b & 1) r = mul_mod(r, a, m);
++    b >>= 1;
++    if (b) a = mul_mod(a, a, m);
++  }
++  return r;
++}
++
++unsigned sprp(uint64_t n, uint64_t a) {
++  uint64_t d = n - 1;
++  unsigned char s = 0;
++  while (!(d & 0xff)) {
++    d >>= 8;
++    s += 8;
++  }
++  if (!(d & 0xf)) {
++    d >>= 4;
++    s += 4;
++  }
++  if (!(d & 0x3)) {
++    d >>= 2;
++    s += 2;
++  }
++  if (!(d & 0x1)) {
++    d >>= 1;
++    s += 1;
++  }
++  uint64_t b = pow_mod(a, d, n);
++  if (b == 1 || b == n - 1) return 1;
++  for (unsigned char r = 1; r < s; ++r) {
++    b = mul_mod(b, b, n);
++    if (b <= 1) return 0;
++    if (b == n - 1) return 1;
++  }
++  return 0;
++}
++
++unsigned is_prime(uint64_t n) {
++  if (n < 2 || !(n & 1)) return 0;
++  if (n < 4) return 1;
++  if (!sprp(n, 2)) return 0;
++  if (n < 2047) return 1;
++  if (!sprp(n, 3)) return 0;
++  if (!sprp(n, 5)) return 0;
++  if (!sprp(n, 7)) return 0;
++  if (!sprp(n, 11)) return 0;
++  if (!sprp(n, 13)) return 0;
++  if (!sprp(n, 17)) return 0;
++  if (!sprp(n, 19)) return 0;
++  if (!sprp(n, 23)) return 0;
++  if (!sprp(n, 29)) return 0;
++  if (!sprp(n, 31)) return 0;
++  if (!sprp(n, 37)) return 0;
++  return 1;
++}
++
++uint64_t wyrand(uint64_t* seed) {
++  *seed += UINT64_C(0x2d358dccaa6c78a5);
++  return rapid_mix(*seed, *seed ^ UINT64_C(0x8bb84b93962eacc9));
++}
++
++void make_secret(uint64_t seed, uint64_t* secret) {
++  constexpr uint8_t c[] = {
++      15,  23,  27,  29,  30,  39,  43,  45,  46,  51,  53,  54,  57,  58,
++      60,  71,  75,  77,  78,  83,  85,  86,  89,  90,  92,  99,  101, 102,
++      105, 106, 108, 113, 114, 116, 120, 135, 139, 141, 142, 147, 149, 150,
++      153, 154, 156, 163, 165, 166, 169, 170, 172, 177, 178, 180, 184, 195,
++      197, 198, 201, 202, 204, 209, 210, 212, 216, 225, 226, 228, 232, 240};
++  for (size_t i = 0; i < 3; ++i) {
++    uint8_t ok;
++    do {
++      ok = 1;
++      secret[i] = 0;
++      for (size_t j = 0; j < 64; j += 8)
++        secret[i] |= static_cast<uint64_t>(c[wyrand(&seed) % sizeof(c)]) << j;
++      if (secret[i] % 2 == 0) {
++        ok = 0;
++        continue;
++      }
++      for (size_t j = 0; j < i; ++j) {
++        if (v8::base::bits::CountPopulation(secret[j] ^ secret[i]) != 32) {
++          ok = 0;
++          break;
++        }
++      }
++      if (ok && !is_prime(secret[i])) ok = 0;
++    } while (!ok);
++  }
++}
++}  // namespace control
++
++uint64_t next(uint64_t* state) {
++  *state += UINT64_C(0x9e3779b97f4a7c15);
++  uint64_t z = *state;
++  z = (z ^ (z >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
++  z = (z ^ (z >> 27)) * UINT64_C(0x94d049bb133111eb);
++  return z ^ (z >> 31);
++}
++
++void expect_prime_matches(uint64_t n, const char* group) {
++  EXPECT_EQ(detail::is_prime(n), control::is_prime(n))
++      << group << " mismatch for " << n;
++}
++
++TEST(RapidhashSecret, SmallFactorRejectionMatchesBaseline) {
++  for (uint64_t n = 0; n < UINT64_C(1) << 20; ++n) {
++    expect_prime_matches(n, "exhaustive");
++  }
++  constexpr std::array<uint64_t, 25> edges = {0,
++                                              1,
++                                              2,
++                                              3,
++                                              4,
++                                              5,
++                                              2045,
++                                              2046,
++                                              2047,
++                                              2049,
++                                              2053,
++                                              3 * 683ULL,
++                                              5 * 409ULL,
++                                              7 * 293ULL,
++                                              11 * 187ULL,
++                                              13 * 157ULL,
++                                              17 * 121ULL,
++                                              19 * 109ULL,
++                                              23 * 89ULL,
++                                              29 * 71ULL,
++                                              31 * 67ULL,
++                                              37 * 59ULL,
++                                              UINT64_MAX - 1,
++                                              UINT64_MAX,
++                                              UINT64_MAX - 2};
++  for (uint64_t n : edges) expect_prime_matches(n, "edge");
++  uint64_t state = UINT64_C(0x8e4d4c3b2a190817);
++#if defined(__SIZEOF_INT128__)
++  constexpr size_t kRandomPrimeCases = 20000;
++  constexpr size_t kSecretCases = 2048;
++#else
++  constexpr size_t kRandomPrimeCases = 256;
++  constexpr size_t kSecretCases = 32;
++#endif
++  for (size_t i = 0; i < kRandomPrimeCases; ++i) {
++    expect_prime_matches(next(&state), "random");
++  }
++  for (size_t i = 0; i < kSecretCases; ++i) {
++    uint64_t candidate[3];
++    uint64_t baseline[3];
++    const uint64_t seed = next(&state);
++    rapidhash_make_secret(seed, candidate);
++    control::make_secret(seed, baseline);
++    for (size_t j = 0; j < std::size(candidate); ++j) {
++      EXPECT_EQ(candidate[j], baseline[j]) << "seed " << seed;
++    }
++  }
++}
++
++}  // namespace
++#endif  // !V8_USE_DEFAULT_HASHER_SECRET
+diff --git a/test/cctest/test_postmortem_exports.cc b/test/cctest/test_postmortem_exports.cc
+new file mode 100644
+index 00000000..a2a6152c
+--- /dev/null
++++ b/test/cctest/test_postmortem_exports.cc
+@@ -0,0 +1,41 @@
++#include "gtest/gtest.h"
++
++#ifdef __APPLE__
++#include <dlfcn.h>
++
++TEST(PostmortemExportsTest, MetadataIsDynamicallyVisible) {
++  const char* symbols[] = {
++      "nodedbg_const_BaseObject__kInternalFieldCount__int",
++      "nodedbg_const_ContextEmbedderIndex__kEnvironment__int",
++      "nodedbg_const_HandleWrap__kInternalFieldCount__int",
++      "nodedbg_const_ReqWrap__kInternalFieldCount__int",
++      "nodedbg_offset_BaseObject__persistent_handle___v8_Persistent_v8_Object",
++      "nodedbg_offset_Environment_HandleWrapQueue__head___ListNode_HandleWrap",
++      "nodedbg_offset_Environment_ReqWrapQueue__head___ListNode_ReqWrapQueue",
++      ("nodedbg_offset_Environment__handle_wrap_queue___"
++       "Environment_HandleWrapQueue"),
++      "nodedbg_offset_Environment__req_wrap_queue___Environment_ReqWrapQueue",
++      "nodedbg_offset_ExternalString__data__uintptr_t",
++      "nodedbg_offset_HandleWrap__handle_wrap_queue___ListNode_HandleWrap",
++      "nodedbg_offset_ListNode_HandleWrap__next___uintptr_t",
++      "nodedbg_offset_ListNode_HandleWrap__prev___uintptr_t",
++      "nodedbg_offset_ListNode_ReqWrap__next___uintptr_t",
++      "nodedbg_offset_ListNode_ReqWrap__prev___uintptr_t",
++      "nodedbg_offset_ReqWrap__req_wrap_queue___ListNode_ReqWrapQueue",
++  };
++
++  for (const char* symbol : symbols) {
++    EXPECT_NE(nullptr, dlsym(RTLD_DEFAULT, symbol)) << symbol;
++  }
++}
++TEST(PublicExportsTest, EmbeddingApisAreDynamicallyVisible) {
++  const char* symbols[] = {
++      "_ZN4node12signo_stringEi",
++      "_ZN4node20EmbedderSnapshotData19BuiltinSnapshotDataEv",
++      "_ZNK4node20EmbedderSnapshotData18DeleteSnapshotDataclEPKS0_",
++  };
++  for (const char* symbol : symbols) {
++    EXPECT_NE(nullptr, dlsym(RTLD_DEFAULT, symbol)) << symbol;
++  }
++}
++#endif  // __APPLE__
+diff --git a/test/fixtures/openssl3-conf/random_unavailable.cnf b/test/fixtures/openssl3-conf/random_unavailable.cnf
+new file mode 100644
+index 00000000..a2dc8d2c
+--- /dev/null
++++ b/test/fixtures/openssl3-conf/random_unavailable.cnf
+@@ -0,0 +1,7 @@
++nodejs_conf = nodejs_init
++
++[nodejs_init]
++random = random_sect
++
++[random_sect]
++random = NO-SUCH-DRBG
+diff --git a/test/parallel/test-crypto-startup-entropy.js b/test/parallel/test-crypto-startup-entropy.js
+new file mode 100644
+index 00000000..70b91ab5
+--- /dev/null
++++ b/test/parallel/test-crypto-startup-entropy.js
+@@ -0,0 +1,121 @@
++'use strict';
++
++const common = require('../common');
++if (!common.hasCrypto)
++  common.skip('missing crypto');
++
++const {
++  hasOpenSSL,
++  isBoringSSL,
++} = require('../common/crypto');
++
++if (common.isAIX)
++  common.skip('AIX retains OpenSSL for V8 entropy');
++
++if (isBoringSSL)
++  common.skip('BoringSSL does not have OpenSSL providers');
++
++if (!hasOpenSSL(3))
++  common.skip('this test requires OpenSSL 3.x');
++
++const crypto = require('node:crypto');
++if (crypto.getFips())
++  common.skip('this test cannot be run in FIPS mode');
++
++const assert = require('node:assert/strict');
++const { spawnSync } = require('node:child_process');
++const fixtures = require('../common/fixtures');
++
++const timeout = common.platformTimeout(10_000);
++
++function runSecureHeapWorkers() {
++  const { Worker } = require('node:worker_threads');
++  const workers = 8;
++
++  for (let i = 0; i < workers; i++) {
++    const worker = new Worker(`
++      const { parentPort } = require('node:worker_threads');
++      try {
++        require('node:crypto').randomBytes(4);
++        parentPort.postMessage({ ok: true });
++      } catch (err) {
++        if (err.code !== 'ERR_OSSL_CRYPTO_SECURE_MALLOC_FAILURE') throw err;
++        parentPort.postMessage({ error: err.code });
++      }
++    `, { eval: true });
++
++    worker.on('error', common.mustNotCall());
++    worker.on('message', common.mustCall((message) => {
++      assert(message.ok === true ||
++             message.error === 'ERR_OSSL_CRYPTO_SECURE_MALLOC_FAILURE');
++    }));
++    worker.on('exit', common.mustCall((code) => {
++      assert.strictEqual(code, 0);
++    }));
++  }
++}
++
++if (process.argv[2] === 'secure-heap-workers') {
++  runSecureHeapWorkers();
++  return;
++}
++
++function run(args) {
++  const child = spawnSync(process.execPath, args, {
++    encoding: 'utf8',
++    timeout,
++  });
++  assert.ifError(child.error);
++  assert.strictEqual(child.signal, null,
++                     `child timed out or crashed: ${child.stderr}`);
++  return child;
++}
++
++function assertHash(args, expected) {
++  const includeMd4 = Object.hasOwn(expected, 'md4');
++  const child = run([...args, '-e', `
++    const crypto = require('node:crypto');
++    const result = {
++      sha256: crypto.createHash('sha256').update('abc').digest('hex'),
++    };
++    if (${includeMd4})
++      result.md4 = crypto.createHash('md4').update('abc').digest('hex');
++    process.stdout.write(JSON.stringify(result));
++  `]);
++  assert.strictEqual(child.status, 0, child.stderr);
++  assert.deepStrictEqual(JSON.parse(child.stdout), expected);
++}
++
++// Crypto remains available after entropy is supplied to V8 from the OS.
++assertHash([], {
++  sha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
++});
++
++// Explicitly loading the legacy provider must not hide the default provider.
++assertHash(['--openssl-legacy-provider'], {
++  sha256: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
++  md4: 'a448017aaf21d8525fc10ae87aa6729d',
++});
++
++{
++  // An unfetchable DRBG must not abort before JavaScript or hang. The deferred
++  // OpenSSL crypto call reports the provider error instead.
++  const randomConf = fixtures.path('openssl3-conf', 'random_unavailable.cnf');
++  const child = run([`--openssl-config=${randomConf}`, '-e', `
++    process.stdout.write('started\\n');
++    require('node:crypto').randomBytes(8);
++  `]);
++  assert.strictEqual(child.status, 1, child.stderr);
++  assert.match(child.stdout, /^started$/m);
++  assert.match(child.stderr, /unable to fetch drbg/i);
++}
++
++if (!common.isWindows && !common.isASan) {
++  const child = run([
++    '--secure-heap=1024',
++    '--secure-heap-min=4',
++    __filename,
++    'secure-heap-workers',
++  ]);
++  assert.strictEqual(child.status, 0, child.stderr);
++}
+diff --git a/test/parallel/test-options-help-storage.js b/test/parallel/test-options-help-storage.js
+new file mode 100644
+index 00000000..f7c1d7c2
+--- /dev/null
++++ b/test/parallel/test-options-help-storage.js
+@@ -0,0 +1,37 @@
++// Flags: --expose-internals --expose-gc --no-warnings
++
++'use strict';
++require('../common');
++const assert = require('assert');
++const { internalBinding } = require('internal/test/binding');
++const {
++  getCLIOptionsInfo,
++  getEnvOptionsInputType,
++  getNamespaceOptionsInputType,
++} = internalBinding('options');
++
++const first = getCLIOptionsInfo();
++const descriptions = new Map();
++for (const [name, info] of first.options) {
++  assert.strictEqual(typeof info.helpText, 'string');
++  descriptions.set(name, info.helpText);
++  info.helpText = 'changed in JavaScript';
++}
++assert(descriptions.size > 0);
++global.gc();
++
++const second = getCLIOptionsInfo();
++for (const [name, info] of second.options) {
++  assert.strictEqual(info.helpText, descriptions.get(name));
++}
++
++function checkDescriptions(options) {
++  for (const [name, info] of Object.entries(options)) {
++    assert.strictEqual(info.description, descriptions.get(name));
++  }
++}
++
++checkDescriptions(getEnvOptionsInputType());
++for (const options of getNamespaceOptionsInputType().values()) {
++  checkDescriptions(options);
++}
+diff --git a/tools/icu/icu-generic.gyp b/tools/icu/icu-generic.gyp
+index c4e8c6fb..f9860a1c 100644
+--- a/tools/icu/icu-generic.gyp
++++ b/tools/icu/icu-generic.gyp
+@@ -112,6 +112,14 @@
+           'defines': [
+             'U_I18N_IMPLEMENTATION=1',
+           ],
++          'conditions': [
++            ['OS=="mac" and node_shared=="false"', {
++              'xcode_settings': {
++                'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
++                'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
++              },
++            }],
++          ],
+           'dependencies': [ 'icuucx', 'icu_implementation', 'icu_uconfig', 'icu_uconfig_target' ],
+           'direct_dependent_settings': {
+             'include_dirs': [
+@@ -362,6 +370,12 @@
+         [ 'OS == "solaris"', { 'defines': [
+           '_XOPEN_SOURCE_EXTENDED=0',
+         ]}],
++        [ 'OS=="mac" and node_shared=="false"', {
++          'xcode_settings': {
++            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
++            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
++          },
++        }],
+       ],
+       'include_dirs': [
+         '<(icu_path)/source/common',
+diff --git a/tools/v8_gypfiles/abseil.gyp b/tools/v8_gypfiles/abseil.gyp
+index 1a1de337..444b25e8 100644
+--- a/tools/v8_gypfiles/abseil.gyp
++++ b/tools/v8_gypfiles/abseil.gyp
+@@ -12,9 +12,6 @@
+         'include_dirs': [
+           '<(ABSEIL_ROOT)',
+         ],
+-        'xcode_settings': {
+-          'OTHER_LDFLAGS': ['-framework CoreFoundation'],
+-        },
+       },
+       'include_dirs': [
+         '<(ABSEIL_ROOT)',
+@@ -371,6 +368,12 @@
+         '<(ABSEIL_ROOT)/absl/utility/utility.h',
+       ],
+       'conditions': [
++        ['OS=="mac" and node_shared=="false"', {
++          'xcode_settings': {
++            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
++            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
++          },
++        }],
+         ['OS=="win"', {
+           'sources': [
+             '<(ABSEIL_ROOT)/absl/time/internal/cctz/src/time_zone_name_win.h',

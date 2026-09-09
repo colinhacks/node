@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "inputs": [
+    {"kind":"paired","name":"identity-control","report":"comparison/identity-control/report.json","raw":"comparison/identity-control/raw.jsonl","files":["comparison/configs/identity-control.json"]},
+    {"kind":"paired","name":"startup","report":"comparison/startup/report.json","raw":"comparison/startup/raw.jsonl","files":["comparison/configs/startup.json"]},
+    {"kind":"paired","name":"throughput","report":"comparison/throughput/report.json","raw":"comparison/throughput/raw.jsonl","files":["comparison/configs/throughput.json"]},
+    {"kind":"first-js","name":"first-js","report":"first-js/summary.json","raw":"first-js/raw.jsonl","files":["first-js/fixtures/first.cjs","first-js/fixtures/first.mjs"]},
+    {"kind":"paired","name":"release-references","report":"release-references/report.json","raw":"release-references/raw.jsonl"}
+  ]
+}
