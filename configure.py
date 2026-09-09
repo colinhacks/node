@@ -1899,9 +1899,21 @@ def configure_node_lib_files(o):
   o['variables']['node_library_files'] = SearchFiles('lib', 'js')
 
 def configure_node_cctest_sources(o):
-  o['variables']['node_cctest_sources'] = [] + \
-    SearchFiles('test/cctest', 'cc') + \
-    SearchFiles('test/cctest', 'h')
+  v8_private_cctest_sources = {
+      'test/cctest/test_source_position_collection.cc',
+      'test/cctest/test_source_positions_advanced.cc',
+  }
+  excluded_sources = v8_private_cctest_sources
+  supports_v8_private_cctests = (
+      not options.without_bundled_v8 and not options.shared)
+  if not supports_v8_private_cctests:
+    # Private V8 headers cannot safely target external V8 or libnode builds.
+    excluded_sources |= {'test/cctest/test_v8_private_startup_cases.cc'}
+  o['variables']['node_cctest_sources'] = [
+      source for source in SearchFiles('test/cctest', 'cc') +
+      SearchFiles('test/cctest', 'h')
+      if source not in excluded_sources
+  ]
 
 def configure_whole_program_vtables(o):
   variables = o['variables']

@@ -1384,6 +1384,11 @@
       'sources': [ '<@(node_cctest_sources)' ],
 
       'conditions': [
+        [ 'node_use_bundled_v8=="true" and node_shared=="false"', {
+          'dependencies': [
+            'tools/v8_gypfiles/node_startup_cctest.gyp:v8_private_cctest_cases',
+          ],
+        }],
         ['OS=="mac"', {
           'xcode_settings': {
             # Match the executable's dynamic exports for symbol-visibility tests.

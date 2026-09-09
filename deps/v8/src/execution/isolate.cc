@@ -16,6 +16,7 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 #include "include/v8-callbacks.h"
@@ -108,6 +109,7 @@
 #include "src/objects/promise-inl.h"
 #include "src/objects/property-descriptor.h"
 #include "src/objects/prototype.h"
+#include "src/objects/script.h"
 #include "src/objects/slots.h"
 #include "src/objects/smi.h"
 #include "src/objects/source-text-module-inl.h"
@@ -7578,21 +7580,27 @@ void Isolate::CollectSourcePositionsForAllBytecodeArrays() {
 
   HandleScope scope(this);
   std::vector<Handle<SharedFunctionInfo>> sfis;
+  std::unordered_set<Address> seen_sfis;
   {
-    HeapObjectIterator iterator(heap());
-    for (Tagged<HeapObject> obj = iterator.Next(); !obj.is_null();
-         obj = iterator.Next()) {
-      if (!IsSharedFunctionInfo(obj)) continue;
-      Tagged<SharedFunctionInfo> sfi = Cast<SharedFunctionInfo>(obj);
-      // If the script is a Smi, then the SharedFunctionInfo is in
-      // the process of being deserialized.
-      Tagged<Object> script = sfi->raw_script(kAcquireLoad);
-      if (IsSmi(script)) {
-        DCHECK_EQ(script, Smi::uninitialized_deserialization_value());
-        continue;
+    Script::Iterator script_iterator(this);
+    for (Tagged<Script> script = script_iterator.Next(); !script.is_null();
+         script = script_iterator.Next()) {
+      SharedFunctionInfo::ScriptIterator sfi_iterator(this, script);
+      for (Tagged<SharedFunctionInfo> sfi = sfi_iterator.Next();
+           !sfi.is_null(); sfi = sfi_iterator.Next()) {
+        // Preserve the existing deserialization guard. A live-edit transfer
+        // can expose one SFI through two script lists, so deduplicate before
+        // taking the strong handle used by the reparsing phase.
+        Tagged<Object> sfi_script = sfi->raw_script(kAcquireLoad);
+        if (IsSmi(sfi_script)) {
+          DCHECK_EQ(sfi_script, Smi::uninitialized_deserialization_value());
+          continue;
+        }
+        if (!sfi->CanCollectSourcePosition(this)) continue;
+        if (seen_sfis.insert(sfi.address()).second) {
+          sfis.push_back(Handle<SharedFunctionInfo>(sfi, this));
+        }
       }
-      if (!sfi->CanCollectSourcePosition(this)) continue;
-      sfis.push_back(Handle<SharedFunctionInfo>(sfi, this));
     }
   }
   for (auto sfi : sfis) {
