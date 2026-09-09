@@ -79,7 +79,8 @@ void TestNameDictionary(i::Isolate* isolate, uint32_t capacity) {
     entries.push_back({key, value, table->DetailsAt(found).AsSmi()});
   }
 
-  const i::InternalIndex deleted = table->FindEntry(isolate, entries.back().key);
+  const i::InternalIndex deleted =
+      table->FindEntry(isolate, entries.back().key);
   ASSERT_TRUE(deleted.is_found());
   table = i::NameDictionary::DeleteEntry(isolate, table, deleted);
   entries.pop_back();

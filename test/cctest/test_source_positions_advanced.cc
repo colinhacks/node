@@ -16,7 +16,8 @@
 
 namespace {
 
-class ChunkSourceStream final : public v8::ScriptCompiler::ExternalSourceStream {
+class ChunkSourceStream final
+    : public v8::ScriptCompiler::ExternalSourceStream {
  public:
   explicit ChunkSourceStream(const char* const* chunks) : chunks_(chunks) {}
 
