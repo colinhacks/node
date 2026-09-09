@@ -413,7 +413,7 @@ using UniquePersistent = Global<T>;
 /**
  * Interface for iterating through all the persistent handles in the heap.
  */
-class V8_EXPORT PersistentHandleVisitor {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT PersistentHandleVisitor {
  public:
   virtual ~PersistentHandleVisitor() = default;
   virtual void VisitPersistentHandle(Persistent<Value>* value,

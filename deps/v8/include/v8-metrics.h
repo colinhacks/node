@@ -178,7 +178,7 @@ struct WasmModulesPerIsolate {
  * providing its implementation and have the virtual methods overwritten
  * for the events it cares about.
  */
-class V8_EXPORT Recorder {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Recorder {
  public:
   // A unique identifier for a context in this Isolate.
   // It is guaranteed to not be reused throughout the lifetime of the Isolate.

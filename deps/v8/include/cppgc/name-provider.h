@@ -23,7 +23,7 @@ namespace cppgc {
  * Depending on the build configuration, Oilpan may hide names, i.e., represent
  * them with kHiddenName, of case b. to avoid exposing internal details.
  */
-class V8_EXPORT NameProvider {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT NameProvider {
  public:
   /**
    * Name that is used when hiding internals.

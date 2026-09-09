@@ -20,7 +20,7 @@ class FunctionTemplate;
 /**
  * Ignore
  */
-class V8_EXPORT Extension {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Extension {
  public:
   // Note that the strings passed into this constructor must live as long
   // as the Extension itself.

@@ -13,6 +13,7 @@
     'enable_pgo_generate%': '0',
     'enable_pgo_use%': '0',
     'node_pgo_profile%': '',
+    'node_whole_program_vtables%': 'false',
     'node_darwin_order_file%': '',
     'node_darwin_order_file_input%': '',
     'node_use_darwin_order_file%': 'false',
@@ -216,6 +217,15 @@
             'xcode_settings': {
               'OTHER_CFLAGS': ['-flto=thin'],
             },
+          }],
+          ['OS=="mac" and configuring_node==1 and node_whole_program_vtables=="true"', {
+            'target_conditions': [
+              ['_target_name.startswith("v8_") or _target_name in ["node", "libnode", "node_base", "node_mksnapshot", "node_js2c", "cctest", "embedtest", "mksnapshot", "torque_generated_definitions", "torque_generated_initializers", "torque_base", "torque_ls_base", "torque", "torque-language-server", "bytecode_builtins_list_generator", "gen-regexp-special-case", "abseil", "simdutf", "highway"]', {
+                'xcode_settings': {
+                  'OTHER_CPLUSPLUSFLAGS': ['$(inherited)', '-fwhole-program-vtables'],
+                },
+              }],
+            ],
           }],
           ['OS=="mac" and configuring_node==1 and enable_pgo_generate=="true"', {
             'xcode_settings': {

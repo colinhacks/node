@@ -30,7 +30,7 @@ namespace node {
 // Legacy interface for tying C++ objects to JavaScript objects.
 // This is not intended to be used by new code, and userland alternatives
 // should be preferred.
-class NODE_DEPRECATED(
+class V8_LTO_VISIBILITY_PUBLIC NODE_DEPRECATED(
     "Use userland alternatives such as node-addon-api or nan instead",
     ObjectWrap) {
  public:

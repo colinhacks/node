@@ -28,7 +28,7 @@ using TracingController = v8::TracingController;
 /**
  * Platform interface used by Heap. Contains allocators and executors.
  */
-class V8_EXPORT Platform {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Platform {
  public:
   virtual ~Platform() = default;
 

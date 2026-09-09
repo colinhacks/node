@@ -114,7 +114,7 @@ class V8_PLATFORM_EXPORT TraceObject {
   void operator=(const TraceObject&) = delete;
 };
 
-class V8_PLATFORM_EXPORT TraceWriter {
+class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TraceWriter {
  public:
   TraceWriter() = default;
   virtual ~TraceWriter() = default;
@@ -157,7 +157,7 @@ class V8_PLATFORM_EXPORT TraceBufferChunk {
   void operator=(const TraceBufferChunk&) = delete;
 };
 
-class V8_PLATFORM_EXPORT TraceBuffer {
+class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TraceBuffer {
  public:
   TraceBuffer() = default;
   virtual ~TraceBuffer() = default;
@@ -239,7 +239,7 @@ class V8_PLATFORM_EXPORT TraceConfig {
  * Will become obsolete in Perfetto build
  * (v8_use_perfetto_json_export = true).
  */
-class V8_PLATFORM_EXPORT TracingController
+class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TracingController
     : public V8_PLATFORM_NON_EXPORTED_BASE(v8::TracingController) {
  public:
   TracingController();

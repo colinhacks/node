@@ -7,6 +7,8 @@
 
 #include <stddef.h>
 
+#include "v8config.h"  // NOLINT(build/include_directory)
+
 namespace cppgc {
 
 /**
@@ -21,7 +23,7 @@ struct CustomSpaceIndex {
  * Top-level base class for custom spaces. Users must inherit from CustomSpace
  * below.
  */
-class CustomSpaceBase {
+class V8_LTO_VISIBILITY_PUBLIC CustomSpaceBase {
  public:
   virtual ~CustomSpaceBase() = default;
   virtual CustomSpaceIndex GetCustomSpaceIndex() const = 0;

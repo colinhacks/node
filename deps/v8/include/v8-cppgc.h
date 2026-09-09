@@ -62,7 +62,7 @@ struct V8_EXPORT CppHeapCreateParams {
  * time. The heap may be used from different threads using the
  * v8::Locker/v8::Unlocker APIs which is different from generic Oilpan.
  */
-class V8_EXPORT CppHeap {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT CppHeap {
  public:
   static std::unique_ptr<CppHeap> Create(v8::Platform* platform,
                                          const CppHeapCreateParams& params);
@@ -137,7 +137,7 @@ class V8_EXPORT CppHeap {
   friend class internal::CppHeap;
 };
 
-class JSVisitor : public cppgc::Visitor {
+class V8_LTO_VISIBILITY_PUBLIC JSVisitor : public cppgc::Visitor {
  public:
   explicit JSVisitor(cppgc::Visitor::Key key) : cppgc::Visitor(key) {}
   ~JSVisitor() override = default;
@@ -158,7 +158,7 @@ class JSVisitor : public cppgc::Visitor {
  *
  * Its method is invoked with the results of the statistic collection.
  */
-class CustomSpaceStatisticsReceiver {
+class V8_LTO_VISIBILITY_PUBLIC CustomSpaceStatisticsReceiver {
  public:
   virtual ~CustomSpaceStatisticsReceiver() = default;
   /**

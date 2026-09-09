@@ -72,7 +72,7 @@ struct EphemeronPair {
  * };
  * \endcode
  */
-class V8_EXPORT Visitor {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Visitor {
  public:
   class Key {
    private:
@@ -468,7 +468,7 @@ void EphemeronPair<K, V>::Trace(Visitor* visitor) const {
 
 namespace internal {
 
-class V8_EXPORT RootVisitor {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT RootVisitor {
  public:
   explicit RootVisitor(Visitor::Key) {}
 

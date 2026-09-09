@@ -240,7 +240,7 @@ class V8_EXPORT String : public Name {
    */
   Local<String> InternalizeString(Isolate* isolate);
 
-  class V8_EXPORT ExternalStringResourceBase {
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalStringResourceBase {
    public:
     virtual ~ExternalStringResourceBase() = default;
 
@@ -272,7 +272,7 @@ class V8_EXPORT String : public Name {
     }
     static constexpr size_t kDefaultMemoryEstimate = static_cast<size_t>(-1);
 
-    class V8_EXPORT SharedMemoryUsageRecorder {
+    class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT SharedMemoryUsageRecorder {
      public:
       /**
        * Record that a shared allocation at the given location has the given
@@ -335,7 +335,7 @@ class V8_EXPORT String : public Name {
    * ExternalStringResource to manage the life cycle of the underlying
    * buffer.  Note that the string data must be immutable.
    */
-  class V8_EXPORT ExternalStringResource : public ExternalStringResourceBase {
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalStringResource : public ExternalStringResourceBase {
    public:
     /**
      * Override the destructor to manage the life cycle of the underlying
@@ -389,7 +389,7 @@ class V8_EXPORT String : public Name {
    * indexing.  Use String::New or convert to 16 bit data for non-Latin1.
    */
 
-  class V8_EXPORT ExternalOneByteStringResource
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalOneByteStringResource
       : public ExternalStringResourceBase {
    public:
     /**
@@ -714,7 +714,7 @@ inline V8_WARN_UNUSED_RESULT Local<String> String::NewFromUtf8Literal(
 /**
  * Interface for iterating through all external resources in the heap.
  */
-class V8_EXPORT ExternalResourceVisitor {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalResourceVisitor {
  public:
   virtual ~ExternalResourceVisitor() = default;
   virtual void VisitExternalString(Local<String> string) {}

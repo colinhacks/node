@@ -62,9 +62,9 @@ class V8_EXPORT SharedValueConveyor final {
  * Value serialization compatible with the HTML structured clone algorithm.
  * The format is backward-compatible (i.e. safe to store to disk).
  */
-class V8_EXPORT ValueSerializer {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ValueSerializer {
  public:
-  class V8_EXPORT Delegate {
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Delegate {
    public:
     virtual ~Delegate() = default;
 
@@ -212,9 +212,9 @@ class V8_EXPORT ValueSerializer {
  * Deserializes values from data written with ValueSerializer, or a compatible
  * implementation.
  */
-class V8_EXPORT ValueDeserializer {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ValueDeserializer {
  public:
-  class V8_EXPORT Delegate {
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Delegate {
    public:
     virtual ~Delegate() = default;
 

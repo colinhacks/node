@@ -37,7 +37,7 @@ class MicrotaskQueue;
  * other synchronously. E.g. for Web embedding, use the same instance for all
  * origins that share the same URL scheme and eTLD+1.
  */
-class V8_EXPORT MicrotaskQueue {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT MicrotaskQueue {
  public:
   /**
    * Creates an empty MicrotaskQueue instance.

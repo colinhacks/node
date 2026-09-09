@@ -9,6 +9,7 @@
 #include "cppgc/platform.h"
 #include "cppgc/trace-trait.h"
 #include "cppgc/type-traits.h"
+#include "v8config.h"  // NOLINT(build/include_directory)
 
 namespace cppgc {
 
@@ -90,7 +91,7 @@ class GarbageCollected {
  * };
  * \endcode
  */
-class GarbageCollectedMixin {
+class V8_LTO_VISIBILITY_PUBLIC GarbageCollectedMixin {
  public:
   using IsGarbageCollectedMixinTypeMarker = void;
 

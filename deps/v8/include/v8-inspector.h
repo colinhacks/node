@@ -75,7 +75,7 @@ class V8_EXPORT StringView {
   };
 };
 
-class V8_EXPORT StringBuffer {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT StringBuffer {
  public:
   virtual ~StringBuffer() = default;
   virtual StringView string() const = 0;
@@ -143,7 +143,7 @@ struct V8_EXPORT V8StackFrame {
   int scriptId;
 };
 
-class V8_EXPORT V8StackTrace {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8StackTrace {
  public:
   virtual StringView firstNonEmptySourceURL() const = 0;
   virtual bool isEmpty() const = 0;
@@ -164,12 +164,12 @@ class V8_EXPORT V8StackTrace {
   virtual std::vector<V8StackFrame> frames() const = 0;
 };
 
-class V8_EXPORT V8InspectorSession {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8InspectorSession {
  public:
   virtual ~V8InspectorSession() = default;
 
   // Cross-context inspectable values (DOM nodes in different worlds, etc.).
-  class V8_EXPORT Inspectable {
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Inspectable {
    public:
     virtual v8::Local<v8::Value> get(v8::Local<v8::Context>) = 0;
     virtual ~Inspectable() = default;
@@ -249,7 +249,7 @@ struct V8_EXPORT DeepSerializationResult {
   bool isSuccess;
 };
 
-class V8_EXPORT V8InspectorClient {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8InspectorClient {
  public:
   virtual ~V8InspectorClient() = default;
 
@@ -364,7 +364,7 @@ struct V8_EXPORT V8StackTraceId {
   std::unique_ptr<StringBuffer> ToString();
 };
 
-class V8_EXPORT V8Inspector {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8Inspector {
  public:
   static std::unique_ptr<V8Inspector> create(v8::Isolate*, V8InspectorClient*);
   virtual ~V8Inspector() = default;
@@ -408,7 +408,7 @@ class V8_EXPORT V8Inspector {
                                       v8::Local<v8::Value> value) = 0;
 
   // Connection.
-  class V8_EXPORT Channel {
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Channel {
    public:
     virtual ~Channel() = default;
     virtual void sendResponse(int callId,
@@ -417,7 +417,7 @@ class V8_EXPORT V8Inspector {
     virtual void flushProtocolNotifications() = 0;
   };
 
-  class V8_EXPORT ManagedChannel
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ManagedChannel
       : public cppgc::GarbageCollected<ManagedChannel>,
         public Channel {
    public:

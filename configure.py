@@ -1881,6 +1881,19 @@ def configure_node_cctest_sources(o):
     SearchFiles('test/cctest', 'cc') + \
     SearchFiles('test/cctest', 'h')
 
+def configure_whole_program_vtables(o):
+  variables = o['variables']
+  # Hidden virtual hierarchies must stay inside the LTO unit. External and custom
+  # dependency builds keep ordinary virtual dispatch until separately validated.
+  variables['node_whole_program_vtables'] = b(
+    flavor == 'mac' and options.enable_thin_lto and
+    variables.get('node_shared') == 'false' and
+    variables.get('node_use_bundled_v8') == 'true' and
+    variables.get('icu_gyp_path') == 'tools/icu/icu-generic.gyp' and
+    not any(name.startswith('node_shared_') and value == 'true'
+            for name, value in variables.items()))
+
+
 def configure_node(o):
   if options.dest_os == 'android':
     o['variables']['OS'] = 'android'
@@ -3009,6 +3022,7 @@ configure_intl(output)
 configure_static(output)
 configure_inspector(output)
 configure_section_file(output)
+configure_whole_program_vtables(output)
 
 # remove builtins that have been disabled
 if options.without_amaro:

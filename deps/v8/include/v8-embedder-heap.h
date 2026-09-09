@@ -19,7 +19,7 @@ class Value;
 /**
  * Handler for embedder roots on non-unified heap garbage collections.
  */
-class V8_EXPORT EmbedderRootsHandler {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT EmbedderRootsHandler {
  public:
   virtual ~EmbedderRootsHandler() = default;
 

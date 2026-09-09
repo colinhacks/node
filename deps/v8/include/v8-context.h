@@ -223,7 +223,7 @@ class V8_EXPORT Context : public Data {
    * Delegate to help with Deep freezing embedder-specific objects (such as
    * JSApiObjects) that can not be frozen natively.
    */
-  class DeepFreezeDelegate {
+  class V8_LTO_VISIBILITY_PUBLIC DeepFreezeDelegate {
    public:
     /**
      * Performs embedder-specific operations to freeze the provided embedder

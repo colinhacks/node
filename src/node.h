@@ -687,7 +687,7 @@ struct SnapshotConfig {
   const v8::StartupData* base_blob = nullptr;
 };
 
-struct InspectorParentHandle {
+struct V8_LTO_VISIBILITY_PUBLIC InspectorParentHandle {
   virtual ~InspectorParentHandle() = default;
 };
 

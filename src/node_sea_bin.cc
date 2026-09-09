@@ -1,6 +1,16 @@
 #include "node_sea.h"
 
 #ifdef HAVE_LIEF
+// LIEF is compiled separately without LTO. Its imported class hierarchies
+// must remain open to whole-program devirtualization in this translation unit.
+#if defined(__APPLE__) && defined(__clang__)
+#pragma push_macro("LIEF_STATIC")
+#pragma push_macro("LIEF_IMPORT")
+#undef LIEF_STATIC
+#undef LIEF_IMPORT
+#define LIEF_IMPORT
+#endif
+
 // Temporarily undefine DEBUG because LIEF uses it as an enum name.
 #if defined(DEBUG)
 #define SAVED_DEBUG_VALUE DEBUG
@@ -11,6 +21,11 @@
 #else  // defined(DEBUG)
 #include "LIEF/LIEF.hpp"
 #endif  // defined(DEBUG)
+
+#if defined(__APPLE__) && defined(__clang__)
+#pragma pop_macro("LIEF_IMPORT")
+#pragma pop_macro("LIEF_STATIC")
+#endif
 #endif  // HAVE_LIEF
 
 #include "debug_utils-inl.h"

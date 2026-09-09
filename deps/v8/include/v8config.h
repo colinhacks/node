@@ -822,6 +822,17 @@ path. Add it with -I<path> to the command line
 #define V8_CLANG_NO_SANITIZE(what)
 #endif
 
+// Public polymorphic interfaces may be implemented by embedders in a separate
+// linkage unit. Keep their class hierarchies open to LTO devirtualization.
+#if defined(__clang__) && defined(__has_attribute)
+#if __has_attribute(lto_visibility_public)
+#define V8_LTO_VISIBILITY_PUBLIC [[clang::lto_visibility_public]]
+#endif
+#endif
+#if !defined(V8_LTO_VISIBILITY_PUBLIC)
+#define V8_LTO_VISIBILITY_PUBLIC
+#endif
+
 // Exposing private symbols requires exposing public symbols too.
 #ifdef BUILDING_V8_SHARED_PRIVATE
 #define BUILDING_V8_SHARED

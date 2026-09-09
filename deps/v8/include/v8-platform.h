@@ -47,7 +47,7 @@ enum class TaskPriority : uint8_t {
 /**
  * A Task represents a unit of work.
  */
-class Task {
+class V8_LTO_VISIBILITY_PUBLIC Task {
  public:
   virtual ~Task() = default;
 
@@ -60,7 +60,7 @@ class Task {
  * seconds returned by MonotonicallyIncreasingTime().
  * The idle task is expected to complete by this deadline.
  */
-class IdleTask {
+class V8_LTO_VISIBILITY_PUBLIC IdleTask {
  public:
   virtual ~IdleTask() = default;
   virtual void Run(double deadline_in_seconds) = 0;
@@ -72,7 +72,7 @@ class IdleTask {
  * executed anymore. All tasks posted to a given TaskRunner will be invoked in
  * sequence. Tasks can be posted from any thread.
  */
-class TaskRunner {
+class V8_LTO_VISIBILITY_PUBLIC TaskRunner {
  public:
   /**
    * Schedules a task to be invoked by this TaskRunner. The TaskRunner
@@ -202,7 +202,7 @@ class TaskRunner {
  * Delegate that's passed to Job's worker task, providing an entry point to
  * communicate with the scheduler.
  */
-class JobDelegate {
+class V8_LTO_VISIBILITY_PUBLIC JobDelegate {
  public:
   /**
    * Returns true if this thread *must* return from the worker task on the
@@ -237,7 +237,7 @@ class JobDelegate {
  * Handle returned when posting a Job. Provides methods to control execution of
  * the posted Job.
  */
-class JobHandle {
+class V8_LTO_VISIBILITY_PUBLIC JobHandle {
  public:
   virtual ~JobHandle() = default;
 
@@ -296,7 +296,7 @@ class JobHandle {
 /**
  * A JobTask represents work to run in parallel from Platform::PostJob().
  */
-class JobTask {
+class V8_LTO_VISIBILITY_PUBLIC JobTask {
  public:
   virtual ~JobTask() = default;
 
@@ -319,7 +319,7 @@ class JobTask {
 // Allows a thread to temporarily boost another thread's priority to match its
 // own priority. The priority is reset when the object is destroyed, which must
 // happens on the boosted thread.
-class ScopedBoostablePriority {
+class V8_LTO_VISIBILITY_PUBLIC ScopedBoostablePriority {
  public:
   ScopedBoostablePriority() = default;
   virtual ~ScopedBoostablePriority() = default;
@@ -366,7 +366,7 @@ enum class BlockingType {
  * CPU usage should be minimal within that scope. ScopedBlockingCalls can be
  * nested.
  */
-class ScopedBlockingCall {
+class V8_LTO_VISIBILITY_PUBLIC ScopedBlockingCall {
  public:
   virtual ~ScopedBlockingCall() = default;
 };
@@ -374,7 +374,7 @@ class ScopedBlockingCall {
 /**
  * The interface represents complex arguments to trace events.
  */
-class ConvertableToTraceFormat {
+class V8_LTO_VISIBILITY_PUBLIC ConvertableToTraceFormat {
  public:
   virtual ~ConvertableToTraceFormat() = default;
 
@@ -394,7 +394,7 @@ class ConvertableToTraceFormat {
  *
  * Will become obsolete in Perfetto build (v8_use_perfetto = true).
  */
-class TracingController {
+class V8_LTO_VISIBILITY_PUBLIC TracingController {
  public:
   virtual ~TracingController() = default;
 
@@ -449,7 +449,7 @@ class TracingController {
                                         const char* name, uint64_t handle) {}
 #endif  // !defined(V8_USE_PERFETTO)
 
-  class TraceStateObserver {
+  class V8_LTO_VISIBILITY_PUBLIC TraceStateObserver {
    public:
     virtual ~TraceStateObserver() = default;
     virtual void OnTraceEnabled() = 0;
@@ -545,7 +545,7 @@ static constexpr PlatformSharedMemoryHandle kInvalidSharedMemoryHandle =
  *
  * Can be implemented by an embedder to manage large host OS allocations.
  */
-class PageAllocator {
+class V8_LTO_VISIBILITY_PUBLIC PageAllocator {
  public:
   virtual ~PageAllocator() = default;
 
@@ -709,7 +709,7 @@ class PageAllocator {
    * INTERNAL ONLY: This interface has not been stabilised and may change
    * without notice from one release to another without being deprecated first.
    */
-  class SharedMemoryMapping {
+  class V8_LTO_VISIBILITY_PUBLIC SharedMemoryMapping {
    public:
     // Implementations are expected to free the shared memory mapping in the
     // destructor.
@@ -721,7 +721,7 @@ class PageAllocator {
    * INTERNAL ONLY: This interface has not been stabilised and may change
    * without notice from one release to another without being deprecated first.
    */
-  class SharedMemory {
+  class V8_LTO_VISIBILITY_PUBLIC SharedMemory {
    public:
     // Implementations are expected to free the shared memory in the destructor.
     virtual ~SharedMemory() = default;
@@ -777,7 +777,7 @@ class PageAllocator {
  * INTERNAL ONLY: This interface has not been stabilised and may change
  * without notice from one release to another without being deprecated first.
  */
-class ThreadIsolatedAllocator {
+class V8_LTO_VISIBILITY_PUBLIC ThreadIsolatedAllocator {
  public:
   virtual ~ThreadIsolatedAllocator() = default;
 
@@ -846,7 +846,7 @@ inline constexpr bool IsSubset(PagePermissions lhs, PagePermissions rhs) {
  *
  * This API is not yet stable and may change without notice!
  */
-class VirtualAddressSpace {
+class V8_LTO_VISIBILITY_PUBLIC VirtualAddressSpace {
  public:
   using Address = uintptr_t;
 
@@ -1209,7 +1209,7 @@ class VirtualAddressSpace {
  * Observer used by V8 to notify the embedder about entering/leaving sections
  * with high throughput of malloc/free operations.
  */
-class HighAllocationThroughputObserver {
+class V8_LTO_VISIBILITY_PUBLIC HighAllocationThroughputObserver {
  public:
   virtual void EnterSection() {}
   virtual void LeaveSection() {}
@@ -1221,7 +1221,7 @@ class HighAllocationThroughputObserver {
  * The embedder has to provide an implementation of this interface before
  * initializing the rest of V8.
  */
-class Platform {
+class V8_LTO_VISIBILITY_PUBLIC Platform {
  public:
   virtual ~Platform() = default;
 

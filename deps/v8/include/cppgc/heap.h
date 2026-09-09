@@ -32,7 +32,7 @@ namespace internal {
 class Heap;
 }  // namespace internal
 
-class V8_EXPORT Heap {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Heap {
  public:
   /**
    * Specifies the stack state the embedder is in.

@@ -581,8 +581,9 @@ class V8_EXPORT Object : public Value {
   //
   // Note that v8::Object::Wrappable` inherits from `NameProvider` and provides
   // `GetWrapperTypeInfo` to allow subclasses to have smaller object sizes.
-  class Wrappable : public cppgc::GarbageCollected<Wrappable>,
-                    public cppgc::NameProvider {
+  class V8_LTO_VISIBILITY_PUBLIC Wrappable
+      : public cppgc::GarbageCollected<Wrappable>,
+        public cppgc::NameProvider {
    public:
     virtual const WrapperTypeInfo* GetWrapperTypeInfo() const {
       return nullptr;

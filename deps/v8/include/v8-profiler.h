@@ -15,6 +15,7 @@
 #include "v8-local-handle.h"       // NOLINT(build/include_directory)
 #include "v8-message.h"            // NOLINT(build/include_directory)
 #include "v8-persistent-handle.h"  // NOLINT(build/include_directory)
+#include "v8config.h"              // NOLINT(build/include_directory)
 
 /**
  * Profiler support for the V8 JavaScript engine.
@@ -198,7 +199,7 @@ class V8_EXPORT CpuProfileNode {
 /**
  * An interface for exporting data from V8, using "push" model.
  */
-class V8_EXPORT OutputStream {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT OutputStream {
  public:
   enum WriteResult { kContinue = 0, kAbort = 1 };
   virtual ~OutputStream() = default;
@@ -354,7 +355,7 @@ struct CpuProfilingResult {
 /**
  * Delegate for when max samples reached and samples are discarded.
  */
-class V8_EXPORT DiscardedSamplesDelegate {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT DiscardedSamplesDelegate {
  public:
   DiscardedSamplesDelegate() = default;
 
@@ -717,7 +718,7 @@ class V8_EXPORT HeapSnapshot {
  * An interface for reporting progress and controlling long-running
  * activities.
  */
-class V8_EXPORT ActivityControl {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ActivityControl {
  public:
   enum ControlOption {
     kContinue = 0,
@@ -735,7 +736,7 @@ class V8_EXPORT ActivityControl {
  * AllocationProfile is a sampled profile of allocations done by the program.
  * This is structured as a call-graph.
  */
-class V8_EXPORT AllocationProfile {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT AllocationProfile {
  public:
   struct Allocation {
     /**
@@ -866,9 +867,9 @@ class V8_EXPORT AllocationProfile {
  * 4) To represent references from/to V8 object, construct V8 nodes using
  *    graph->V8Node(value).
  */
-class V8_EXPORT EmbedderGraph {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT EmbedderGraph {
  public:
-  class Node {
+  class V8_LTO_VISIBILITY_PUBLIC Node {
    public:
     /**
      * Detachedness specifies whether an object is attached or detached from the
@@ -981,7 +982,7 @@ class V8_EXPORT EmbedderGraph {
   virtual ~EmbedderGraph() = default;
 };
 
-class QueryObjectPredicate {
+class V8_LTO_VISIBILITY_PUBLIC QueryObjectPredicate {
  public:
   virtual ~QueryObjectPredicate() = default;
   virtual bool Filter(v8::Local<v8::Object> object) = 0;
@@ -1069,7 +1070,7 @@ class V8_EXPORT HeapProfiler {
    *
    * This interface will soon be deprecated in favour of ContextNameResolver.
    */
-  class ObjectNameResolver {
+  class V8_LTO_VISIBILITY_PUBLIC ObjectNameResolver {
    public:
     /**
      * Returns name to be used in the heap snapshot for given node. Returned
@@ -1085,7 +1086,7 @@ class V8_EXPORT HeapProfiler {
    * Callback interface for retrieving user friendly names of a V8::Context
    * objects.
    */
-  class ContextNameResolver {
+  class V8_LTO_VISIBILITY_PUBLIC ContextNameResolver {
    public:
     /**
      * Returns name to be used in the heap snapshot for given node. Returned
@@ -1376,7 +1377,7 @@ class V8_EXPORT CodeEvent {
 /**
  * Interface to listen to code creation and code relocation events.
  */
-class V8_EXPORT CodeEventHandler {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT CodeEventHandler {
  public:
   /**
    * Creates a new listener for the |isolate|. The isolate must be initialized.

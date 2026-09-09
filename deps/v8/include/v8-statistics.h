@@ -52,7 +52,7 @@ enum class MeasureMemoryExecution { kDefault, kEager, kLazy };
  * Each implementation of this class should hence implement only one of them,
  * and leave the other empty.
  */
-class V8_EXPORT MeasureMemoryDelegate {
+class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT MeasureMemoryDelegate {
  public:
   virtual ~MeasureMemoryDelegate() = default;
 

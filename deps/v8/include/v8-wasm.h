@@ -135,7 +135,7 @@ class V8_EXPORT WasmStreaming final {
       internal::kWasmWasmStreamingTag;
   class WasmStreamingImpl;
 
-  class ModuleCachingInterface {
+  class V8_LTO_VISIBILITY_PUBLIC ModuleCachingInterface {
    public:
     // Get the full wire bytes, to check against the cached version.
     virtual MemorySpan<const uint8_t> GetWireBytes() const = 0;

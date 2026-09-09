@@ -150,7 +150,7 @@ class V8_EXPORT ArrayBuffer : public Object {
    * Note that it is unsafe to call back into V8 from any of the allocator
    * functions.
    */
-  class V8_EXPORT Allocator {
+  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Allocator {
    public:
     virtual ~Allocator() = default;
 
