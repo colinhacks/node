@@ -89,6 +89,17 @@ err:
 }
 
 static CRYPTO_ONCE register_atexit = CRYPTO_ONCE_STATIC_INIT;
+#if defined(__APPLE__) && !defined(OPENSSL_NO_ATEXIT)
+/* Avoid atexit's dladdr() lookup while retaining DSO-scoped exit cleanup. */
+extern void *__dso_handle;
+extern int __cxa_atexit(void (*func)(void *), void *arg, void *dso);
+
+static void cleanup_at_exit(void *unused)
+{
+    (void)unused;
+    OPENSSL_cleanup();
+}
+#endif
 #if !defined(OPENSSL_SYS_UEFI) && defined(_WIN32)
 static int win32atexit(void)
 {
@@ -107,6 +118,9 @@ DEFINE_RUN_ONCE_STATIC(ossl_init_register_atexit)
 #if defined(_WIN32) && !defined(__BORLANDC__)
     /* We use _onexit() in preference because it gets called on DLL unload */
     if (_onexit(win32atexit) == NULL)
+        return 0;
+#elif defined(__APPLE__)
+    if (__cxa_atexit(cleanup_at_exit, NULL, &__dso_handle) != 0)
         return 0;
 #else
     if (atexit(OPENSSL_cleanup) != 0)
