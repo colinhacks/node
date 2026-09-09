@@ -1758,7 +1758,7 @@ MapEnvOptionsFlagInputType() {
         item.second.env_setting == kAllowedInEnvvar) {
       const auto mapping_details = options_parser::OptionMappingDetails{
           item.second.type,
-          item.second.help_text,
+          std::string(item.second.help_text),
       };
       type_map[item.first] = mapping_details;
     }
@@ -1790,7 +1790,7 @@ MapOptionsByNamespace(std::string namespace_name) {
         item.second.namespace_id == namespace_name) {
       const auto mapping_details = options_parser::OptionMappingDetails{
           item.second.type,
-          item.second.help_text,
+          std::string(item.second.help_text),
       };
       type_map[item.first] = mapping_details;
     }
@@ -2085,7 +2085,7 @@ void GetEnvOptionsInputType(const FunctionCallbackInfo<Value>& args) {
         item.second.env_setting == kAllowedInEnvvar) {
       const auto mapping_details = options_parser::OptionMappingDetails{
           item.second.type,
-          item.second.help_text,
+          std::string(item.second.help_text),
       };
       if (!AddOptionTypeToObject(isolate,
                                  context,

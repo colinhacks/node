@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 #include "node_constants.h"
@@ -522,6 +523,7 @@ class OptionsParser {
   // These methods add a single option to the parser. Optionally, it can be
   // specified whether the option should be allowed from environment variable
   // sources (i.e. NODE_OPTIONS).
+  // Help text is borrowed and must have static storage duration.
 
   // default_is_true is only a hint in printing help text, it does not
   // affect the default value of the option. Set the default value in the
@@ -702,7 +704,7 @@ class OptionsParser {
     OptionType type;
     std::shared_ptr<BaseOptionField> field;
     OptionEnvvarSettings env_setting;
-    std::string help_text;
+    std::string_view help_text;
     bool default_is_true = false;
     std::string namespace_id;
     bool strict = false;
