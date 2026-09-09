@@ -986,14 +986,38 @@ constexpr uint8_t VerifyBytecodeCount(uint8_t bytecode) {
 // clang-format on
 
 template <typename IsolateT>
+template <typename SlotAccessor>
+V8_INLINE int Deserializer<IsolateT>::CopyFixedRawData(
+    int size_in_tagged, SlotAccessor slot_accessor) {
+  using TSlot = decltype(slot_accessor.slot());
+
+  static_assert(TSlot::kSlotDataSize == kTaggedSize ||
+                TSlot::kSlotDataSize == 2 * kTaggedSize);
+  int size_in_slots = size_in_tagged / (TSlot::kSlotDataSize / kTaggedSize);
+  // kFixedRawData can have kTaggedSize != TSlot::kSlotDataSize when
+  // serializing Smi roots in pointer-compressed builds. In this case, the
+  // size in bytes is unconditionally the (full) slot size.
+  DCHECK_IMPLIES(kTaggedSize != TSlot::kSlotDataSize, size_in_slots == 1);
+  source_.CopySlots(slot_accessor.slot().location(), size_in_slots);
+  return size_in_slots;
+}
+
+template <typename IsolateT>
 void Deserializer<IsolateT>::ReadData(Handle<HeapObject> object,
                                       int start_slot_index,
                                       int end_slot_index) {
   int current = start_slot_index;
   while (current < end_slot_index) {
     uint8_t data = source_.Get();
-    current += ReadSingleBytecodeData(
-        data, SlotAccessorForHeapObject::ForSlotIndex(object, current));
+    auto slot_accessor =
+        SlotAccessorForHeapObject::ForSlotIndex(object, current);
+    if (V8_LIKELY(!v8_flags.trace_deserialization) && data >= kFixedRawData &&
+        data < kFixedRawData + kFixedRawDataCount) {
+      current +=
+          CopyFixedRawData(FixedRawDataWithSize::Decode(data), slot_accessor);
+    } else {
+      current += ReadSingleBytecodeData(data, slot_accessor);
+    }
   }
   CHECK_EQ(current, end_slot_index);
 }
@@ -1004,7 +1028,14 @@ void Deserializer<IsolateT>::ReadData(FullMaybeObjectSlot start,
   FullMaybeObjectSlot current = start;
   while (current < end) {
     uint8_t data = source_.Get();
-    current += ReadSingleBytecodeData(data, SlotAccessorForRootSlots(current));
+    auto slot_accessor = SlotAccessorForRootSlots(current);
+    if (V8_LIKELY(!v8_flags.trace_deserialization) && data >= kFixedRawData &&
+        data < kFixedRawData + kFixedRawDataCount) {
+      current +=
+          CopyFixedRawData(FixedRawDataWithSize::Decode(data), slot_accessor);
+    } else {
+      current += ReadSingleBytecodeData(data, slot_accessor);
+    }
   }
   CHECK_EQ(current, end);
 }
@@ -1611,17 +1642,8 @@ template <typename IsolateT>
 template <typename SlotAccessor>
 int Deserializer<IsolateT>::ReadFixedRawData(uint8_t data,
                                              SlotAccessor slot_accessor) {
-  using TSlot = decltype(slot_accessor.slot());
-
   // Deserialize raw data of fixed length from 1 to 32 times kTaggedSize.
   int size_in_tagged = FixedRawDataWithSize::Decode(data);
-  static_assert(TSlot::kSlotDataSize == kTaggedSize ||
-                TSlot::kSlotDataSize == 2 * kTaggedSize);
-  int size_in_slots = size_in_tagged / (TSlot::kSlotDataSize / kTaggedSize);
-  // kFixedRawData can have kTaggedSize != TSlot::kSlotDataSize when
-  // serializing Smi roots in pointer-compressed builds. In this case, the
-  // size in bytes is unconditionally the (full) slot size.
-  DCHECK_IMPLIES(kTaggedSize != TSlot::kSlotDataSize, size_in_slots == 1);
   if (v8_flags.trace_deserialization) {
     PrintF("%*sFixedRawData [%u] :", depth_, "", size_in_tagged);
     for (int i = 0; i < size_in_tagged; ++i) {
@@ -1632,8 +1654,7 @@ int Deserializer<IsolateT>::ReadFixedRawData(uint8_t data,
   }
   // TODO(leszeks): Only copy slots when there are Smis in the serialized
   // data.
-  source_.CopySlots(slot_accessor.slot().location(), size_in_slots);
-  return size_in_slots;
+  return CopyFixedRawData(size_in_tagged, slot_accessor);
 }
 
 template <typename IsolateT>
