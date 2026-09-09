@@ -1,6 +1,8 @@
 # Extended patch digest
 
-The [18-patch series](patches/series) preserves the original 15 diffs byte-for-byte and adds three changes. The [source commits](COMMITS.md) record the corresponding signed-off Git history. The tables explain every patch, its measured margin or lack of isolated attribution, and its compatibility costs.
+The frozen [18-patch series](patches/series) preserves the original 15 diffs byte-for-byte and adds three changes. The [source commits](COMMITS.md) record the corresponding signed-off Git history. The tables explain every patch, its measured margin or lack of isolated attribution, and its compatibility costs.
+
+The current branch also contains [four renewed Linux changes](LINUX-RENEWED.md), with screening results, compatibility costs and pending validation recorded separately.
 
 ## Original 15 patches
 

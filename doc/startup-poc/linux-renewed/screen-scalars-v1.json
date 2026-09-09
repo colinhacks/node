@@ -1,0 +1,2630 @@
+{
+  "screen/startup": {
+    "report_sha256": "2030540742a3aa3e21ac1361c4b0599eb53932ab3d216721c578d7c581e70b0e",
+    "summaries": {
+      "empty-cjs": {
+        "metric_kind": "process-lifetime",
+        "samples": {
+          "backrefs": {
+            "max": 20.528523,
+            "median": 18.835555499999998,
+            "min": 17.428204,
+            "n": 220,
+            "p50": 18.835555499999998,
+            "p95": 19.935271999999998
+          },
+          "baseline": {
+            "max": 20.725773,
+            "median": 19.0173515,
+            "min": 17.521675,
+            "n": 220,
+            "p50": 19.0173515,
+            "p95": 20.150529499999998
+          },
+          "dictionary": {
+            "max": 20.471881,
+            "median": 18.741729499999998,
+            "min": 17.271584,
+            "n": 220,
+            "p50": 18.741729499999998,
+            "p95": 19.747329399999998
+          },
+          "pgo": {
+            "max": 19.346129,
+            "median": 17.4804345,
+            "min": 16.025492,
+            "n": 220,
+            "p50": 17.4804345,
+            "p95": 18.5652524
+          },
+          "pristine": {
+            "max": 30.643302,
+            "median": 24.626832,
+            "min": 21.680075,
+            "n": 220,
+            "p50": 24.626832,
+            "p95": 27.946441399999998
+          },
+          "sourcepositions": {
+            "max": 28.381098,
+            "median": 18.579876,
+            "min": 17.019799,
+            "n": 220,
+            "p50": 18.579876,
+            "p95": 19.6676332
+          },
+          "sourcepositions-dictionary": {
+            "max": 19.685633,
+            "median": 18.2256,
+            "min": 16.510278,
+            "n": 220,
+            "p50": 18.2256,
+            "p95": 19.302388399999998
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 0.9987837683304899,
+            "bootstrap_95_ci_low": 0.9870169016296679,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9918805419713868,
+            "n": 220,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0185969290419943,
+            "bootstrap_95_ci_low": 1.0009163070789415,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0098337743647168,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 1.0817277325050423,
+            "bootstrap_95_ci_low": 1.0702212875519785,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0761167012166548,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 0.7763849415931687,
+            "bootstrap_95_ci_low": 0.760482881244625,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.7714263339518426,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.019954268190356,
+            "bootstrap_95_ci_low": 1.0062531321883068,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0137983182466224,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0432266229188134,
+            "bootstrap_95_ci_low": 1.0292913165136024,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0367057678002989,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.025618059746734,
+            "bootstrap_95_ci_low": 1.0093228571503254,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0166661280417109,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 1.0910469602682968,
+            "bootstrap_95_ci_low": 1.0779618434737217,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.084902768215759,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 0.7822138196137876,
+            "bootstrap_95_ci_low": 0.7654355414340106,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 0.7735451543325662,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.031308560855188,
+            "bootstrap_95_ci_low": 1.018059498452566,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0276780585201921,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0475104547392802,
+            "bootstrap_95_ci_low": 1.035081701552833,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.041467916019636,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 1.0776622922523003,
+            "bootstrap_95_ci_low": 1.057900458739475,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0670925479025941,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 0.770113504598551,
+            "bootstrap_95_ci_low": 0.7526091708337973,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.7614972586029237,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0163076007525482,
+            "bootstrap_95_ci_low": 1.0025652767153144,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0094764289436284,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.030113253034908,
+            "bootstrap_95_ci_low": 1.0182062708250843,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0243939216513924,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 0.7207337820122368,
+            "bootstrap_95_ci_low": 0.7067584244101149,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.7140799612268234,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 0.948788870968995,
+            "bootstrap_95_ci_low": 0.9338206755239709,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.9431822083039652,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 0.968933234474339,
+            "bootstrap_95_ci_low": 0.9544186855743226,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.9629875187226778,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.3352766273713368,
+            "bootstrap_95_ci_low": 1.308638482089835,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.3234876684149102,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.3643819910889805,
+            "bootstrap_95_ci_low": 1.3400841494962898,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.3523771706082492,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.023800686734079,
+            "bootstrap_95_ci_low": 1.0119256455777372,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 1.0177229912995815,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      },
+      "empty-eval": {
+        "metric_kind": "process-lifetime",
+        "samples": {
+          "backrefs": {
+            "max": 21.106536,
+            "median": 19.228393,
+            "min": 17.261958,
+            "n": 220,
+            "p50": 19.228393,
+            "p95": 20.268494
+          },
+          "baseline": {
+            "max": 21.479602,
+            "median": 19.400244,
+            "min": 17.712517,
+            "n": 220,
+            "p50": 19.400244,
+            "p95": 20.465764749999998
+          },
+          "dictionary": {
+            "max": 20.980679,
+            "median": 18.919711,
+            "min": 17.533619,
+            "n": 220,
+            "p50": 18.919711,
+            "p95": 20.07269015
+          },
+          "pgo": {
+            "max": 26.426568,
+            "median": 17.8906525,
+            "min": 16.160732,
+            "n": 220,
+            "p50": 17.8906525,
+            "p95": 19.16877155
+          },
+          "pristine": {
+            "max": 32.367536,
+            "median": 25.160512,
+            "min": 22.399445,
+            "n": 220,
+            "p50": 25.160512,
+            "p95": 29.634406449999997
+          },
+          "sourcepositions": {
+            "max": 21.324456,
+            "median": 18.9902275,
+            "min": 17.492454,
+            "n": 220,
+            "p50": 18.9902275,
+            "p95": 20.06473865
+          },
+          "sourcepositions-dictionary": {
+            "max": 22.266813,
+            "median": 18.5420035,
+            "min": 16.877676,
+            "n": 220,
+            "p50": 18.5420035,
+            "p95": 19.5036933
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 1.0012011519247712,
+            "bootstrap_95_ci_low": 0.9889538495152785,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9954484734543823,
+            "n": 220,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.023299063778192,
+            "bootstrap_95_ci_low": 1.0076427572585076,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0137351899984473,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 1.082044151007025,
+            "bootstrap_95_ci_low": 1.0646194884452496,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.074591486701085,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 0.7705312892869802,
+            "bootstrap_95_ci_low": 0.7524789798829092,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.7613373447292835,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.017546726902364,
+            "bootstrap_95_ci_low": 1.0053514436712623,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0121562212203457,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0406748024887142,
+            "bootstrap_95_ci_low": 1.0290028524373167,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.035728223860302,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0291112937778075,
+            "bootstrap_95_ci_low": 1.0201721570279032,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0253958949622124,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 1.0892459090861673,
+            "bootstrap_95_ci_low": 1.0751421965921375,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0839118810696713,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 0.7754961951689292,
+            "bootstrap_95_ci_low": 0.7590936898975869,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 0.767939810149766,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0263032745401819,
+            "bootstrap_95_ci_low": 1.0120648056243364,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0171786070201305,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0489736380057846,
+            "bootstrap_95_ci_low": 1.0376262034748334,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0438915002221325,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 1.0694770047117113,
+            "bootstrap_95_ci_low": 1.052242314641217,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0583345091712495,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 0.7651590370511183,
+            "bootstrap_95_ci_low": 0.7451722585561342,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.7507976694091938,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0062723124080717,
+            "bootstrap_95_ci_low": 0.9940690070730123,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9997672790083214,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0281120377911637,
+            "bootstrap_95_ci_low": 1.0139637570426063,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.019505655040812,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 0.7213460736222915,
+            "bootstrap_95_ci_low": 0.6987264453332692,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.7098522308330082,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 0.9517269432039758,
+            "bootstrap_95_ci_low": 0.937095621620283,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.943835389493568,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 0.9712086474071167,
+            "bootstrap_95_ci_low": 0.9551550518855696,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.9635508543673719,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.3360346042123425,
+            "bootstrap_95_ci_low": 1.309587947331525,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.322455614321938,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.3741974965186783,
+            "bootstrap_95_ci_low": 1.3438127436321272,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.3581037978271446,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0335621839583058,
+            "bootstrap_95_ci_low": 1.0189325225670056,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 1.0270898889298636,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      },
+      "empty-mjs": {
+        "metric_kind": "process-lifetime",
+        "samples": {
+          "backrefs": {
+            "max": 21.335343,
+            "median": 19.3104615,
+            "min": 17.760344,
+            "n": 220,
+            "p50": 19.3104615,
+            "p95": 20.331163800000002
+          },
+          "baseline": {
+            "max": 21.12374,
+            "median": 19.449295,
+            "min": 18.106428,
+            "n": 220,
+            "p50": 19.449295,
+            "p95": 20.451395799999997
+          },
+          "dictionary": {
+            "max": 20.693785,
+            "median": 19.213717,
+            "min": 17.413791,
+            "n": 220,
+            "p50": 19.213717,
+            "p95": 20.197652650000002
+          },
+          "pgo": {
+            "max": 19.855286,
+            "median": 17.911502,
+            "min": 16.367917,
+            "n": 220,
+            "p50": 17.911502,
+            "p95": 18.916324149999998
+          },
+          "pristine": {
+            "max": 31.192421,
+            "median": 25.037032500000002,
+            "min": 21.745444,
+            "n": 220,
+            "p50": 25.037032500000002,
+            "p95": 27.85522605
+          },
+          "sourcepositions": {
+            "max": 20.470467,
+            "median": 19.0327835,
+            "min": 17.410796,
+            "n": 220,
+            "p50": 19.0327835,
+            "p95": 20.063103599999998
+          },
+          "sourcepositions-dictionary": {
+            "max": 20.905903,
+            "median": 18.695976,
+            "min": 17.097742,
+            "n": 220,
+            "p50": 18.695976,
+            "p95": 19.62671235
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 0.9963554063956737,
+            "bootstrap_95_ci_low": 0.9841469497708745,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9894451073131141,
+            "n": 220,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.011218306892414,
+            "bootstrap_95_ci_low": 0.9991988580726441,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0046372628554803,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 1.0847850935584629,
+            "bootstrap_95_ci_low": 1.0724464775564722,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0790965003967408,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 0.7853349031848672,
+            "bootstrap_95_ci_low": 0.7627451412117977,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.775828839583565,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0232062215749251,
+            "bootstrap_95_ci_low": 1.0123228133427875,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0186852570861447,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0405921121583015,
+            "bootstrap_95_ci_low": 1.0274926812033152,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0341526252091144,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0190346489246263,
+            "bootstrap_95_ci_low": 1.0073536055710082,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.013811819046538,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 1.0880931693512248,
+            "bootstrap_95_ci_low": 1.0785896259833962,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0835759800334097,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 0.7856909346883348,
+            "bootstrap_95_ci_low": 0.768001842410661,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 0.7754297848677063,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0311630961303064,
+            "bootstrap_95_ci_low": 1.0197094512170304,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0265939611395454,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0442888885396022,
+            "bootstrap_95_ci_low": 1.0347471677738793,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0391989280665936,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 1.0767169446115692,
+            "bootstrap_95_ci_low": 1.0619640169247333,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0699482003204506,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 0.7753384268428324,
+            "bootstrap_95_ci_low": 0.7607586564794458,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.7700237424175475,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0178918873094602,
+            "bootstrap_95_ci_low": 1.001850102517916,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0084295770960692,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0303137784077143,
+            "bootstrap_95_ci_low": 1.018717072331507,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.025044275377906,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 0.7216858795083505,
+            "bootstrap_95_ci_low": 0.7079436552008741,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.7166795876521532,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 0.9501331156283093,
+            "bootstrap_95_ci_low": 0.9365726174122491,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.9443688630850684,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 0.9605547328072962,
+            "bootstrap_95_ci_low": 0.9516543689243315,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.956211807357864,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.3315312335078633,
+            "bootstrap_95_ci_low": 1.3036958912208205,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.312495008356778,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.3620743676366522,
+            "bootstrap_95_ci_low": 1.3216359488108762,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.3425374327427753,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0189512553695288,
+            "bootstrap_95_ci_low": 1.0078997788820758,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 1.0134702109720204,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      },
+      "worker": {
+        "metric_kind": "process-lifetime",
+        "samples": {
+          "backrefs": {
+            "max": 46.769351,
+            "median": 42.176787000000004,
+            "min": 39.179139,
+            "n": 220,
+            "p50": 42.176787000000004,
+            "p95": 43.726589149999995
+          },
+          "baseline": {
+            "max": 58.895213,
+            "median": 42.4290855,
+            "min": 39.083593,
+            "n": 220,
+            "p50": 42.4290855,
+            "p95": 44.001642
+          },
+          "dictionary": {
+            "max": 45.772092,
+            "median": 41.6400125,
+            "min": 38.535773,
+            "n": 220,
+            "p50": 41.6400125,
+            "p95": 42.8895826
+          },
+          "pgo": {
+            "max": 44.046723,
+            "median": 38.204208,
+            "min": 34.872667,
+            "n": 220,
+            "p50": 38.204208,
+            "p95": 39.71643435
+          },
+          "pristine": {
+            "max": 56.038107,
+            "median": 47.9280655,
+            "min": 42.448778,
+            "n": 220,
+            "p50": 47.9280655,
+            "p95": 51.1024687
+          },
+          "sourcepositions": {
+            "max": 47.948057,
+            "median": 41.6207025,
+            "min": 37.07253,
+            "n": 220,
+            "p50": 41.6207025,
+            "p95": 43.049928799999996
+          },
+          "sourcepositions-dictionary": {
+            "max": 43.770648,
+            "median": 40.716614500000006,
+            "min": 37.824221,
+            "n": 220,
+            "p50": 40.716614500000006,
+            "p95": 42.124393500000004
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 0.999799759559306,
+            "bootstrap_95_ci_low": 0.9900151885775184,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9941852293668376,
+            "n": 220,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0200055068948226,
+            "bootstrap_95_ci_low": 1.0112376251609674,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0156537197166662,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 1.1099403146636486,
+            "bootstrap_95_ci_low": 1.101733537556726,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.1044494702425678,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 0.8855023957362103,
+            "bootstrap_95_ci_low": 0.8727088617497033,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.8794059228884127,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0181481185016064,
+            "bootstrap_95_ci_low": 1.0083814976767629,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0140991764304501,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0439274757413277,
+            "bootstrap_95_ci_low": 1.0352920937142405,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.040243250810104,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0248205915836073,
+            "bootstrap_95_ci_low": 1.017580974793927,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.021643628199226,
+            "n": 220,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 1.114261586819551,
+            "bootstrap_95_ci_low": 1.1015013527757564,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.1076869002761482,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 0.8868404900429293,
+            "bootstrap_95_ci_low": 0.877210987132978,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 0.8813989699096918,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.026059606943733,
+            "bootstrap_95_ci_low": 1.0170170086454287,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0204791201874466,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0489335874876162,
+            "bootstrap_95_ci_low": 1.0382089467924192,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0427883856653466,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 1.0944170515295852,
+            "bootstrap_95_ci_low": 1.0819107258690148,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.087551698820588,
+            "n": 220,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 0.8708242655226618,
+            "bootstrap_95_ci_low": 0.8621358925544697,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.8663837898545701,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0023657981764997,
+            "bootstrap_95_ci_low": 0.9939049086902906,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9974658493532085,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0266287547935182,
+            "bootstrap_95_ci_low": 1.01879544685132,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0231525156555485,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 0.8008298169127904,
+            "bootstrap_95_ci_low": 0.7902649171377671,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.7944274021853349,
+            "n": 220,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 0.9246927511924103,
+            "bootstrap_95_ci_low": 0.9146329949366244,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.9187717972899401,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 0.943765061817591,
+            "bootstrap_95_ci_low": 0.932587603756643,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pgo",
+            "median_ratio": 0.9373372408506112,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.1636451806734083,
+            "bootstrap_95_ci_low": 1.1484669748387681,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.154722148075785,
+            "n": 220,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.1903076233230805,
+            "bootstrap_95_ci_low": 1.174660676488003,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "pristine",
+            "median_ratio": 1.1814853918793062,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0245821382661198,
+            "bootstrap_95_ci_low": 1.0133398259993973,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 1.0204103531413926,
+            "n": 220,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      }
+    }
+  },
+  "screen/throughput": {
+    "report_sha256": "756cf95e4e1d3411817e196e71735259b8eddb8329a03c9e8e2a17326a0099b1",
+    "summaries": {
+      "buffer-from": {
+        "metric_kind": "node-csv-throughput",
+        "samples": {
+          "backrefs": {
+            "max": 1080903.3177663933,
+            "median": 1067249.1252441586,
+            "min": 905782.6645124906,
+            "n": 10,
+            "p50": 1067249.1252441586,
+            "p95": 1077359.9630374995
+          },
+          "baseline": {
+            "max": 1097737.9324705133,
+            "median": 1079008.695883594,
+            "min": 974768.853914594,
+            "n": 10,
+            "p50": 1079008.695883594,
+            "p95": 1095998.0938495584
+          },
+          "dictionary": {
+            "max": 1105650.3638534336,
+            "median": 1062037.7287414449,
+            "min": 979517.4525791481,
+            "n": 10,
+            "p50": 1062037.7287414449,
+            "p95": 1101123.0219536964
+          },
+          "pgo": {
+            "max": 1094972.807246841,
+            "median": 1085061.3748060884,
+            "min": 982032.8991602623,
+            "n": 10,
+            "p50": 1085061.3748060884,
+            "p95": 1094670.5870388781
+          },
+          "pristine": {
+            "max": 1073584.792675706,
+            "median": 1013318.8616007853,
+            "min": 963659.6710595896,
+            "n": 10,
+            "p50": 1013318.8616007853,
+            "p95": 1058157.2553598573
+          },
+          "sourcepositions": {
+            "max": 1089370.1886459223,
+            "median": 1086554.8569229846,
+            "min": 983880.1760669318,
+            "n": 10,
+            "p50": 1086554.8569229846,
+            "p95": 1089211.4723884147
+          },
+          "sourcepositions-dictionary": {
+            "max": 1099134.5744101468,
+            "median": 1062802.6469856817,
+            "min": 948504.4080900569,
+            "n": 10,
+            "p50": 1062802.6469856817,
+            "p95": 1091524.1789962326
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 1.0363536231772443,
+            "bootstrap_95_ci_low": 0.9715170585667933,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9849284389054715,
+            "n": 10,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0388986818376864,
+            "bootstrap_95_ci_low": 0.9760512665672156,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9989043831003976,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 0.9991464515445745,
+            "bootstrap_95_ci_low": 0.9754256270629458,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9859131268645249,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 1.0741003400961509,
+            "bootstrap_95_ci_low": 1.004876732950993,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0378411034082173,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 0.9919936788961716,
+            "bootstrap_95_ci_low": 0.9670326431565661,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9822323167080347,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0502871819463198,
+            "bootstrap_95_ci_low": 0.9838360565059279,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.010069389635215,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0655290405053786,
+            "bootstrap_95_ci_low": 0.9526767492163719,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.02290530453022,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 1.0166709586908027,
+            "bootstrap_95_ci_low": 0.9518542612322114,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0010770976981416,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 1.0778456072908846,
+            "bootstrap_95_ci_low": 1.0188734320480592,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0490381393189205,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0276596279867567,
+            "bootstrap_95_ci_low": 0.9454975613989013,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.991457708850735,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0514320396221613,
+            "bootstrap_95_ci_low": 0.958152463304904,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.015137928230227,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 0.9996579122652833,
+            "bootstrap_95_ci_low": 0.9598814590413882,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9816176989347412,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 1.070058343197071,
+            "bootstrap_95_ci_low": 0.995482584311928,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0342715433839935,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0057091845317045,
+            "bootstrap_95_ci_low": 0.9535409351679778,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9776901232957024,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0377266161198424,
+            "bootstrap_95_ci_low": 0.9691552106315817,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0127253252164796,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 1.0989294128992833,
+            "bootstrap_95_ci_low": 1.0291931650727673,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.06285953769742,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0300849473414817,
+            "bootstrap_95_ci_low": 0.9845213547929399,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 0.9989210219862503,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.06354490878957,
+            "bootstrap_95_ci_low": 1.0031951160963444,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0187301363924182,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 0.9599526674319637,
+            "bootstrap_95_ci_low": 0.9156903307551112,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 0.9452840621608858,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 0.9967687703309195,
+            "bootstrap_95_ci_low": 0.9334707795798763,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 0.9645625401918542,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0569320139519531,
+            "bootstrap_95_ci_low": 0.9818353899874173,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 1.019269964714991,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      },
+      "decode-windows1252": {
+        "metric_kind": "node-csv-throughput",
+        "samples": {
+          "backrefs": {
+            "max": 49384.65143996952,
+            "median": 47884.154135291596,
+            "min": 47425.252230018355,
+            "n": 10,
+            "p50": 47884.154135291596,
+            "p95": 49256.01400500925
+          },
+          "baseline": {
+            "max": 48844.80545336232,
+            "median": 47776.84866675487,
+            "min": 46773.508210874206,
+            "n": 10,
+            "p50": 47776.84866675487,
+            "p95": 48492.634291727736
+          },
+          "dictionary": {
+            "max": 48471.81362099067,
+            "median": 47556.41371792994,
+            "min": 46968.60777479912,
+            "n": 10,
+            "p50": 47556.41371792994,
+            "p95": 48426.450614055655
+          },
+          "pgo": {
+            "max": 51056.66673242766,
+            "median": 47574.51896189846,
+            "min": 45856.11727001311,
+            "n": 10,
+            "p50": 47574.51896189846,
+            "p95": 50902.61177742878
+          },
+          "pristine": {
+            "max": 48545.28377373793,
+            "median": 47939.9833656993,
+            "min": 46181.44837925214,
+            "n": 10,
+            "p50": 47939.9833656993,
+            "p95": 48535.58851829444
+          },
+          "sourcepositions": {
+            "max": 48750.27333668881,
+            "median": 47774.27259564877,
+            "min": 47065.1734518723,
+            "n": 10,
+            "p50": 47774.27259564877,
+            "p95": 48525.60103523912
+          },
+          "sourcepositions-dictionary": {
+            "max": 49028.845214048044,
+            "median": 47407.03585186477,
+            "min": 46481.50421696242,
+            "n": 10,
+            "p50": 47407.03585186477,
+            "p95": 48549.66254968699
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 1.0268685907916013,
+            "bootstrap_95_ci_low": 0.9925859866062551,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0060865843400766,
+            "n": 10,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0317467427744258,
+            "bootstrap_95_ci_low": 0.9931207065866654,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0058502622682597,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 1.0221639898754282,
+            "bootstrap_95_ci_low": 0.9678781273455168,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0011417711562043,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 1.0236636384920252,
+            "bootstrap_95_ci_low": 0.9934310743197259,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9991508726290967,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.013196274147261,
+            "bootstrap_95_ci_low": 0.9950988840051124,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0089206245653513,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0366134957939277,
+            "bootstrap_95_ci_low": 0.9987420263404551,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0115710711933552,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0131386857338496,
+            "bootstrap_95_ci_low": 0.9902023590540617,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.00213658361512,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 1.0154534105843172,
+            "bootstrap_95_ci_low": 0.9486510043142199,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9988247184849922,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 1.0129394857748675,
+            "bootstrap_95_ci_low": 0.9881807109800506,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9920818082300318,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0052720979928584,
+            "bootstrap_95_ci_low": 0.993144367806972,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0003810152793031,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0171516628485775,
+            "bootstrap_95_ci_low": 1.0015270793285083,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0103249060725703,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 1.0124960310620992,
+            "bootstrap_95_ci_low": 0.9582058203750978,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9935249558221161,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 1.0049673607160647,
+            "bootstrap_95_ci_low": 0.9842713617834817,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9943043576968752,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0077325145397023,
+            "bootstrap_95_ci_low": 0.9802649743727877,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0025684974682663,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0145856061824334,
+            "bootstrap_95_ci_low": 0.9956949637095637,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0067138132451094,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 1.0324105623820314,
+            "bootstrap_95_ci_low": 0.9902604548773151,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 0.996942862260613,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0413959733738376,
+            "bootstrap_95_ci_low": 0.9893530038098353,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0040518642485496,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0485609979451531,
+            "bootstrap_95_ci_low": 0.9844126409740969,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0111122562663744,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0114911199280858,
+            "bootstrap_95_ci_low": 0.989552237676581,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 1.002306947142964,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.024824071724325,
+            "bootstrap_95_ci_low": 0.9905973565616187,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 1.019104412599618,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0243091909472741,
+            "bootstrap_95_ci_low": 0.995978365414775,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 1.011753031002754,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      },
+      "fs-stat": {
+        "metric_kind": "node-csv-throughput",
+        "samples": {
+          "backrefs": {
+            "max": 883471.5434743492,
+            "median": 845732.7645395903,
+            "min": 824594.3239181648,
+            "n": 10,
+            "p50": 845732.7645395903,
+            "p95": 873334.3395584527
+          },
+          "baseline": {
+            "max": 875308.7804902216,
+            "median": 847927.5348327728,
+            "min": 820303.0315881717,
+            "n": 10,
+            "p50": 847927.5348327728,
+            "p95": 865590.9872528394
+          },
+          "dictionary": {
+            "max": 877357.4331020222,
+            "median": 841809.5200110859,
+            "min": 802211.4402330617,
+            "n": 10,
+            "p50": 841809.5200110859,
+            "p95": 869086.6184033066
+          },
+          "pgo": {
+            "max": 906528.1211278217,
+            "median": 882861.9888329003,
+            "min": 867389.6608141254,
+            "n": 10,
+            "p50": 882861.9888329003,
+            "p95": 905229.7695342684
+          },
+          "pristine": {
+            "max": 880181.8406392578,
+            "median": 862776.4764185066,
+            "min": 820350.7225755809,
+            "n": 10,
+            "p50": 862776.4764185066,
+            "p95": 878062.348694275
+          },
+          "sourcepositions": {
+            "max": 870965.6923565401,
+            "median": 850284.5834554727,
+            "min": 809890.1583233214,
+            "n": 10,
+            "p50": 850284.5834554727,
+            "p95": 869958.2339676236
+          },
+          "sourcepositions-dictionary": {
+            "max": 878123.6934342682,
+            "median": 858187.1428093191,
+            "min": 807971.4985145201,
+            "n": 10,
+            "p50": 858187.1428093191,
+            "p95": 874845.5290200787
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 1.0206129146541294,
+            "bootstrap_95_ci_low": 0.9794956666246503,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0008572481755809,
+            "n": 10,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0209415619303777,
+            "bootstrap_95_ci_low": 0.9965240728775239,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0041875594926681,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 0.9609209359568323,
+            "bootstrap_95_ci_low": 0.9464963183929433,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9504957950582726,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 1.0160059918152657,
+            "bootstrap_95_ci_low": 0.9582532384251653,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9913613240864763,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.037395194764703,
+            "bootstrap_95_ci_low": 0.9692374697573848,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9995863465486181,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.025179685821327,
+            "bootstrap_95_ci_low": 0.964388755077707,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9859208365364487,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0316500991874182,
+            "bootstrap_95_ci_low": 0.9967548619693386,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.011875908770488,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 0.9758956443281037,
+            "bootstrap_95_ci_low": 0.9416319495526948,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9576535473143156,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 1.0171880271273597,
+            "bootstrap_95_ci_low": 0.9706106966616025,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9807941283576824,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0213418708253144,
+            "bootstrap_95_ci_low": 0.9827199168166222,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9998376926524011,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0078530340451874,
+            "bootstrap_95_ci_low": 0.9749179107626599,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9874758601833336,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 0.9686445537695161,
+            "bootstrap_95_ci_low": 0.9256768040925779,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.945680340266555,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 1.0048889426923462,
+            "bootstrap_95_ci_low": 0.9532871876386688,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9822037802248222,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0302158478266348,
+            "bootstrap_95_ci_low": 0.9566816912977011,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.98272974578825,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.015875055712681,
+            "bootstrap_95_ci_low": 0.9466915637161861,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9781179457696162,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 1.0664136152110981,
+            "bootstrap_95_ci_low": 0.9948961479955777,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0351731118583598,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0936130701556233,
+            "bootstrap_95_ci_low": 1.0130287726168081,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0387403723178563,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0805674510679235,
+            "bootstrap_95_ci_low": 1.00953490131446,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0265302613916032,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0346876112523038,
+            "bootstrap_95_ci_low": 0.9900552936059197,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 1.0158640517954725,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0288461267264246,
+            "bootstrap_95_ci_low": 0.9831358012936586,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 1.002666774024707,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.010425057687967,
+            "bootstrap_95_ci_low": 0.9795938915951189,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 0.9872371650560944,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      },
+      "module-cached": {
+        "metric_kind": "node-csv-throughput",
+        "samples": {
+          "backrefs": {
+            "max": 2088325.5189932683,
+            "median": 2035020.7156709847,
+            "min": 1909567.3218341225,
+            "n": 10,
+            "p50": 2035020.7156709847,
+            "p95": 2077634.2717440643
+          },
+          "baseline": {
+            "max": 2064588.717307573,
+            "median": 2035270.0541431736,
+            "min": 1997442.155473387,
+            "n": 10,
+            "p50": 2035270.0541431736,
+            "p95": 2058813.0078277185
+          },
+          "dictionary": {
+            "max": 2112372.915948724,
+            "median": 2059134.3269613022,
+            "min": 1914041.8358248991,
+            "n": 10,
+            "p50": 2059134.3269613022,
+            "p95": 2106757.8079440016
+          },
+          "pgo": {
+            "max": 2321792.6616863906,
+            "median": 2208184.4109980585,
+            "min": 2053582.1475368165,
+            "n": 10,
+            "p50": 2208184.4109980585,
+            "p95": 2289375.952569399
+          },
+          "pristine": {
+            "max": 2074808.8084431107,
+            "median": 2051786.501814548,
+            "min": 1992754.9805722332,
+            "n": 10,
+            "p50": 2051786.501814548,
+            "p95": 2073496.6698011404
+          },
+          "sourcepositions": {
+            "max": 2071116.1642663535,
+            "median": 2021192.6377724053,
+            "min": 1970058.1888207,
+            "n": 10,
+            "p50": 2021192.6377724053,
+            "p95": 2060821.713349835
+          },
+          "sourcepositions-dictionary": {
+            "max": 2118818.645883768,
+            "median": 2043167.007280169,
+            "min": 1988014.8548445983,
+            "n": 10,
+            "p50": 2043167.007280169,
+            "p95": 2098980.6296430146
+          }
+        },
+        "paired_ratios": {
+          "backrefs_over_baseline": {
+            "bootstrap_95_ci_high": 1.0066119125708592,
+            "bootstrap_95_ci_low": 0.9812586367952664,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9978079009843313,
+            "n": 10,
+            "right_artifact": "baseline"
+          },
+          "backrefs_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0133217626177409,
+            "bootstrap_95_ci_low": 0.9486478169672328,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0021051240970855,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "backrefs_over_pgo": {
+            "bootstrap_95_ci_high": 0.9357129240439956,
+            "bootstrap_95_ci_low": 0.8977033022106053,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9213498784712268,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "backrefs_over_pristine": {
+            "bootstrap_95_ci_high": 1.0095177144900265,
+            "bootstrap_95_ci_low": 0.9693653052976703,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9894169749816958,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "backrefs_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0282760851561292,
+            "bootstrap_95_ci_low": 0.987282193212681,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 1.0032444066988004,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "backrefs_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0030033641571794,
+            "bootstrap_95_ci_low": 0.9638839388766631,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "backrefs",
+            "median_ratio": 0.9863408617423064,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "baseline_over_dictionary": {
+            "bootstrap_95_ci_high": 1.0134494719001135,
+            "bootstrap_95_ci_low": 0.9757583583475741,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9940514773875188,
+            "n": 10,
+            "right_artifact": "dictionary"
+          },
+          "baseline_over_pgo": {
+            "bootstrap_95_ci_high": 0.9555988714543082,
+            "bootstrap_95_ci_low": 0.898476406095182,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9231046354018192,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "baseline_over_pristine": {
+            "bootstrap_95_ci_high": 1.0150542078297096,
+            "bootstrap_95_ci_low": 0.9777443090410753,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9911726278163931,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "baseline_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0185047166323333,
+            "bootstrap_95_ci_low": 0.9898080913505402,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 1.0050872739980465,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "baseline_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0065585506165995,
+            "bootstrap_95_ci_low": 0.97924418127799,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "baseline",
+            "median_ratio": 0.9982995083539467,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "dictionary_over_pgo": {
+            "bootstrap_95_ci_high": 0.9685820278185933,
+            "bootstrap_95_ci_low": 0.9027445033510624,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9272804607309935,
+            "n": 10,
+            "right_artifact": "pgo"
+          },
+          "dictionary_over_pristine": {
+            "bootstrap_95_ci_high": 1.0267971403371423,
+            "bootstrap_95_ci_low": 0.9729247756673485,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 0.9985472961927421,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "dictionary_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0283760565926159,
+            "bootstrap_95_ci_low": 0.9888711786014057,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.0175674001968833,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "dictionary_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0182723167281624,
+            "bootstrap_95_ci_low": 0.9715855136520659,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "dictionary",
+            "median_ratio": 1.003163973963767,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pgo_over_pristine": {
+            "bootstrap_95_ci_high": 1.0929237191810808,
+            "bootstrap_95_ci_low": 1.048145824808718,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0731723989170936,
+            "n": 10,
+            "right_artifact": "pristine"
+          },
+          "pgo_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.1096146948085883,
+            "bootstrap_95_ci_low": 1.0445333732764368,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0970703441675975,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pgo_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0967444822608354,
+            "bootstrap_95_ci_low": 1.037773283646038,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pgo",
+            "median_ratio": 1.0669217254816883,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "pristine_over_sourcepositions": {
+            "bootstrap_95_ci_high": 1.0288122612635455,
+            "bootstrap_95_ci_low": 0.9911520979397503,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 1.0143061490587648,
+            "n": 10,
+            "right_artifact": "sourcepositions"
+          },
+          "pristine_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.012449465493594,
+            "bootstrap_95_ci_low": 0.9826699070633259,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "pristine",
+            "median_ratio": 1.0014896926884367,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          },
+          "sourcepositions_over_sourcepositions-dictionary": {
+            "bootstrap_95_ci_high": 1.0052369933756937,
+            "bootstrap_95_ci_low": 0.9666343562921214,
+            "bootstrap_resamples": 2000,
+            "interpretation": "greater-than-one means the left artifact has higher throughput",
+            "left_artifact": "sourcepositions",
+            "median_ratio": 0.9930559674363619,
+            "n": 10,
+            "right_artifact": "sourcepositions-dictionary"
+          }
+        }
+      }
+    }
+  },
+  "screen/identity-control": {
+    "report_sha256": "211041a40843c02127293d0c02fd186864cf4dc62f274847fd0cfc061a72d856",
+    "summaries": {
+      "empty-cjs": {
+        "metric_kind": "process-lifetime",
+        "samples": {
+          "same-a": {
+            "max": 20.757042,
+            "median": 18.926098,
+            "min": 17.633148,
+            "n": 100,
+            "p50": 18.926098,
+            "p95": 19.7381246
+          },
+          "same-b": {
+            "max": 20.195957,
+            "median": 18.781429,
+            "min": 17.495417,
+            "n": 100,
+            "p50": 18.781429,
+            "p95": 19.728010899999997
+          }
+        },
+        "paired_ratios": {
+          "same-a_over_same-b": {
+            "bootstrap_95_ci_high": 1.0108920236442747,
+            "bootstrap_95_ci_low": 0.9970500765151655,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "same-a",
+            "median_ratio": 1.0032597097170508,
+            "n": 100,
+            "right_artifact": "same-b"
+          }
+        }
+      },
+      "empty-eval": {
+        "metric_kind": "process-lifetime",
+        "samples": {
+          "same-a": {
+            "max": 22.486891,
+            "median": 19.265895999999998,
+            "min": 17.788599,
+            "n": 100,
+            "p50": 19.265895999999998,
+            "p95": 20.22596095
+          },
+          "same-b": {
+            "max": 20.613405,
+            "median": 19.087466,
+            "min": 17.663795,
+            "n": 100,
+            "p50": 19.087466,
+            "p95": 20.209415399999997
+          }
+        },
+        "paired_ratios": {
+          "same-a_over_same-b": {
+            "bootstrap_95_ci_high": 1.0130207675632024,
+            "bootstrap_95_ci_low": 0.9959462081613444,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "same-a",
+            "median_ratio": 1.0082754847382795,
+            "n": 100,
+            "right_artifact": "same-b"
+          }
+        }
+      },
+      "empty-mjs": {
+        "metric_kind": "process-lifetime",
+        "samples": {
+          "same-a": {
+            "max": 20.947845,
+            "median": 19.326880000000003,
+            "min": 17.612867,
+            "n": 100,
+            "p50": 19.326880000000003,
+            "p95": 20.33572595
+          },
+          "same-b": {
+            "max": 21.868963,
+            "median": 19.3721595,
+            "min": 18.393984,
+            "n": 100,
+            "p50": 19.3721595,
+            "p95": 20.264360049999997
+          }
+        },
+        "paired_ratios": {
+          "same-a_over_same-b": {
+            "bootstrap_95_ci_high": 1.004202782015848,
+            "bootstrap_95_ci_low": 0.9860783763602843,
+            "bootstrap_resamples": 2000,
+            "interpretation": "lower-than-one means the left artifact has lower latency",
+            "left_artifact": "same-a",
+            "median_ratio": 0.9953921771499,
+            "n": 100,
+            "right_artifact": "same-b"
+          }
+        }
+      }
+    }
+  },
+  "rss": {
+    "report_sha256": "22f678aa32aba0791d15d4b98a51f2602cb0153025554c1afd36a69a6f500afd",
+    "summary": {
+      "failures": 0,
+      "metric": {
+        "direction": "lower-is-better",
+        "name": "peak_rss",
+        "source": "/usr/bin/time -v Maximum resident set size (kbytes)",
+        "unit": "KiB"
+      },
+      "workloads": {
+        "emptyCJS": {
+          "backrefs": {
+            "median_peak_rss_kib": 51748.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9945991821618703,
+                1.0054305663304888
+              ],
+              "median": 1.000077816594625
+            },
+            "samples": 50
+          },
+          "baseline": {
+            "median_peak_rss_kib": 51726.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0,
+                1.0
+              ],
+              "median": 1.0
+            },
+            "samples": 50
+          },
+          "baseline__identity": {
+            "median_peak_rss_kib": 51530.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9922307692307692,
+                1.0000877312520358
+              ],
+              "median": 0.9974500721609246
+            },
+            "samples": 50
+          },
+          "combined": {
+            "median_peak_rss_kib": 51658.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9925289823041539,
+                1.0033328166175786
+              ],
+              "median": 0.9981473315860505
+            },
+            "samples": 50
+          },
+          "dictionary": {
+            "median_peak_rss_kib": 51730.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9954400364797081,
+                1.004990253411306
+              ],
+              "median": 0.9993056502115968
+            },
+            "samples": 50
+          },
+          "pgo": {
+            "median_peak_rss_kib": 44404.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.8508213224804969,
+                0.8568097014925373
+              ],
+              "median": 0.8535560500761614
+            },
+            "samples": 50
+          },
+          "sourcepositions": {
+            "median_peak_rss_kib": 51706.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9933745683949029,
+                1.0025251053065833
+              ],
+              "median": 0.9983241656150762
+            },
+            "samples": 50
+          }
+        },
+        "emptyESM": {
+          "backrefs": {
+            "median_peak_rss_kib": 52824.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9975783260178599,
+                1.0037767202960948
+              ],
+              "median": 1.0011332970793707
+            },
+            "samples": 50
+          },
+          "baseline": {
+            "median_peak_rss_kib": 52714.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0,
+                1.0
+              ],
+              "median": 1.0
+            },
+            "samples": 50
+          },
+          "baseline__identity": {
+            "median_peak_rss_kib": 52764.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.997153976664535,
+                1.0047828533527514
+              ],
+              "median": 1.0001138405136816
+            },
+            "samples": 50
+          },
+          "combined": {
+            "median_peak_rss_kib": 52866.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9965614522720958,
+                1.0053967771359076
+              ],
+              "median": 1.0022402745619274
+            },
+            "samples": 50
+          },
+          "dictionary": {
+            "median_peak_rss_kib": 52834.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.992597628219654,
+                1.0040624048997715
+              ],
+              "median": 0.9990775557167492
+            },
+            "samples": 50
+          },
+          "pgo": {
+            "median_peak_rss_kib": 45218.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.8537250109309549,
+                0.8626931403789039
+              ],
+              "median": 0.8588130682290779
+            },
+            "samples": 50
+          },
+          "sourcepositions": {
+            "median_peak_rss_kib": 52866.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9996214132135434,
+                1.0071168988491823
+              ],
+              "median": 1.0036457552459694
+            },
+            "samples": 50
+          }
+        },
+        "eval": {
+          "backrefs": {
+            "median_peak_rss_kib": 49506.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0004867570417475,
+                1.0111594031928628
+              ],
+              "median": 1.0050838347139677
+            },
+            "samples": 50
+          },
+          "baseline": {
+            "median_peak_rss_kib": 49352.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0,
+                1.0
+              ],
+              "median": 1.0
+            },
+            "samples": 50
+          },
+          "baseline__identity": {
+            "median_peak_rss_kib": 49436.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.998498891271802,
+                1.0076057933489764
+              ],
+              "median": 1.0020059778014843
+            },
+            "samples": 50
+          },
+          "combined": {
+            "median_peak_rss_kib": 49584.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.001736319030206,
+                1.007289810464928
+              ],
+              "median": 1.0052771971115377
+            },
+            "samples": 50
+          },
+          "dictionary": {
+            "median_peak_rss_kib": 49600.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0015228019555984,
+                1.007469351303077
+              ],
+              "median": 1.0038477051634078
+            },
+            "samples": 50
+          },
+          "pgo": {
+            "median_peak_rss_kib": 44968.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9009772053788212,
+                0.9165977826653776
+              ],
+              "median": 0.9112709862058543
+            },
+            "samples": 50
+          },
+          "sourcepositions": {
+            "median_peak_rss_kib": 49586.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0015373412088358,
+                1.0098934905067396
+              ],
+              "median": 1.0062595984170057
+            },
+            "samples": 50
+          }
+        },
+        "worker": {
+          "backrefs": {
+            "median_peak_rss_kib": 61314.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.004386257121567,
+                1.008365918572784
+              ],
+              "median": 1.006472031389991
+            },
+            "samples": 50
+          },
+          "baseline": {
+            "median_peak_rss_kib": 61012.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0,
+                1.0
+              ],
+              "median": 1.0
+            },
+            "samples": 50
+          },
+          "baseline__identity": {
+            "median_peak_rss_kib": 60984.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9978449683275649,
+                1.0024983563445102
+              ],
+              "median": 1.000327844356363
+            },
+            "samples": 50
+          },
+          "combined": {
+            "median_peak_rss_kib": 61162.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.000228890761834,
+                1.0051691421841262
+              ],
+              "median": 1.002787933560156
+            },
+            "samples": 50
+          },
+          "dictionary": {
+            "median_peak_rss_kib": 61146.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                1.0008493401280543,
+                1.0049872038847694
+              ],
+              "median": 1.002693913697211
+            },
+            "samples": 50
+          },
+          "pgo": {
+            "median_peak_rss_kib": 56946.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.931873161163779,
+                0.9366672480096053
+              ],
+              "median": 0.9346760776620047
+            },
+            "samples": 50
+          },
+          "sourcepositions": {
+            "median_peak_rss_kib": 61006.0,
+            "paired_ratio_to_baseline": {
+              "bootstrap_95_ci": [
+                0.9992140424417082,
+                1.0021664915966386
+              ],
+              "median": 1.000950281810146
+            },
+            "samples": 50
+          }
+        }
+      }
+    }
+  }
+}

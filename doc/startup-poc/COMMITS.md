@@ -26,3 +26,7 @@ Each source commit carries the human author’s DCO sign-off and an assistance d
 | 18 | [9b4c6bc82b](https://github.com/colinhacks/node/commit/9b4c6bc82b0a11aef7cd46422f0e604086d9ed6a) | build: support optional Linux Clang ThinLTO |
 
 The pinned base is `8af75451e9041cd6058080ad3d4a65546797b418` and the source-only tree is `3166f9876aa2586b4008f7c722ba406e8258d44a`.
+
+## Renewed Linux commits
+
+The [renewed Linux report](LINUX-RENEWED.md) describes commits 19–22 and their current validation status. The frozen 18-patch replay manifest above is unchanged.

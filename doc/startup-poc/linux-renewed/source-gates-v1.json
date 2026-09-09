@@ -1,0 +1,245 @@
+{
+  "passed": true,
+  "artifact_unchanged": true,
+  "plan": 6144,
+  "failures": [],
+  "skips": 387,
+  "todos": 10,
+  "events": [
+    {
+      "label": "identity",
+      "command": [
+        "/home/nub/linux-renewed/fork/out/Release/node",
+        "-p",
+        "JSON.stringify({platform:process.platform,arch:process.arch,versions:process.versions,config:process.config})"
+      ],
+      "started": 1788987431.9209855,
+      "seconds": 0.06477785110473633,
+      "exit": 0
+    },
+    {
+      "label": "source-status",
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "started": 1788987431.9861078,
+      "seconds": 0.16478514671325684,
+      "exit": 0
+    },
+    {
+      "label": "source-diff",
+      "command": [
+        "git",
+        "diff",
+        "--binary",
+        "HEAD"
+      ],
+      "started": 1788987432.151135,
+      "seconds": 0.11470413208007812,
+      "exit": 0
+    },
+    {
+      "label": "source-base",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "started": 1788987432.2660863,
+      "seconds": 0.00396728515625,
+      "exit": 0
+    },
+    {
+      "label": "doc-dependencies",
+      "command": [
+        "/home/nub/linux-renewed/fork/out/Release/node",
+        "deps/npm/bin/npm-cli.js",
+        "ci",
+        "--prefix",
+        "tools/doc"
+      ],
+      "started": 1788987432.270643,
+      "seconds": 8.138192415237427,
+      "exit": 0
+    },
+    {
+      "label": "addon-doc-fixtures",
+      "command": [
+        "/home/nub/linux-renewed/fork/out/Release/node",
+        "tools/doc/addon-verify.mjs",
+        "--input",
+        "/home/nub/linux-renewed/fork/doc/api/addons.md",
+        "--output",
+        "/home/nub/linux-renewed/fork/test/addons"
+      ],
+      "started": 1788987440.4093175,
+      "seconds": 0.06443023681640625,
+      "exit": 0
+    },
+    {
+      "label": "build-test-addons",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/addons",
+        "--out-dir",
+        "/home/nub/linux-renewed/fork/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1788987440.4740145,
+      "seconds": 16.343639850616455,
+      "exit": 0
+    },
+    {
+      "label": "build-test-js-native-api",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/js-native-api",
+        "--out-dir",
+        "/home/nub/linux-renewed/fork/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1788987456.8179188,
+      "seconds": 3.8360114097595215,
+      "exit": 0
+    },
+    {
+      "label": "build-test-node-api",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/node-api",
+        "--out-dir",
+        "/home/nub/linux-renewed/fork/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1788987460.6541991,
+      "seconds": 3.8424296379089355,
+      "exit": 0
+    },
+    {
+      "label": "build-test-sqlite",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/sqlite",
+        "--out-dir",
+        "/home/nub/linux-renewed/fork/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1788987464.4968958,
+      "seconds": 1.6191375255584717,
+      "exit": 0
+    },
+    {
+      "label": "build-test-ffi",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/ffi",
+        "--out-dir",
+        "/home/nub/linux-renewed/fork/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1788987466.1162853,
+      "seconds": 1.719480276107788,
+      "exit": 0
+    },
+    {
+      "label": "build-benchmark-napi",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "benchmark/napi",
+        "--out-dir",
+        "/home/nub/linux-renewed/fork/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1788987467.8360584,
+      "seconds": 3.5004866123199463,
+      "exit": 0
+    },
+    {
+      "label": "build-embedding",
+      "command": [
+        "ninja",
+        "-C",
+        "/home/nub/linux-renewed/fork/out/Release",
+        "-j4",
+        "embedtest"
+      ],
+      "started": 1788987471.3368108,
+      "seconds": 3.3250887393951416,
+      "exit": 0
+    },
+    {
+      "label": "documentation",
+      "command": [
+        "make",
+        "doc-only",
+        "JOBS=4"
+      ],
+      "started": 1788987474.662162,
+      "seconds": 30.138201236724854,
+      "exit": 0
+    },
+    {
+      "label": "cctest",
+      "command": [
+        "/home/nub/linux-renewed/fork/out/Release/cctest",
+        "--gtest_output=xml:/home/nub/linux-renewed/evidence/source-combined-gates-v1/cctest.xml"
+      ],
+      "started": 1788987505.0037532,
+      "seconds": 4.827315807342529,
+      "exit": 0
+    },
+    {
+      "label": "node-tests",
+      "command": [
+        "/usr/bin/python3",
+        "tools/test.py",
+        "--mode=release",
+        "--progress=tap",
+        "--flaky-tests=run",
+        "-j4",
+        "--temp-dir",
+        "/home/nub/sc-gates-tmp",
+        "default",
+        "pummel",
+        "addons",
+        "ffi",
+        "js-native-api",
+        "node-api",
+        "embedding",
+        "benchmark",
+        "sqlite",
+        "doctool"
+      ],
+      "started": 1788987509.8314462,
+      "seconds": 1442.568139076233,
+      "exit": 0
+    }
+  ],
+  "scope": "Native release suite selection; not all upstream configurations"
+}
