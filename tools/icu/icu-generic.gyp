@@ -112,6 +112,14 @@
           'defines': [
             'U_I18N_IMPLEMENTATION=1',
           ],
+          'conditions': [
+            ['OS=="mac" and node_shared=="false"', {
+              'xcode_settings': {
+                'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
+                'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
+              },
+            }],
+          ],
           'dependencies': [ 'icuucx', 'icu_implementation', 'icu_uconfig', 'icu_uconfig_target' ],
           'direct_dependent_settings': {
             'include_dirs': [
@@ -362,6 +370,12 @@
         [ 'OS == "solaris"', { 'defines': [
           '_XOPEN_SOURCE_EXTENDED=0',
         ]}],
+        [ 'OS=="mac" and node_shared=="false"', {
+          'xcode_settings': {
+            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
+            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
+          },
+        }],
       ],
       'include_dirs': [
         '<(icu_path)/source/common',
