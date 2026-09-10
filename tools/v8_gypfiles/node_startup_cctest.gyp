@@ -13,6 +13,7 @@
       'dependencies': [
         'abseil.gyp:abseil',
         'v8.gyp:v8_internal_headers',
+        'v8.gyp:v8_maybe_icu',
       ],
       'include_dirs': [
         '<(SHARED_INTERMEDIATE_DIR)',
@@ -56,6 +57,7 @@
           'type': 'none',
           'dependencies!': [
             'v8.gyp:v8_internal_headers',
+            'v8.gyp:v8_maybe_icu',
             '../../deps/googletest/googletest.gyp:gtest',
           ],
           'sources!': [
