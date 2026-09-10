@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "recorded_environment": {
+    "os": "Ubuntu 24.04",
+    "machine": "GCE n2-standard-16",
+    "cpu": "Intel Ice Lake",
+    "compiler": "Clang/LLD 20.1.8",
+    "rust": "1.89",
+    "python": "3.12"
+  },
+  "source": {
+    "original_base": "8af75451e9041cd6058080ad3d4a65546797b418",
+    "public_head": "f788616cf1515e30a8cce13513dbe8b30e567904",
+    "source_package": {"patches": 22, "exact_files": 64, "tree": "9526a6758f0d6a11b779afc556a7eb0a86da84f9"},
+    "combined": {"head": "d4663c8727f57a404c1744e549aa8186db5a74d8", "tree": "878cefc7616672165f913da854bca91740443fc7", "bundle": "../../../../artifacts/cloud-20260909-linux/source-combined-pgo-v3.bundle"},
+    "pristine_pgo": {"head": "47b8893a5f1eb165038f9c11b3f6d5dbfaa6f869", "tree": "cf7b01eb8b765089f3547e5c73cf97b7a01d329b", "bundle": "../../../../artifacts/cloud-20260909-linux/source-pristine-pgo-v1.bundle"}
+  },
+  "profiles": {
+    "combined": {"sha256": "5550e875db8b1b3da5545e45ea268548350e77ceb0527ce20571fa47c0ff39b9", "bytes": 38123920, "raw_profiles": 71, "training_cases": 55, "archive": "../../../../artifacts/cloud-20260909-linux/frozen-combined-phase-v4.tar.gz"},
+    "pristine": {"sha256": "925a0b33c8cc2beb2a1a15d3367113de16f538839fac2065bbece48e34ec20b5", "bytes": 38118376, "raw_profiles": 71, "training_cases": 55, "archive": "../../../../artifacts/cloud-20260909-linux/frozen-pgo-controls-v5.tar.gz"}
+  },
+  "binaries": {
+    "baseline": {"name": "node-pristine-v2", "bytes": 145318168, "sha256": "8d89c33846996b94cd96f32e9fd9d092adde29ebbd218c71e193bed217845a97", "archive": "../../../../artifacts/cloud-20260909-linux/early-frozen-artifacts-v1"},
+    "source_control": {"name": "node-source-control-v2", "bytes": 145272944, "sha256": "051029e011fb1597eab10e1779d66704558c48d3465ceb4584c49f09be4e79c1", "archive": "../../../../artifacts/cloud-20260909-linux/early-frozen-artifacts-v1"},
+    "combined_normal": {"name": "node-source-combined-v1", "bytes": 145287712, "sha256": "21430df7fd41549437d7f834de811d2f8507961e60710fd580ed831047e3d6e6", "archive": "../../../../artifacts/cloud-20260909-linux/frozen-combined-phase-v4.tar.gz"},
+    "combined_pgo": {"name": "node-combined-use-v3", "bytes": 140799672, "sha256": "b47ddfdc12327738606b3b0214298847fde9d93718713f16a50ef0bb0c91ce54", "archive": "../../../../artifacts/cloud-20260909-linux/frozen-pgo-controls-v5.tar.gz"},
+    "pristine_pgo": {"name": "node-pristine-pgo-use-v1", "bytes": 140874400, "sha256": "fdc6c3f0c7c5db0c0e40d31cde8762c13bbedfaacf9dc7683641413b0db5e0c4", "archive": "../../../../artifacts/cloud-20260909-linux/frozen-pgo-controls-v5.tar.gz"},
+    "combined_thin_pgo": {"name": "node-combined-thin-use-v1", "bytes": 136315856, "sha256": "ffa49c64dc7ecc307c58252a4c38b5159b9a68c9d0c60247af609ca0c53b0ed0", "archive": "../../../../artifacts/cloud-20260909-linux/frozen-final-linux-v6"}
+  },
+  "archive_verification": {
+    "v4": "../../../../artifacts/cloud-20260909-linux/frozen-combined-phase-v4.verification.json",
+    "v5": "../../../../artifacts/cloud-20260909-linux/frozen-pgo-controls-v5.verification.json",
+    "v6": "../../../../artifacts/cloud-20260909-linux/frozen-final-linux-v6.verification.json"
+  }
+}

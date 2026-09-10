@@ -1,0 +1,78 @@
+[
+  {
+    "label": "comparison",
+    "command": [
+      "/usr/bin/python3",
+      "/REDACTED_HOME/linux-renewed/probes/final-v1/measure-native.py",
+      "--source",
+      "/REDACTED_HOME/linux-renewed/fork",
+      "--output",
+      "/REDACTED_HOME/linux-renewed/evidence/final-matrix-v1/comparison",
+      "--startup-rounds",
+      "350",
+      "--throughput-rounds",
+      "30",
+      "--seed",
+      "20260914",
+      "--artifact",
+      "baseline=/REDACTED_HOME/linux-renewed/artifacts/node-pristine-v2",
+      "--artifact",
+      "source-control=/REDACTED_HOME/linux-renewed/artifacts/node-source-control-v2",
+      "--artifact",
+      "combined-normal=/REDACTED_HOME/linux-renewed/artifacts/node-source-combined-v1",
+      "--artifact",
+      "combined-pgo=/REDACTED_HOME/linux-renewed/artifacts/node-combined-use-v3",
+      "--artifact",
+      "pristine-pgo=/REDACTED_HOME/linux-renewed/artifacts/node-pristine-pgo-use-v1",
+      "--artifact",
+      "combined-thin-pgo=/REDACTED_HOME/linux-renewed/artifacts/node-combined-thin-use-v1"
+    ],
+    "started": 1789005595.4738069,
+    "seconds": 1631.9114649295807,
+    "exit": 0
+  },
+  {
+    "label": "first-js",
+    "command": [
+      "/usr/bin/python3",
+      "/REDACTED_HOME/linux-renewed/probes/final-v1/first-js/first_js.py",
+      "--output",
+      "/REDACTED_HOME/linux-renewed/evidence/final-matrix-v1/first-js",
+      "--rounds",
+      "350",
+      "--warmups",
+      "10",
+      "--seed",
+      "20260915",
+      "--artifact",
+      "baseline=/REDACTED_HOME/linux-renewed/artifacts/node-pristine-v2",
+      "--artifact",
+      "source-control=/REDACTED_HOME/linux-renewed/artifacts/node-source-control-v2",
+      "--artifact",
+      "combined-normal=/REDACTED_HOME/linux-renewed/artifacts/node-source-combined-v1",
+      "--artifact",
+      "combined-pgo=/REDACTED_HOME/linux-renewed/artifacts/node-combined-use-v3",
+      "--artifact",
+      "pristine-pgo=/REDACTED_HOME/linux-renewed/artifacts/node-pristine-pgo-use-v1",
+      "--artifact",
+      "combined-thin-pgo=/REDACTED_HOME/linux-renewed/artifacts/node-combined-thin-use-v1"
+    ],
+    "started": 1789007227.3855588,
+    "seconds": 200.75255036354065,
+    "exit": 0
+  },
+  {
+    "label": "release-references",
+    "command": [
+      "/usr/bin/python3",
+      "/REDACTED_HOME/linux-renewed/probes/final-v1/paired_bench.py",
+      "--config",
+      "/REDACTED_HOME/linux-renewed/evidence/final-matrix-v1/release-references.json",
+      "--output",
+      "/REDACTED_HOME/linux-renewed/evidence/final-matrix-v1/release-references"
+    ],
+    "started": 1789007428.138884,
+    "seconds": 151.72921991348267,
+    "exit": 0
+  }
+]

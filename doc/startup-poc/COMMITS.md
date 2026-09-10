@@ -1,6 +1,6 @@
 # Source commits
 
-The 18 source commits reproduce the [patch manifest](patches/manifest.json) exactly. Documentation and fork CI are separate commits. Dependencies in the patch digest still apply; arbitrary subsets have not all been runtime-tested.
+The first 18 source commits reproduce the frozen [patch manifest](patches/manifest.json) exactly. Four later source commits extend the series to 22; documentation and fork CI are separate. Dependencies in the patch digest still apply; arbitrary subsets have not all been runtime-tested.
 
 Each source commit carries the human author’s DCO sign-off and an assistance disclosure. DCO sign-off is not a cryptographic signature.
 
@@ -29,4 +29,13 @@ The pinned base is `8af75451e9041cd6058080ad3d4a65546797b418` and the source-onl
 
 ## Renewed Linux commits
 
-The [renewed Linux report](LINUX-RENEWED.md) describes commits 19–22 and their current validation status. The frozen 18-patch replay manifest above is unchanged.
+The [renewed Linux report](LINUX-RENEWED.md) records the final source/compiler matrix. The frozen 18-patch replay manifest above is unchanged.
+
+| Patch | Commit | Change |
+| --- | --- | --- |
+| 19 | [e22d467345](https://github.com/colinhacks/node/commit/e22d4673456e6dd59f2e246e9b2abd0e38151d5c) | build: support optional Linux LLVM PGO |
+| 20 | [99d932a158](https://github.com/colinhacks/node/commit/99d932a15875728562a62d65a2c0499af0d3953b) | deps: collect source positions through published scripts |
+| 21 | [7efdf3f408](https://github.com/colinhacks/node/commit/7efdf3f40841ab7b6ff8dcad2fc8f9ce7c8d42d6) | deps: bound scratch storage for dictionary rehashing |
+| 22 | [e0ecad7bc3](https://github.com/colinhacks/node/commit/e0ecad7bc3c17754a8f1f522fb089e686e00ad33) | deps: size initial deserializer back-reference storage |
+
+The [22-patch package](linux-renewed/final-v1/source-package/README.md) folds two test-only follow-ups into patches 20 and 21: line wrapping from `1769a845456079ffea5bee4dc3503a55ba7f5a73` and the private ICU test dependency from `f788616cf1515e30a8cce13513dbe8b30e567904`. The complete replay produces source tree `9526a6758f0d6a11b779afc556a7eb0a86da84f9` and matches all 64 packaged source files at the tested public head. Production runtime/build files match the measured Linux source; documentation and workflow files are excluded from this source-only tree.

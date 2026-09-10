@@ -1,0 +1,340 @@
+{
+  "run": {
+    "databaseId": 34423776381,
+    "headSha": "f788616cf1515e30a8cce13513dbe8b30e567904",
+    "headBranch": "startup-time-poc",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "failure",
+    "workflowName": "Fork startup validation",
+    "createdAt": "2026-09-10T01:01:41Z",
+    "updatedAt": "2026-09-10T03:58:47Z",
+    "url": "https://github.com/colinhacks/node/actions/runs/34423776381"
+  },
+  "source": {
+    "candidate": "f788616cf1515e30a8cce13513dbe8b30e567904",
+    "baseline": "8af75451e9041cd6058080ad3d4a65546797b418"
+  },
+  "workflow": {
+    "path": ".github/workflows/fork-startup-ci.yml",
+    "posix_config_flags": "--error-on-warn --v8-enable-temporal-support",
+    "posix_test_command": "make test-ci -j1 V=1 TEST_CI_ARGS=-p actions",
+    "windows_native_command": "vcbuild.bat release clang-cl v8temporal test-ci-native",
+    "windows_js_command": "vcbuild.bat release clang-cl noprojgen nobuild test-ci-js",
+    "contains_pgo_profile_lto_token": false,
+    "contains_coverage_collection_or_upload": false,
+    "documentation_build_via_test_ci_prerequisite": true
+  },
+  "jobs": [
+    {
+      "job_id": 102704568811,
+      "name": "Windows x64 (baseline)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704568811",
+      "conclusion": "failure",
+      "platform": "windows-x64",
+      "role": "baseline",
+      "artifact": {
+        "id": 10134069465,
+        "name": "fork-startup-ci-windows-x64-baseline-34423776381-1",
+        "digest": "sha256:14cee208ce633ae8f6acbaba841c2503775f0e0b2dd2bb1333dfcffa7a857368"
+      },
+      "provenance_sha": "8af75451e9041cd6058080ad3d4a65546797b418",
+      "native_tap": {
+        "bytes": 21826,
+        "plan": 249,
+        "ok": 249,
+        "not_ok": 0,
+        "skip_annotations": 11,
+        "todo_annotations": 1
+      },
+      "javascript_tap": {
+        "bytes": 541016,
+        "plan": 5834,
+        "ok": 5830,
+        "not_ok": 4,
+        "skip_annotations": 493,
+        "todo_annotations": 8
+      },
+      "cctest": {
+        "tests": 226,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "javascript_failures": [
+        "parallel/test-child-process-exec-any-shells-windows",
+        "parallel/test-dlopen-binary",
+        "parallel/test-permission-dlopen-binary",
+        "parallel/test-vfs-addon"
+      ],
+      "windows_apps_filtered": true,
+      "cleanliness_exit_code": 0
+    },
+    {
+      "job_id": 102704568983,
+      "name": "Linux arm64 (baseline)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704568983",
+      "conclusion": "success",
+      "platform": "linux-arm64",
+      "role": "baseline",
+      "artifact": {
+        "id": 10134553817,
+        "name": "fork-startup-ci-linux-arm64-baseline-34423776381-1",
+        "digest": "sha256:d9b846790acaf74517613b8234628daf421c8794e42275bca6559cccde2b2133"
+      },
+      "provenance_sha": "8af75451e9041cd6058080ad3d4a65546797b418",
+      "combined_runner_counts": [
+        226,
+        6134
+      ],
+      "combined_runner_all_tests_passed": true,
+      "cctest": {
+        "tests": 226,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "documentation_build": true,
+      "doctool_suite_selected": false,
+      "tap_output": {
+        "bytes": 0,
+        "plan": null,
+        "ok": 0,
+        "not_ok": 0,
+        "skip_annotations": 0,
+        "todo_annotations": 0
+      },
+      "tree_cleanliness_bytes": 0
+    },
+    {
+      "job_id": 102704568996,
+      "name": "macOS arm64 (baseline)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704568996",
+      "conclusion": "success",
+      "platform": "macos-arm64",
+      "role": "baseline",
+      "artifact": {
+        "id": 10134703926,
+        "name": "fork-startup-ci-macos-arm64-baseline-34423776381-1",
+        "digest": "sha256:9e2a21fa34fa8fe0df9842c371e7fd87bcb10a0866f6a6a49ed097ac7bd241dd"
+      },
+      "provenance_sha": "8af75451e9041cd6058080ad3d4a65546797b418",
+      "combined_runner_counts": [
+        226,
+        6131
+      ],
+      "combined_runner_all_tests_passed": true,
+      "cctest": {
+        "tests": 226,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "documentation_build": true,
+      "doctool_suite_selected": false,
+      "tap_output": {
+        "bytes": 0,
+        "plan": null,
+        "ok": 0,
+        "not_ok": 0,
+        "skip_annotations": 0,
+        "todo_annotations": 0
+      },
+      "tree_cleanliness_bytes": 0
+    },
+    {
+      "job_id": 102704568997,
+      "name": "Linux arm64 (candidate)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704568997",
+      "conclusion": "success",
+      "platform": "linux-arm64",
+      "role": "candidate",
+      "artifact": {
+        "id": 10134529319,
+        "name": "fork-startup-ci-linux-arm64-candidate-34423776381-1",
+        "digest": "sha256:dae0e666dabfe4b5cf2448fd914a14a1ec2fcbdb519c5340916800b2463dbc1a"
+      },
+      "provenance_sha": "f788616cf1515e30a8cce13513dbe8b30e567904",
+      "combined_runner_counts": [
+        238,
+        6136
+      ],
+      "combined_runner_all_tests_passed": true,
+      "cctest": {
+        "tests": 238,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "documentation_build": true,
+      "doctool_suite_selected": false,
+      "tap_output": {
+        "bytes": 0,
+        "plan": null,
+        "ok": 0,
+        "not_ok": 0,
+        "skip_annotations": 0,
+        "todo_annotations": 0
+      },
+      "tree_cleanliness_bytes": 0
+    },
+    {
+      "job_id": 102704569014,
+      "name": "macOS arm64 (candidate)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704569014",
+      "conclusion": "success",
+      "platform": "macos-arm64",
+      "role": "candidate",
+      "artifact": {
+        "id": 10134228575,
+        "name": "fork-startup-ci-macos-arm64-candidate-34423776381-1",
+        "digest": "sha256:8840ca60fc4ac55e659d7a4dc798dee2f4d8f476a8286d01ee3885e822f740ad"
+      },
+      "provenance_sha": "f788616cf1515e30a8cce13513dbe8b30e567904",
+      "combined_runner_counts": [
+        240,
+        6133
+      ],
+      "combined_runner_all_tests_passed": true,
+      "cctest": {
+        "tests": 240,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "documentation_build": true,
+      "doctool_suite_selected": false,
+      "tap_output": {
+        "bytes": 0,
+        "plan": null,
+        "ok": 0,
+        "not_ok": 0,
+        "skip_annotations": 0,
+        "todo_annotations": 0
+      },
+      "tree_cleanliness_bytes": 0
+    },
+    {
+      "job_id": 102704569038,
+      "name": "Windows x64 (candidate)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704569038",
+      "conclusion": "failure",
+      "platform": "windows-x64",
+      "role": "candidate",
+      "artifact": {
+        "id": 10134054195,
+        "name": "fork-startup-ci-windows-x64-candidate-34423776381-1",
+        "digest": "sha256:24e87d9611035fdf84b1c5886dfff46d4f3e35bbac7db4e955d3d77aaee4dec0"
+      },
+      "provenance_sha": "f788616cf1515e30a8cce13513dbe8b30e567904",
+      "native_tap": {
+        "bytes": 21824,
+        "plan": 249,
+        "ok": 249,
+        "not_ok": 0,
+        "skip_annotations": 11,
+        "todo_annotations": 1
+      },
+      "javascript_tap": {
+        "bytes": 541004,
+        "plan": 5836,
+        "ok": 5832,
+        "not_ok": 4,
+        "skip_annotations": 493,
+        "todo_annotations": 8
+      },
+      "cctest": {
+        "tests": 238,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "javascript_failures": [
+        "parallel/test-child-process-exec-any-shells-windows",
+        "parallel/test-dlopen-binary",
+        "parallel/test-permission-dlopen-binary",
+        "parallel/test-vfs-addon"
+      ],
+      "windows_apps_filtered": true,
+      "cleanliness_exit_code": 0
+    },
+    {
+      "job_id": 102704569065,
+      "name": "Linux x64 (candidate)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704569065",
+      "conclusion": "success",
+      "platform": "linux-x64",
+      "role": "candidate",
+      "artifact": {
+        "id": 10134254497,
+        "name": "fork-startup-ci-linux-x64-candidate-34423776381-1",
+        "digest": "sha256:96c319ead07a3a86a4d479e1deb2b82029be6d45a4d7b355326bc37ff0fd4100"
+      },
+      "provenance_sha": "f788616cf1515e30a8cce13513dbe8b30e567904",
+      "combined_runner_counts": [
+        238,
+        6140
+      ],
+      "combined_runner_all_tests_passed": true,
+      "cctest": {
+        "tests": 238,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "documentation_build": true,
+      "doctool_suite_selected": false,
+      "tap_output": {
+        "bytes": 0,
+        "plan": null,
+        "ok": 0,
+        "not_ok": 0,
+        "skip_annotations": 0,
+        "todo_annotations": 0
+      },
+      "tree_cleanliness_bytes": 0
+    },
+    {
+      "job_id": 102704569099,
+      "name": "Linux x64 (baseline)",
+      "url": "https://github.com/colinhacks/node/actions/runs/34423776381/job/102704569099",
+      "conclusion": "success",
+      "platform": "linux-x64",
+      "role": "baseline",
+      "artifact": {
+        "id": 10135961112,
+        "name": "fork-startup-ci-linux-x64-baseline-34423776381-1",
+        "digest": "sha256:ab94f5f073a82cae888a5dad03405ca75db842b08bd019a676a5900e9a5bbffc"
+      },
+      "provenance_sha": "8af75451e9041cd6058080ad3d4a65546797b418",
+      "combined_runner_counts": [
+        226,
+        6138
+      ],
+      "combined_runner_all_tests_passed": true,
+      "cctest": {
+        "tests": 226,
+        "failures": 0,
+        "disabled": 0,
+        "errors": 0
+      },
+      "documentation_build": true,
+      "doctool_suite_selected": false,
+      "tap_output": {
+        "bytes": 0,
+        "plan": null,
+        "ok": 0,
+        "not_ok": 0,
+        "skip_annotations": 0,
+        "todo_annotations": 0
+      },
+      "tree_cleanliness_bytes": 0
+    }
+  ],
+  "comparison": {
+    "successful_jobs": 6,
+    "failed_jobs": 2,
+    "windows_failure_sets_equal": true,
+    "candidate_only_windows_javascript_failures": []
+  }
+}

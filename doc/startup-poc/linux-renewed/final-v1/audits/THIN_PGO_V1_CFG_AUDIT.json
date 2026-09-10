@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "verdict": "pass-with-scoped-warnings",
+  "scope": "combined ThinLTO plus PGO-use v1 build-pair provenance and PGO-warning membership; performance excluded",
+  "pair": {
+    "source_head": "d4663c8727f57a404c1744e549aa8186db5a74d8",
+    "source_tree": "878cefc7616672165f913da854bca91740443fc7",
+    "profile_sha256": "5550e875db8b1b3da5545e45ea268548350e77ceb0527ce20571fa47c0ff39b9",
+    "profile_path": "/REDACTED_HOME/linux-renewed/evidence/balanced-pgo-training-v3/node.profdata",
+    "config_difference": ["enable_thin_lto"],
+    "profiled_source_sets_equal": true,
+    "unique_profiled_sources_per_arm": 4260,
+    "explicit_compile_exclusions_per_arm": 0
+  },
+  "thin_arm": {
+    "config_sha256": "bcf20f1ccb38bd766f69b3e8ed4b382bd1aa8447e7456aaeab62e6ae988e55cd",
+    "commands_sha256": "bd6a9e09d8d71e27b428ae79c6eaf2b23a788674f4c54fe921f0fb95f710eee2",
+    "build_exit": 0,
+    "profiled_compile_commands": 4721,
+    "final_node_or_cctest_links": 2,
+    "all_profiled_compiles_have_thinlto": true,
+    "all_final_node_or_cctest_links_have_thinlto_and_lld": true,
+    "compiler_errors": 0,
+    "cctest": {"tests": 238, "failures": 0, "errors": 0, "disabled": 0},
+    "artifact_manifest": {
+      "node_sha256": "ffa49c64dc7ecc307c58252a4c38b5159b9a68c9d0c60247af609ca0c53b0ed0",
+      "cctest_sha256": "ddb5374ef75b126bb5b6540fe2536e96385c18cada5c50666f52a3c1d4054c37",
+      "independent_artifact_rehash": "pending parent archival"
+    }
+  },
+  "diagnostics": {
+    "profile_cfg_mismatch": 8,
+    "profile_cfg_runtime_node_or_cctest_members": [],
+    "profile_cfg_helper_only_members": [
+      {"log_line": 226, "object": "bytecode_builtins_list_generator.generate-bytecodes-builtins-list.o", "final_target": "bytecode_builtins_list_generator"},
+      {"log_line": 1182, "object": "genccode.genccode.o", "final_target": "genccode"},
+      {"log_line": 1199, "object": "icupkg.icupkg.o", "final_target": "icupkg"},
+      {"log_line": 1669, "object": "gen-regexp-special-case.gen-regexp-special-case.o", "final_target": "gen-regexp-special-case"},
+      {"log_line": 3254, "object": "v8_init.setup-isolate-full.o", "final_target": "mksnapshot via libv8_init.a"},
+      {"log_line": 3255, "object": "v8_init.setup-isolate-full.o", "final_target": "mksnapshot via libv8_init.a"},
+      {"log_line": 4006, "object": "mksnapshot.mksnapshot.o", "final_target": "mksnapshot"},
+      {"log_line": 7233, "object": "openssl-cli.openssl.o", "final_target": "openssl-cli"}
+    ],
+    "profile_unused_argument": {"count": 39, "scope": "assembly-source compile commands; not a runtime PGO CFG diagnostic"},
+    "other_compiler_warning": 2190,
+    "thinlto_or_linker_profile_diagnostics": 0
+  },
+  "limitations": [
+    "The helper's manual-review exit is caused by recorded warnings, not a build-pair error.",
+    "No startup or steady-throughput result is assessed.",
+    "Artifact byte rehash awaits the parent's archive retrieval."
+  ]
+}

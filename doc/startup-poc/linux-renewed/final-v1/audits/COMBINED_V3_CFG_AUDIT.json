@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "verdict": "pass-with-scoped-helper-warnings",
+  "scope": "combined PGO-use v3 build provenance and CFG-warning final-link membership; performance excluded",
+  "source": {
+    "head": "d4663c8727f57a404c1744e549aa8186db5a74d8",
+    "tree": "878cefc7616672165f913da854bca91740443fc7",
+    "source_bundle_sha256": "39ceb7efb80c1ebfd5a3cf9439c93f3dd33b9d75ba00af18059aaaf9b0487269",
+    "bundle_head_matches": true,
+    "commit_object_and_tree_verified_locally": true,
+    "training_report_head_matches": true
+  },
+  "profile": {
+    "path": "/REDACTED_HOME/linux-renewed/evidence/balanced-pgo-training-v3/node.profdata",
+    "sha256": "5550e875db8b1b3da5545e45ea268548350e77ceb0527ce20571fa47c0ff39b9",
+    "sha256_verified_locally": true
+  },
+  "configuration": {
+    "clang": 1,
+    "llvm_version": "20.1",
+    "enable_pgo_generate": "false",
+    "enable_pgo_use": "true",
+    "enable_lto": "false",
+    "enable_thin_lto": "false",
+    "profile_path_matches": true
+  },
+  "graph": {
+    "commands_sha256": "a71487639f064a61ef5ab95e540afb72f322b70952d8937f8d64f13105022a16",
+    "config_sha256": "9e78e0820f33b0e972aa756dbacd1e73ffccabd1799b95826e17d36696aa3630",
+    "profiled_compile_count": 4721,
+    "profiled_compile_sources": 4721,
+    "unprofiled_compile_exclusions": 0,
+    "node_or_cctest_links": 2,
+    "no_lto_compile_or_final_link_flags": true,
+    "all_profiled_compiles_use_pinned_profile": true
+  },
+  "build": {
+    "exit": 0,
+    "compiler_errors": 0,
+    "diagnostics": {
+      "profile_cfg_mismatch": 8,
+      "profile_unused_argument": 39,
+      "other_compiler_warning": 2190
+    }
+  },
+  "artifacts": {
+    "node_sha256": "b47ddfdc12327738606b3b0214298847fde9d93718713f16a50ef0bb0c91ce54",
+    "cctest_sha256": "23d6312320a6feac4288ce3208161170464a35f20d4e14700fcf0c62ec83ca4e",
+    "frozen_archive_sha256": "60dbfb7e61934f048b60a66434b9dee071c537f1d271e042903dd8ef32aa0380",
+    "frozen_archive_verified_payload_files": 212,
+    "streamed_bytes_rehashed_against_embedded_manifest": true,
+    "cctest": {"tests": 238, "failures": 0, "errors": 0, "disabled": 0}
+  },
+  "cfg_warnings": {
+    "runtime_node_or_cctest_members": [],
+    "helper_only_members": [
+      {"log_line": 226, "object": "bytecode_builtins_list_generator.generate-bytecodes-builtins-list.o", "function": "main", "final_target": "bytecode_builtins_list_generator"},
+      {"log_line": 1185, "object": "genccode.genccode.o", "function": "main", "final_target": "genccode"},
+      {"log_line": 1196, "object": "icupkg.icupkg.o", "function": "main", "final_target": "icupkg"},
+      {"log_line": 1255, "object": "gen-regexp-special-case.gen-regexp-special-case.o", "function": "main", "final_target": "gen-regexp-special-case"},
+      {"log_line": 3361, "object": "v8_init.setup-isolate-full.o", "function": "SetupIsolateDelegate::SetupHeap", "final_target": "mksnapshot via libv8_init.a"},
+      {"log_line": 3362, "object": "v8_init.setup-isolate-full.o", "function": "SetupIsolateDelegate::SetupBuiltins", "final_target": "mksnapshot via libv8_init.a"},
+      {"log_line": 3983, "object": "mksnapshot.mksnapshot.o", "function": "main", "final_target": "mksnapshot"},
+      {"log_line": 7242, "object": "openssl-cli.openssl.o", "function": "main", "final_target": "openssl-cli"}
+    ]
+  },
+  "limitations": [
+    "No startup or throughput measurement is assessed by this audit."
+  ]
+}

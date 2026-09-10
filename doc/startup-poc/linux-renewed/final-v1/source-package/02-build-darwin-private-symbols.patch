@@ -1,0 +1,182 @@
+diff --git a/deps/ada/ada.gyp b/deps/ada/ada.gyp
+index 30054e63..4dbee7a4 100644
+--- a/deps/ada/ada.gyp
++++ b/deps/ada/ada.gyp
+@@ -19,7 +19,15 @@
+       'dependencies': [
+         '../../tools/v8_gypfiles/v8.gyp:simdutf',
+       ],
+-      'sources': [ '<@(ada_sources)' ]
++      'sources': [ '<@(ada_sources)' ],
++      'conditions': [
++        ['OS=="mac" and node_shared=="false"', {
++          'xcode_settings': {
++            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
++            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
++          },
++        }],
++      ],
+     },
+   ]
+ }
+diff --git a/node.gyp b/node.gyp
+index 7e1e4f21..f5a2205c 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -544,13 +544,12 @@
+       ['clang==0 and OS!="win"', {
+         'cflags': [ '-Wno-restrict', ],
+       }],
+-      # TODO(joyeecheung): investigate if it breaks addons.
+-      # ['OS=="mac"', {
+-      #   'xcode_settings': {
+-      #     'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
+-      #     'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'  # -fvisibility-inlines-hidden
+-      #   },
+-      # }],
++      ['OS=="mac" and node_shared=="false"', {
++        'xcode_settings': {
++          'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',  # -fvisibility=hidden
++          'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES'  # -fvisibility-inlines-hidden
++        },
++      }],
+       # ['OS!="win" or clang==1', {
+       #   'cflags': [
+       #     '-fvisibility=hidden',
+@@ -633,6 +632,13 @@
+       'msvs_disabled_warnings!': [4244],
+ 
+       'conditions': [
++        ['OS=="mac" and node_shared=="false"', {
++          'xcode_settings': {
++            'DEAD_CODE_STRIPPING': 'YES',
++            # Preserve public symbols that native addons resolve at runtime.
++            'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
++          },
++        }],
+         [ 'node_shared_hdr_histogram=="false"', {
+           'dependencies': [
+             'deps/histogram/histogram.gyp:histogram',
+@@ -1362,6 +1368,12 @@
+       'sources': [ '<@(node_cctest_sources)' ],
+ 
+       'conditions': [
++        ['OS=="mac"', {
++          'xcode_settings': {
++            # Match the executable's dynamic exports for symbol-visibility tests.
++            'OTHER_LDFLAGS': ['-Wl,-export_dynamic'],
++          },
++        }],
+         [ 'node_shared_gtest=="false"', {
+           'dependencies': [
+             'deps/googletest/googletest.gyp:gtest',
+diff --git a/src/node.h b/src/node.h
+index 8e7d1e6a..a800193a 100644
+--- a/src/node.h
++++ b/src/node.h
+@@ -488,7 +488,7 @@ struct IsolateSettings {
+ // Snapshots are an *experimental* feature. In particular, the embedder API
+ // exposed through this class is subject to change or removal between Node.js
+ // versions, including possible API and ABI breakage.
+-class EmbedderSnapshotData {
++class NODE_EXTERN EmbedderSnapshotData {
+  public:
+   struct DeleteSnapshotData {
+     void operator()(const EmbedderSnapshotData*) const;
+@@ -1289,7 +1289,7 @@ NODE_EXTERN v8::Local<v8::Value> WinapiErrnoException(
+     const char* path = nullptr);
+ #endif
+ 
+-const char* signo_string(int errorno);
++NODE_EXTERN const char* signo_string(int errorno);
+ 
+ 
+ typedef void (*addon_register_func)(
+diff --git a/src/node_postmortem_metadata.cc b/src/node_postmortem_metadata.cc
+index e40d82c0..da8099ad 100644
+--- a/src/node_postmortem_metadata.cc
++++ b/src/node_postmortem_metadata.cc
+@@ -36,12 +36,13 @@
+   V(ListNode_ReqWrap, next_, uintptr_t, ListNode<ReqWrapBase>::next_)
+ 
+ extern "C" {
+-int nodedbg_const_ContextEmbedderIndex__kEnvironment__int;
+-int nodedbg_const_BaseObject__kInternalFieldCount__int;
+-int nodedbg_const_HandleWrap__kInternalFieldCount__int;
+-int nodedbg_const_ReqWrap__kInternalFieldCount__int;
+-uintptr_t nodedbg_offset_ExternalString__data__uintptr_t;
+-uintptr_t nodedbg_offset_ReqWrap__req_wrap_queue___ListNode_ReqWrapQueue;
++NODE_EXTERN int nodedbg_const_ContextEmbedderIndex__kEnvironment__int;
++NODE_EXTERN int nodedbg_const_BaseObject__kInternalFieldCount__int;
++NODE_EXTERN int nodedbg_const_HandleWrap__kInternalFieldCount__int;
++NODE_EXTERN int nodedbg_const_ReqWrap__kInternalFieldCount__int;
++NODE_EXTERN uintptr_t nodedbg_offset_ExternalString__data__uintptr_t;
++NODE_EXTERN uintptr_t
++    nodedbg_offset_ReqWrap__req_wrap_queue___ListNode_ReqWrapQueue;
+ 
+ #define V(Class, Member, Type, Accessor)                                      \
+   NODE_EXTERN uintptr_t NODEDBG_OFFSET(Class, Member, Type);
+diff --git a/test/cctest/test_postmortem_exports.cc b/test/cctest/test_postmortem_exports.cc
+new file mode 100644
+index 00000000..a2a6152c
+--- /dev/null
++++ b/test/cctest/test_postmortem_exports.cc
+@@ -0,0 +1,41 @@
++#include "gtest/gtest.h"
++
++#ifdef __APPLE__
++#include <dlfcn.h>
++
++TEST(PostmortemExportsTest, MetadataIsDynamicallyVisible) {
++  const char* symbols[] = {
++      "nodedbg_const_BaseObject__kInternalFieldCount__int",
++      "nodedbg_const_ContextEmbedderIndex__kEnvironment__int",
++      "nodedbg_const_HandleWrap__kInternalFieldCount__int",
++      "nodedbg_const_ReqWrap__kInternalFieldCount__int",
++      "nodedbg_offset_BaseObject__persistent_handle___v8_Persistent_v8_Object",
++      "nodedbg_offset_Environment_HandleWrapQueue__head___ListNode_HandleWrap",
++      "nodedbg_offset_Environment_ReqWrapQueue__head___ListNode_ReqWrapQueue",
++      ("nodedbg_offset_Environment__handle_wrap_queue___"
++       "Environment_HandleWrapQueue"),
++      "nodedbg_offset_Environment__req_wrap_queue___Environment_ReqWrapQueue",
++      "nodedbg_offset_ExternalString__data__uintptr_t",
++      "nodedbg_offset_HandleWrap__handle_wrap_queue___ListNode_HandleWrap",
++      "nodedbg_offset_ListNode_HandleWrap__next___uintptr_t",
++      "nodedbg_offset_ListNode_HandleWrap__prev___uintptr_t",
++      "nodedbg_offset_ListNode_ReqWrap__next___uintptr_t",
++      "nodedbg_offset_ListNode_ReqWrap__prev___uintptr_t",
++      "nodedbg_offset_ReqWrap__req_wrap_queue___ListNode_ReqWrapQueue",
++  };
++
++  for (const char* symbol : symbols) {
++    EXPECT_NE(nullptr, dlsym(RTLD_DEFAULT, symbol)) << symbol;
++  }
++}
++TEST(PublicExportsTest, EmbeddingApisAreDynamicallyVisible) {
++  const char* symbols[] = {
++      "_ZN4node12signo_stringEi",
++      "_ZN4node20EmbedderSnapshotData19BuiltinSnapshotDataEv",
++      "_ZNK4node20EmbedderSnapshotData18DeleteSnapshotDataclEPKS0_",
++  };
++  for (const char* symbol : symbols) {
++    EXPECT_NE(nullptr, dlsym(RTLD_DEFAULT, symbol)) << symbol;
++  }
++}
++#endif  // __APPLE__
+diff --git a/tools/v8_gypfiles/abseil.gyp b/tools/v8_gypfiles/abseil.gyp
+index 1a1de337..f968003c 100644
+--- a/tools/v8_gypfiles/abseil.gyp
++++ b/tools/v8_gypfiles/abseil.gyp
+@@ -371,6 +371,12 @@
+         '<(ABSEIL_ROOT)/absl/utility/utility.h',
+       ],
+       'conditions': [
++        ['OS=="mac" and node_shared=="false"', {
++          'xcode_settings': {
++            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
++            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
++          },
++        }],
+         ['OS=="win"', {
+           'sources': [
+             '<(ABSEIL_ROOT)/absl/time/internal/cctz/src/time_zone_name_win.h',

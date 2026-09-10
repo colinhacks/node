@@ -1,0 +1,865 @@
+diff --git a/common.gypi b/common.gypi
+index 8139bcdc..1c4dd3ed 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -13,6 +13,7 @@
+     'enable_pgo_generate%': '0',
+     'enable_pgo_use%': '0',
+     'node_pgo_profile%': '',
++    'node_whole_program_vtables%': 'false',
+     'node_darwin_order_file%': '',
+     'node_darwin_order_file_input%': '',
+     'node_use_darwin_order_file%': 'false',
+@@ -217,6 +218,15 @@
+               'OTHER_CFLAGS': ['-flto=thin'],
+             },
+           }],
++          ['OS=="mac" and configuring_node==1 and node_whole_program_vtables=="true"', {
++            'target_conditions': [
++              ['_target_name.startswith("v8_") or _target_name in ["node", "libnode", "node_base", "node_mksnapshot", "node_js2c", "cctest", "embedtest", "mksnapshot", "torque_generated_definitions", "torque_generated_initializers", "torque_base", "torque_ls_base", "torque", "torque-language-server", "bytecode_builtins_list_generator", "gen-regexp-special-case", "abseil", "simdutf", "highway"]', {
++                'xcode_settings': {
++                  'OTHER_CPLUSPLUSFLAGS': ['$(inherited)', '-fwhole-program-vtables'],
++                },
++              }],
++            ],
++          }],
+           ['OS=="mac" and configuring_node==1 and enable_pgo_generate=="true"', {
+             'xcode_settings': {
+               'OTHER_CFLAGS': ['-fprofile-generate', '-fprofile-update=atomic'],
+diff --git a/configure.py b/configure.py
+index 408dcb8b..2407785a 100755
+--- a/configure.py
++++ b/configure.py
+@@ -1881,6 +1881,19 @@ def configure_node_cctest_sources(o):
+     SearchFiles('test/cctest', 'cc') + \
+     SearchFiles('test/cctest', 'h')
+ 
++def configure_whole_program_vtables(o):
++  variables = o['variables']
++  # Hidden virtual hierarchies must stay inside the LTO unit. External and custom
++  # dependency builds keep ordinary virtual dispatch until separately validated.
++  variables['node_whole_program_vtables'] = b(
++    flavor == 'mac' and options.enable_thin_lto and
++    variables.get('node_shared') == 'false' and
++    variables.get('node_use_bundled_v8') == 'true' and
++    variables.get('icu_gyp_path') == 'tools/icu/icu-generic.gyp' and
++    not any(name.startswith('node_shared_') and value == 'true'
++            for name, value in variables.items()))
++
++
+ def configure_node(o):
+   if options.dest_os == 'android':
+     o['variables']['OS'] = 'android'
+@@ -3009,6 +3022,7 @@ configure_intl(output)
+ configure_static(output)
+ configure_inspector(output)
+ configure_section_file(output)
++configure_whole_program_vtables(output)
+ 
+ # remove builtins that have been disabled
+ if options.without_amaro:
+diff --git a/deps/v8/include/cppgc/custom-space.h b/deps/v8/include/cppgc/custom-space.h
+index 757c4fde..5c72f5ce 100644
+--- a/deps/v8/include/cppgc/custom-space.h
++++ b/deps/v8/include/cppgc/custom-space.h
+@@ -7,6 +7,8 @@
+ 
+ #include <stddef.h>
+ 
++#include "v8config.h"  // NOLINT(build/include_directory)
++
+ namespace cppgc {
+ 
+ /**
+@@ -21,7 +23,7 @@ struct CustomSpaceIndex {
+  * Top-level base class for custom spaces. Users must inherit from CustomSpace
+  * below.
+  */
+-class CustomSpaceBase {
++class V8_LTO_VISIBILITY_PUBLIC CustomSpaceBase {
+  public:
+   virtual ~CustomSpaceBase() = default;
+   virtual CustomSpaceIndex GetCustomSpaceIndex() const = 0;
+diff --git a/deps/v8/include/cppgc/garbage-collected.h b/deps/v8/include/cppgc/garbage-collected.h
+index dfd758a3..55bbb42e 100644
+--- a/deps/v8/include/cppgc/garbage-collected.h
++++ b/deps/v8/include/cppgc/garbage-collected.h
+@@ -9,6 +9,7 @@
+ #include "cppgc/platform.h"
+ #include "cppgc/trace-trait.h"
+ #include "cppgc/type-traits.h"
++#include "v8config.h"  // NOLINT(build/include_directory)
+ 
+ namespace cppgc {
+ 
+@@ -90,7 +91,7 @@ class GarbageCollected {
+  * };
+  * \endcode
+  */
+-class GarbageCollectedMixin {
++class V8_LTO_VISIBILITY_PUBLIC GarbageCollectedMixin {
+  public:
+   using IsGarbageCollectedMixinTypeMarker = void;
+ 
+diff --git a/deps/v8/include/cppgc/heap.h b/deps/v8/include/cppgc/heap.h
+index 02ee12ea..667a4fef 100644
+--- a/deps/v8/include/cppgc/heap.h
++++ b/deps/v8/include/cppgc/heap.h
+@@ -32,7 +32,7 @@ namespace internal {
+ class Heap;
+ }  // namespace internal
+ 
+-class V8_EXPORT Heap {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Heap {
+  public:
+   /**
+    * Specifies the stack state the embedder is in.
+diff --git a/deps/v8/include/cppgc/name-provider.h b/deps/v8/include/cppgc/name-provider.h
+index 849176fd..e5ae1d0c 100644
+--- a/deps/v8/include/cppgc/name-provider.h
++++ b/deps/v8/include/cppgc/name-provider.h
+@@ -23,7 +23,7 @@ namespace cppgc {
+  * Depending on the build configuration, Oilpan may hide names, i.e., represent
+  * them with kHiddenName, of case b. to avoid exposing internal details.
+  */
+-class V8_EXPORT NameProvider {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT NameProvider {
+  public:
+   /**
+    * Name that is used when hiding internals.
+diff --git a/deps/v8/include/cppgc/platform.h b/deps/v8/include/cppgc/platform.h
+index 8e19272f..02816730 100644
+--- a/deps/v8/include/cppgc/platform.h
++++ b/deps/v8/include/cppgc/platform.h
+@@ -28,7 +28,7 @@ using TracingController = v8::TracingController;
+ /**
+  * Platform interface used by Heap. Contains allocators and executors.
+  */
+-class V8_EXPORT Platform {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Platform {
+  public:
+   virtual ~Platform() = default;
+ 
+diff --git a/deps/v8/include/cppgc/visitor.h b/deps/v8/include/cppgc/visitor.h
+index 29c29eb9..35bda50c 100644
+--- a/deps/v8/include/cppgc/visitor.h
++++ b/deps/v8/include/cppgc/visitor.h
+@@ -72,7 +72,7 @@ struct EphemeronPair {
+  * };
+  * \endcode
+  */
+-class V8_EXPORT Visitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Visitor {
+  public:
+   class Key {
+    private:
+@@ -468,7 +468,7 @@ void EphemeronPair<K, V>::Trace(Visitor* visitor) const {
+ 
+ namespace internal {
+ 
+-class V8_EXPORT RootVisitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT RootVisitor {
+  public:
+   explicit RootVisitor(Visitor::Key) {}
+ 
+diff --git a/deps/v8/include/libplatform/v8-tracing.h b/deps/v8/include/libplatform/v8-tracing.h
+index 9d05949c..e432fd04 100644
+--- a/deps/v8/include/libplatform/v8-tracing.h
++++ b/deps/v8/include/libplatform/v8-tracing.h
+@@ -114,7 +114,7 @@ class V8_PLATFORM_EXPORT TraceObject {
+   void operator=(const TraceObject&) = delete;
+ };
+ 
+-class V8_PLATFORM_EXPORT TraceWriter {
++class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TraceWriter {
+  public:
+   TraceWriter() = default;
+   virtual ~TraceWriter() = default;
+@@ -157,7 +157,7 @@ class V8_PLATFORM_EXPORT TraceBufferChunk {
+   void operator=(const TraceBufferChunk&) = delete;
+ };
+ 
+-class V8_PLATFORM_EXPORT TraceBuffer {
++class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TraceBuffer {
+  public:
+   TraceBuffer() = default;
+   virtual ~TraceBuffer() = default;
+@@ -239,7 +239,7 @@ class V8_PLATFORM_EXPORT TraceConfig {
+  * Will become obsolete in Perfetto build
+  * (v8_use_perfetto_json_export = true).
+  */
+-class V8_PLATFORM_EXPORT TracingController
++class V8_LTO_VISIBILITY_PUBLIC V8_PLATFORM_EXPORT TracingController
+     : public V8_PLATFORM_NON_EXPORTED_BASE(v8::TracingController) {
+  public:
+   TracingController();
+diff --git a/deps/v8/include/v8-array-buffer.h b/deps/v8/include/v8-array-buffer.h
+index f70c6dd5..a73bae89 100644
+--- a/deps/v8/include/v8-array-buffer.h
++++ b/deps/v8/include/v8-array-buffer.h
+@@ -150,7 +150,7 @@ class V8_EXPORT ArrayBuffer : public Object {
+    * Note that it is unsafe to call back into V8 from any of the allocator
+    * functions.
+    */
+-  class V8_EXPORT Allocator {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Allocator {
+    public:
+     virtual ~Allocator() = default;
+ 
+diff --git a/deps/v8/include/v8-context.h b/deps/v8/include/v8-context.h
+index 21137f62..4819cb7b 100644
+--- a/deps/v8/include/v8-context.h
++++ b/deps/v8/include/v8-context.h
+@@ -223,7 +223,7 @@ class V8_EXPORT Context : public Data {
+    * Delegate to help with Deep freezing embedder-specific objects (such as
+    * JSApiObjects) that can not be frozen natively.
+    */
+-  class DeepFreezeDelegate {
++  class V8_LTO_VISIBILITY_PUBLIC DeepFreezeDelegate {
+    public:
+     /**
+      * Performs embedder-specific operations to freeze the provided embedder
+diff --git a/deps/v8/include/v8-cppgc.h b/deps/v8/include/v8-cppgc.h
+index aa3813b9..dd72fe01 100644
+--- a/deps/v8/include/v8-cppgc.h
++++ b/deps/v8/include/v8-cppgc.h
+@@ -62,7 +62,7 @@ struct V8_EXPORT CppHeapCreateParams {
+  * time. The heap may be used from different threads using the
+  * v8::Locker/v8::Unlocker APIs which is different from generic Oilpan.
+  */
+-class V8_EXPORT CppHeap {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT CppHeap {
+  public:
+   static std::unique_ptr<CppHeap> Create(v8::Platform* platform,
+                                          const CppHeapCreateParams& params);
+@@ -137,7 +137,7 @@ class V8_EXPORT CppHeap {
+   friend class internal::CppHeap;
+ };
+ 
+-class JSVisitor : public cppgc::Visitor {
++class V8_LTO_VISIBILITY_PUBLIC JSVisitor : public cppgc::Visitor {
+  public:
+   explicit JSVisitor(cppgc::Visitor::Key key) : cppgc::Visitor(key) {}
+   ~JSVisitor() override = default;
+@@ -158,7 +158,7 @@ class JSVisitor : public cppgc::Visitor {
+  *
+  * Its method is invoked with the results of the statistic collection.
+  */
+-class CustomSpaceStatisticsReceiver {
++class V8_LTO_VISIBILITY_PUBLIC CustomSpaceStatisticsReceiver {
+  public:
+   virtual ~CustomSpaceStatisticsReceiver() = default;
+   /**
+diff --git a/deps/v8/include/v8-embedder-heap.h b/deps/v8/include/v8-embedder-heap.h
+index 929b3c39..3433b4cd 100644
+--- a/deps/v8/include/v8-embedder-heap.h
++++ b/deps/v8/include/v8-embedder-heap.h
+@@ -19,7 +19,7 @@ class Value;
+ /**
+  * Handler for embedder roots on non-unified heap garbage collections.
+  */
+-class V8_EXPORT EmbedderRootsHandler {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT EmbedderRootsHandler {
+  public:
+   virtual ~EmbedderRootsHandler() = default;
+ 
+diff --git a/deps/v8/include/v8-extension.h b/deps/v8/include/v8-extension.h
+index d0056cb2..e47bff91 100644
+--- a/deps/v8/include/v8-extension.h
++++ b/deps/v8/include/v8-extension.h
+@@ -20,7 +20,7 @@ class FunctionTemplate;
+ /**
+  * Ignore
+  */
+-class V8_EXPORT Extension {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Extension {
+  public:
+   // Note that the strings passed into this constructor must live as long
+   // as the Extension itself.
+diff --git a/deps/v8/include/v8-inspector.h b/deps/v8/include/v8-inspector.h
+index 9eb9b213..19a29477 100644
+--- a/deps/v8/include/v8-inspector.h
++++ b/deps/v8/include/v8-inspector.h
+@@ -75,7 +75,7 @@ class V8_EXPORT StringView {
+   };
+ };
+ 
+-class V8_EXPORT StringBuffer {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT StringBuffer {
+  public:
+   virtual ~StringBuffer() = default;
+   virtual StringView string() const = 0;
+@@ -143,7 +143,7 @@ struct V8_EXPORT V8StackFrame {
+   int scriptId;
+ };
+ 
+-class V8_EXPORT V8StackTrace {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8StackTrace {
+  public:
+   virtual StringView firstNonEmptySourceURL() const = 0;
+   virtual bool isEmpty() const = 0;
+@@ -164,12 +164,12 @@ class V8_EXPORT V8StackTrace {
+   virtual std::vector<V8StackFrame> frames() const = 0;
+ };
+ 
+-class V8_EXPORT V8InspectorSession {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8InspectorSession {
+  public:
+   virtual ~V8InspectorSession() = default;
+ 
+   // Cross-context inspectable values (DOM nodes in different worlds, etc.).
+-  class V8_EXPORT Inspectable {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Inspectable {
+    public:
+     virtual v8::Local<v8::Value> get(v8::Local<v8::Context>) = 0;
+     virtual ~Inspectable() = default;
+@@ -249,7 +249,7 @@ struct V8_EXPORT DeepSerializationResult {
+   bool isSuccess;
+ };
+ 
+-class V8_EXPORT V8InspectorClient {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8InspectorClient {
+  public:
+   virtual ~V8InspectorClient() = default;
+ 
+@@ -364,7 +364,7 @@ struct V8_EXPORT V8StackTraceId {
+   std::unique_ptr<StringBuffer> ToString();
+ };
+ 
+-class V8_EXPORT V8Inspector {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT V8Inspector {
+  public:
+   static std::unique_ptr<V8Inspector> create(v8::Isolate*, V8InspectorClient*);
+   virtual ~V8Inspector() = default;
+@@ -408,7 +408,7 @@ class V8_EXPORT V8Inspector {
+                                       v8::Local<v8::Value> value) = 0;
+ 
+   // Connection.
+-  class V8_EXPORT Channel {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Channel {
+    public:
+     virtual ~Channel() = default;
+     virtual void sendResponse(int callId,
+@@ -417,7 +417,7 @@ class V8_EXPORT V8Inspector {
+     virtual void flushProtocolNotifications() = 0;
+   };
+ 
+-  class V8_EXPORT ManagedChannel
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ManagedChannel
+       : public cppgc::GarbageCollected<ManagedChannel>,
+         public Channel {
+    public:
+diff --git a/deps/v8/include/v8-metrics.h b/deps/v8/include/v8-metrics.h
+index b67196c3..aa6e3e9e 100644
+--- a/deps/v8/include/v8-metrics.h
++++ b/deps/v8/include/v8-metrics.h
+@@ -178,7 +178,7 @@ struct WasmModulesPerIsolate {
+  * providing its implementation and have the virtual methods overwritten
+  * for the events it cares about.
+  */
+-class V8_EXPORT Recorder {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Recorder {
+  public:
+   // A unique identifier for a context in this Isolate.
+   // It is guaranteed to not be reused throughout the lifetime of the Isolate.
+diff --git a/deps/v8/include/v8-microtask-queue.h b/deps/v8/include/v8-microtask-queue.h
+index 135dfb06..8dc14230 100644
+--- a/deps/v8/include/v8-microtask-queue.h
++++ b/deps/v8/include/v8-microtask-queue.h
+@@ -37,7 +37,7 @@ class MicrotaskQueue;
+  * other synchronously. E.g. for Web embedding, use the same instance for all
+  * origins that share the same URL scheme and eTLD+1.
+  */
+-class V8_EXPORT MicrotaskQueue {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT MicrotaskQueue {
+  public:
+   /**
+    * Creates an empty MicrotaskQueue instance.
+diff --git a/deps/v8/include/v8-object.h b/deps/v8/include/v8-object.h
+index 634aebb5..0b6b37b0 100644
+--- a/deps/v8/include/v8-object.h
++++ b/deps/v8/include/v8-object.h
+@@ -581,8 +581,9 @@ class V8_EXPORT Object : public Value {
+   //
+   // Note that v8::Object::Wrappable` inherits from `NameProvider` and provides
+   // `GetWrapperTypeInfo` to allow subclasses to have smaller object sizes.
+-  class Wrappable : public cppgc::GarbageCollected<Wrappable>,
+-                    public cppgc::NameProvider {
++  class V8_LTO_VISIBILITY_PUBLIC Wrappable
++      : public cppgc::GarbageCollected<Wrappable>,
++        public cppgc::NameProvider {
+    public:
+     virtual const WrapperTypeInfo* GetWrapperTypeInfo() const {
+       return nullptr;
+diff --git a/deps/v8/include/v8-persistent-handle.h b/deps/v8/include/v8-persistent-handle.h
+index aae1f83e..dd020d8e 100644
+--- a/deps/v8/include/v8-persistent-handle.h
++++ b/deps/v8/include/v8-persistent-handle.h
+@@ -413,7 +413,7 @@ using UniquePersistent = Global<T>;
+ /**
+  * Interface for iterating through all the persistent handles in the heap.
+  */
+-class V8_EXPORT PersistentHandleVisitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT PersistentHandleVisitor {
+  public:
+   virtual ~PersistentHandleVisitor() = default;
+   virtual void VisitPersistentHandle(Persistent<Value>* value,
+diff --git a/deps/v8/include/v8-platform.h b/deps/v8/include/v8-platform.h
+index 3484e988..4f0a0330 100644
+--- a/deps/v8/include/v8-platform.h
++++ b/deps/v8/include/v8-platform.h
+@@ -47,7 +47,7 @@ enum class TaskPriority : uint8_t {
+ /**
+  * A Task represents a unit of work.
+  */
+-class Task {
++class V8_LTO_VISIBILITY_PUBLIC Task {
+  public:
+   virtual ~Task() = default;
+ 
+@@ -60,7 +60,7 @@ class Task {
+  * seconds returned by MonotonicallyIncreasingTime().
+  * The idle task is expected to complete by this deadline.
+  */
+-class IdleTask {
++class V8_LTO_VISIBILITY_PUBLIC IdleTask {
+  public:
+   virtual ~IdleTask() = default;
+   virtual void Run(double deadline_in_seconds) = 0;
+@@ -72,7 +72,7 @@ class IdleTask {
+  * executed anymore. All tasks posted to a given TaskRunner will be invoked in
+  * sequence. Tasks can be posted from any thread.
+  */
+-class TaskRunner {
++class V8_LTO_VISIBILITY_PUBLIC TaskRunner {
+  public:
+   /**
+    * Schedules a task to be invoked by this TaskRunner. The TaskRunner
+@@ -202,7 +202,7 @@ class TaskRunner {
+  * Delegate that's passed to Job's worker task, providing an entry point to
+  * communicate with the scheduler.
+  */
+-class JobDelegate {
++class V8_LTO_VISIBILITY_PUBLIC JobDelegate {
+  public:
+   /**
+    * Returns true if this thread *must* return from the worker task on the
+@@ -237,7 +237,7 @@ class JobDelegate {
+  * Handle returned when posting a Job. Provides methods to control execution of
+  * the posted Job.
+  */
+-class JobHandle {
++class V8_LTO_VISIBILITY_PUBLIC JobHandle {
+  public:
+   virtual ~JobHandle() = default;
+ 
+@@ -296,7 +296,7 @@ class JobHandle {
+ /**
+  * A JobTask represents work to run in parallel from Platform::PostJob().
+  */
+-class JobTask {
++class V8_LTO_VISIBILITY_PUBLIC JobTask {
+  public:
+   virtual ~JobTask() = default;
+ 
+@@ -319,7 +319,7 @@ class JobTask {
+ // Allows a thread to temporarily boost another thread's priority to match its
+ // own priority. The priority is reset when the object is destroyed, which must
+ // happens on the boosted thread.
+-class ScopedBoostablePriority {
++class V8_LTO_VISIBILITY_PUBLIC ScopedBoostablePriority {
+  public:
+   ScopedBoostablePriority() = default;
+   virtual ~ScopedBoostablePriority() = default;
+@@ -366,7 +366,7 @@ enum class BlockingType {
+  * CPU usage should be minimal within that scope. ScopedBlockingCalls can be
+  * nested.
+  */
+-class ScopedBlockingCall {
++class V8_LTO_VISIBILITY_PUBLIC ScopedBlockingCall {
+  public:
+   virtual ~ScopedBlockingCall() = default;
+ };
+@@ -374,7 +374,7 @@ class ScopedBlockingCall {
+ /**
+  * The interface represents complex arguments to trace events.
+  */
+-class ConvertableToTraceFormat {
++class V8_LTO_VISIBILITY_PUBLIC ConvertableToTraceFormat {
+  public:
+   virtual ~ConvertableToTraceFormat() = default;
+ 
+@@ -394,7 +394,7 @@ class ConvertableToTraceFormat {
+  *
+  * Will become obsolete in Perfetto build (v8_use_perfetto = true).
+  */
+-class TracingController {
++class V8_LTO_VISIBILITY_PUBLIC TracingController {
+  public:
+   virtual ~TracingController() = default;
+ 
+@@ -449,7 +449,7 @@ class TracingController {
+                                         const char* name, uint64_t handle) {}
+ #endif  // !defined(V8_USE_PERFETTO)
+ 
+-  class TraceStateObserver {
++  class V8_LTO_VISIBILITY_PUBLIC TraceStateObserver {
+    public:
+     virtual ~TraceStateObserver() = default;
+     virtual void OnTraceEnabled() = 0;
+@@ -545,7 +545,7 @@ static constexpr PlatformSharedMemoryHandle kInvalidSharedMemoryHandle =
+  *
+  * Can be implemented by an embedder to manage large host OS allocations.
+  */
+-class PageAllocator {
++class V8_LTO_VISIBILITY_PUBLIC PageAllocator {
+  public:
+   virtual ~PageAllocator() = default;
+ 
+@@ -709,7 +709,7 @@ class PageAllocator {
+    * INTERNAL ONLY: This interface has not been stabilised and may change
+    * without notice from one release to another without being deprecated first.
+    */
+-  class SharedMemoryMapping {
++  class V8_LTO_VISIBILITY_PUBLIC SharedMemoryMapping {
+    public:
+     // Implementations are expected to free the shared memory mapping in the
+     // destructor.
+@@ -721,7 +721,7 @@ class PageAllocator {
+    * INTERNAL ONLY: This interface has not been stabilised and may change
+    * without notice from one release to another without being deprecated first.
+    */
+-  class SharedMemory {
++  class V8_LTO_VISIBILITY_PUBLIC SharedMemory {
+    public:
+     // Implementations are expected to free the shared memory in the destructor.
+     virtual ~SharedMemory() = default;
+@@ -777,7 +777,7 @@ class PageAllocator {
+  * INTERNAL ONLY: This interface has not been stabilised and may change
+  * without notice from one release to another without being deprecated first.
+  */
+-class ThreadIsolatedAllocator {
++class V8_LTO_VISIBILITY_PUBLIC ThreadIsolatedAllocator {
+  public:
+   virtual ~ThreadIsolatedAllocator() = default;
+ 
+@@ -846,7 +846,7 @@ inline constexpr bool IsSubset(PagePermissions lhs, PagePermissions rhs) {
+  *
+  * This API is not yet stable and may change without notice!
+  */
+-class VirtualAddressSpace {
++class V8_LTO_VISIBILITY_PUBLIC VirtualAddressSpace {
+  public:
+   using Address = uintptr_t;
+ 
+@@ -1209,7 +1209,7 @@ class VirtualAddressSpace {
+  * Observer used by V8 to notify the embedder about entering/leaving sections
+  * with high throughput of malloc/free operations.
+  */
+-class HighAllocationThroughputObserver {
++class V8_LTO_VISIBILITY_PUBLIC HighAllocationThroughputObserver {
+  public:
+   virtual void EnterSection() {}
+   virtual void LeaveSection() {}
+@@ -1221,7 +1221,7 @@ class HighAllocationThroughputObserver {
+  * The embedder has to provide an implementation of this interface before
+  * initializing the rest of V8.
+  */
+-class Platform {
++class V8_LTO_VISIBILITY_PUBLIC Platform {
+  public:
+   virtual ~Platform() = default;
+ 
+diff --git a/deps/v8/include/v8-primitive.h b/deps/v8/include/v8-primitive.h
+index 457a8838..4949e1e0 100644
+--- a/deps/v8/include/v8-primitive.h
++++ b/deps/v8/include/v8-primitive.h
+@@ -240,7 +240,7 @@ class V8_EXPORT String : public Name {
+    */
+   Local<String> InternalizeString(Isolate* isolate);
+ 
+-  class V8_EXPORT ExternalStringResourceBase {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalStringResourceBase {
+    public:
+     virtual ~ExternalStringResourceBase() = default;
+ 
+@@ -272,7 +272,7 @@ class V8_EXPORT String : public Name {
+     }
+     static constexpr size_t kDefaultMemoryEstimate = static_cast<size_t>(-1);
+ 
+-    class V8_EXPORT SharedMemoryUsageRecorder {
++    class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT SharedMemoryUsageRecorder {
+      public:
+       /**
+        * Record that a shared allocation at the given location has the given
+@@ -335,7 +335,7 @@ class V8_EXPORT String : public Name {
+    * ExternalStringResource to manage the life cycle of the underlying
+    * buffer.  Note that the string data must be immutable.
+    */
+-  class V8_EXPORT ExternalStringResource : public ExternalStringResourceBase {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalStringResource : public ExternalStringResourceBase {
+    public:
+     /**
+      * Override the destructor to manage the life cycle of the underlying
+@@ -389,7 +389,7 @@ class V8_EXPORT String : public Name {
+    * indexing.  Use String::New or convert to 16 bit data for non-Latin1.
+    */
+ 
+-  class V8_EXPORT ExternalOneByteStringResource
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalOneByteStringResource
+       : public ExternalStringResourceBase {
+    public:
+     /**
+@@ -714,7 +714,7 @@ inline V8_WARN_UNUSED_RESULT Local<String> String::NewFromUtf8Literal(
+ /**
+  * Interface for iterating through all external resources in the heap.
+  */
+-class V8_EXPORT ExternalResourceVisitor {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalResourceVisitor {
+  public:
+   virtual ~ExternalResourceVisitor() = default;
+   virtual void VisitExternalString(Local<String> string) {}
+diff --git a/deps/v8/include/v8-profiler.h b/deps/v8/include/v8-profiler.h
+index 927fa12e..0c2cf5fc 100644
+--- a/deps/v8/include/v8-profiler.h
++++ b/deps/v8/include/v8-profiler.h
+@@ -15,6 +15,7 @@
+ #include "v8-local-handle.h"       // NOLINT(build/include_directory)
+ #include "v8-message.h"            // NOLINT(build/include_directory)
+ #include "v8-persistent-handle.h"  // NOLINT(build/include_directory)
++#include "v8config.h"              // NOLINT(build/include_directory)
+ 
+ /**
+  * Profiler support for the V8 JavaScript engine.
+@@ -198,7 +199,7 @@ class V8_EXPORT CpuProfileNode {
+ /**
+  * An interface for exporting data from V8, using "push" model.
+  */
+-class V8_EXPORT OutputStream {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT OutputStream {
+  public:
+   enum WriteResult { kContinue = 0, kAbort = 1 };
+   virtual ~OutputStream() = default;
+@@ -354,7 +355,7 @@ struct CpuProfilingResult {
+ /**
+  * Delegate for when max samples reached and samples are discarded.
+  */
+-class V8_EXPORT DiscardedSamplesDelegate {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT DiscardedSamplesDelegate {
+  public:
+   DiscardedSamplesDelegate() = default;
+ 
+@@ -717,7 +718,7 @@ class V8_EXPORT HeapSnapshot {
+  * An interface for reporting progress and controlling long-running
+  * activities.
+  */
+-class V8_EXPORT ActivityControl {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ActivityControl {
+  public:
+   enum ControlOption {
+     kContinue = 0,
+@@ -735,7 +736,7 @@ class V8_EXPORT ActivityControl {
+  * AllocationProfile is a sampled profile of allocations done by the program.
+  * This is structured as a call-graph.
+  */
+-class V8_EXPORT AllocationProfile {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT AllocationProfile {
+  public:
+   struct Allocation {
+     /**
+@@ -866,9 +867,9 @@ class V8_EXPORT AllocationProfile {
+  * 4) To represent references from/to V8 object, construct V8 nodes using
+  *    graph->V8Node(value).
+  */
+-class V8_EXPORT EmbedderGraph {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT EmbedderGraph {
+  public:
+-  class Node {
++  class V8_LTO_VISIBILITY_PUBLIC Node {
+    public:
+     /**
+      * Detachedness specifies whether an object is attached or detached from the
+@@ -981,7 +982,7 @@ class V8_EXPORT EmbedderGraph {
+   virtual ~EmbedderGraph() = default;
+ };
+ 
+-class QueryObjectPredicate {
++class V8_LTO_VISIBILITY_PUBLIC QueryObjectPredicate {
+  public:
+   virtual ~QueryObjectPredicate() = default;
+   virtual bool Filter(v8::Local<v8::Object> object) = 0;
+@@ -1069,7 +1070,7 @@ class V8_EXPORT HeapProfiler {
+    *
+    * This interface will soon be deprecated in favour of ContextNameResolver.
+    */
+-  class ObjectNameResolver {
++  class V8_LTO_VISIBILITY_PUBLIC ObjectNameResolver {
+    public:
+     /**
+      * Returns name to be used in the heap snapshot for given node. Returned
+@@ -1085,7 +1086,7 @@ class V8_EXPORT HeapProfiler {
+    * Callback interface for retrieving user friendly names of a V8::Context
+    * objects.
+    */
+-  class ContextNameResolver {
++  class V8_LTO_VISIBILITY_PUBLIC ContextNameResolver {
+    public:
+     /**
+      * Returns name to be used in the heap snapshot for given node. Returned
+@@ -1376,7 +1377,7 @@ class V8_EXPORT CodeEvent {
+ /**
+  * Interface to listen to code creation and code relocation events.
+  */
+-class V8_EXPORT CodeEventHandler {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT CodeEventHandler {
+  public:
+   /**
+    * Creates a new listener for the |isolate|. The isolate must be initialized.
+diff --git a/deps/v8/include/v8-script.h b/deps/v8/include/v8-script.h
+index c3a2274d..6971b79f 100644
+--- a/deps/v8/include/v8-script.h
++++ b/deps/v8/include/v8-script.h
+@@ -589,7 +589,7 @@ class V8_EXPORT ScriptCompiler {
+    * For streaming incomplete script data to V8. The embedder should implement a
+    * subclass of this class.
+    */
+-  class V8_EXPORT ExternalSourceStream {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ExternalSourceStream {
+    public:
+     virtual ~ExternalSourceStream() = default;
+ 
+diff --git a/deps/v8/include/v8-statistics.h b/deps/v8/include/v8-statistics.h
+index 2dc10e0f..58dd6f0c 100644
+--- a/deps/v8/include/v8-statistics.h
++++ b/deps/v8/include/v8-statistics.h
+@@ -52,7 +52,7 @@ enum class MeasureMemoryExecution { kDefault, kEager, kLazy };
+  * Each implementation of this class should hence implement only one of them,
+  * and leave the other empty.
+  */
+-class V8_EXPORT MeasureMemoryDelegate {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT MeasureMemoryDelegate {
+  public:
+   virtual ~MeasureMemoryDelegate() = default;
+ 
+diff --git a/deps/v8/include/v8-value-serializer.h b/deps/v8/include/v8-value-serializer.h
+index 0cb3e045..717cf156 100644
+--- a/deps/v8/include/v8-value-serializer.h
++++ b/deps/v8/include/v8-value-serializer.h
+@@ -62,9 +62,9 @@ class V8_EXPORT SharedValueConveyor final {
+  * Value serialization compatible with the HTML structured clone algorithm.
+  * The format is backward-compatible (i.e. safe to store to disk).
+  */
+-class V8_EXPORT ValueSerializer {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ValueSerializer {
+  public:
+-  class V8_EXPORT Delegate {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Delegate {
+    public:
+     virtual ~Delegate() = default;
+ 
+@@ -212,9 +212,9 @@ class V8_EXPORT ValueSerializer {
+  * Deserializes values from data written with ValueSerializer, or a compatible
+  * implementation.
+  */
+-class V8_EXPORT ValueDeserializer {
++class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT ValueDeserializer {
+  public:
+-  class V8_EXPORT Delegate {
++  class V8_LTO_VISIBILITY_PUBLIC V8_EXPORT Delegate {
+    public:
+     virtual ~Delegate() = default;
+ 
+diff --git a/deps/v8/include/v8-wasm.h b/deps/v8/include/v8-wasm.h
+index 550cdfb3..ebe41642 100644
+--- a/deps/v8/include/v8-wasm.h
++++ b/deps/v8/include/v8-wasm.h
+@@ -135,7 +135,7 @@ class V8_EXPORT WasmStreaming final {
+       internal::kWasmWasmStreamingTag;
+   class WasmStreamingImpl;
+ 
+-  class ModuleCachingInterface {
++  class V8_LTO_VISIBILITY_PUBLIC ModuleCachingInterface {
+    public:
+     // Get the full wire bytes, to check against the cached version.
+     virtual MemorySpan<const uint8_t> GetWireBytes() const = 0;
+diff --git a/deps/v8/include/v8config.h b/deps/v8/include/v8config.h
+index d8978c28..8ec21e35 100644
+--- a/deps/v8/include/v8config.h
++++ b/deps/v8/include/v8config.h
+@@ -822,6 +822,17 @@ path. Add it with -I<path> to the command line
+ #define V8_CLANG_NO_SANITIZE(what)
+ #endif
+ 
++// Public polymorphic interfaces may be implemented by embedders in a separate
++// linkage unit. Keep their class hierarchies open to LTO devirtualization.
++#if defined(__clang__) && defined(__has_attribute)
++#if __has_attribute(lto_visibility_public)
++#define V8_LTO_VISIBILITY_PUBLIC [[clang::lto_visibility_public]]
++#endif
++#endif
++#if !defined(V8_LTO_VISIBILITY_PUBLIC)
++#define V8_LTO_VISIBILITY_PUBLIC
++#endif
++
+ // Exposing private symbols requires exposing public symbols too.
+ #ifdef BUILDING_V8_SHARED_PRIVATE
+ #define BUILDING_V8_SHARED
+diff --git a/src/node.h b/src/node.h
+index a800193a..02134a08 100644
+--- a/src/node.h
++++ b/src/node.h
+@@ -687,7 +687,7 @@ struct SnapshotConfig {
+   const v8::StartupData* base_blob = nullptr;
+ };
+ 
+-struct InspectorParentHandle {
++struct V8_LTO_VISIBILITY_PUBLIC InspectorParentHandle {
+   virtual ~InspectorParentHandle() = default;
+ };
+ 
+diff --git a/src/node_object_wrap.h b/src/node_object_wrap.h
+index 0002c25e..39441301 100644
+--- a/src/node_object_wrap.h
++++ b/src/node_object_wrap.h
+@@ -30,7 +30,7 @@ namespace node {
+ // Legacy interface for tying C++ objects to JavaScript objects.
+ // This is not intended to be used by new code, and userland alternatives
+ // should be preferred.
+-class NODE_DEPRECATED(
++class V8_LTO_VISIBILITY_PUBLIC NODE_DEPRECATED(
+     "Use userland alternatives such as node-addon-api or nan instead",
+     ObjectWrap) {
+  public:
+diff --git a/src/node_sea_bin.cc b/src/node_sea_bin.cc
+index 30197b9b..9e17e5d9 100644
+--- a/src/node_sea_bin.cc
++++ b/src/node_sea_bin.cc
+@@ -1,6 +1,16 @@
+ #include "node_sea.h"
+ 
+ #ifdef HAVE_LIEF
++// LIEF is compiled separately without LTO. Its imported class hierarchies
++// must remain open to whole-program devirtualization in this translation unit.
++#if defined(__APPLE__) && defined(__clang__)
++#pragma push_macro("LIEF_STATIC")
++#pragma push_macro("LIEF_IMPORT")
++#undef LIEF_STATIC
++#undef LIEF_IMPORT
++#define LIEF_IMPORT
++#endif
++
+ // Temporarily undefine DEBUG because LIEF uses it as an enum name.
+ #if defined(DEBUG)
+ #define SAVED_DEBUG_VALUE DEBUG
+@@ -11,6 +21,11 @@
+ #else  // defined(DEBUG)
+ #include "LIEF/LIEF.hpp"
+ #endif  // defined(DEBUG)
++
++#if defined(__APPLE__) && defined(__clang__)
++#pragma pop_macro("LIEF_IMPORT")
++#pragma pop_macro("LIEF_STATIC")
++#endif
+ #endif  // HAVE_LIEF
+ 
+ #include "debug_utils-inl.h"

@@ -1,0 +1,245 @@
+{
+  "passed": true,
+  "artifact_unchanged": true,
+  "plan": 6142,
+  "failures": [],
+  "skips": 387,
+  "todos": 10,
+  "events": [
+    {
+      "label": "identity",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release/node",
+        "-p",
+        "JSON.stringify({platform:process.platform,arch:process.arch,versions:process.versions,config:process.config})"
+      ],
+      "started": 1789001816.0200758,
+      "seconds": 0.06447172164916992,
+      "exit": 0
+    },
+    {
+      "label": "source-status",
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "started": 1789001816.0848594,
+      "seconds": 0.16472887992858887,
+      "exit": 0
+    },
+    {
+      "label": "source-diff",
+      "command": [
+        "git",
+        "diff",
+        "--binary",
+        "HEAD"
+      ],
+      "started": 1789001816.2498114,
+      "seconds": 0.03726601600646973,
+      "exit": 0
+    },
+    {
+      "label": "source-base",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "started": 1789001816.2873213,
+      "seconds": 0.0038576126098632812,
+      "exit": 0
+    },
+    {
+      "label": "doc-dependencies",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release/node",
+        "deps/npm/bin/npm-cli.js",
+        "ci",
+        "--prefix",
+        "tools/doc"
+      ],
+      "started": 1789001816.2923517,
+      "seconds": 4.77662205696106,
+      "exit": 0
+    },
+    {
+      "label": "addon-doc-fixtures",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release/node",
+        "tools/doc/addon-verify.mjs",
+        "--input",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/doc/api/addons.md",
+        "--output",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/test/addons"
+      ],
+      "started": 1789001821.0694125,
+      "seconds": 0.06415009498596191,
+      "exit": 0
+    },
+    {
+      "label": "build-test-addons",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/addons",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789001821.1338038,
+      "seconds": 19.688886404037476,
+      "exit": 0
+    },
+    {
+      "label": "build-test-js-native-api",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/js-native-api",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789001840.8229403,
+      "seconds": 3.388369560241699,
+      "exit": 0
+    },
+    {
+      "label": "build-test-node-api",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/node-api",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789001844.2115529,
+      "seconds": 3.4991390705108643,
+      "exit": 0
+    },
+    {
+      "label": "build-test-sqlite",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/sqlite",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789001847.710933,
+      "seconds": 0.966681718826294,
+      "exit": 0
+    },
+    {
+      "label": "build-test-ffi",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/ffi",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789001848.677796,
+      "seconds": 1.0665481090545654,
+      "exit": 0
+    },
+    {
+      "label": "build-benchmark-napi",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "benchmark/napi",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789001849.7445874,
+      "seconds": 3.932723045349121,
+      "exit": 0
+    },
+    {
+      "label": "build-embedding",
+      "command": [
+        "ninja",
+        "-C",
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release",
+        "-j4",
+        "embedtest"
+      ],
+      "started": 1789001853.6775582,
+      "seconds": 7.136590242385864,
+      "exit": 0
+    },
+    {
+      "label": "documentation",
+      "command": [
+        "make",
+        "doc-only",
+        "JOBS=4"
+      ],
+      "started": 1789001860.814365,
+      "seconds": 26.32286024093628,
+      "exit": 0
+    },
+    {
+      "label": "cctest",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pristine-pgo/out/Release/cctest",
+        "--gtest_output=xml:/REDACTED_HOME/linux-renewed/evidence/pristine-pgo-gates-v1/cctest.xml"
+      ],
+      "started": 1789001887.3179262,
+      "seconds": 6.231613874435425,
+      "exit": 0
+    },
+    {
+      "label": "node-tests",
+      "command": [
+        "/usr/bin/python3",
+        "tools/test.py",
+        "--mode=release",
+        "--progress=tap",
+        "--flaky-tests=run",
+        "-j4",
+        "--temp-dir",
+        "/REDACTED_HOME/ppgo-tmp",
+        "default",
+        "pummel",
+        "addons",
+        "ffi",
+        "js-native-api",
+        "node-api",
+        "embedding",
+        "benchmark",
+        "sqlite",
+        "doctool"
+      ],
+      "started": 1789001893.5499043,
+      "seconds": 1436.2742412090302,
+      "exit": 0
+    }
+  ],
+  "scope": "Native release suite selection; not all upstream configurations"
+}

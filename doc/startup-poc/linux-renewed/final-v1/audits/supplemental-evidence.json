@@ -1,0 +1,23 @@
+{
+  "all_22_manifest_digest_mismatches": [],
+  "result_to_public_head_difference_count": 324,
+  "result_to_public_head_doc_count": 323,
+  "result_to_public_head_github_count": 1,
+  "result_to_public_head_other_paths": [],
+  "renewed_paths": [
+    "common.gypi",
+    "configure.py",
+    "deps/v8/src/execution/isolate.cc",
+    "deps/v8/src/objects/hash-table.h",
+    "deps/v8/src/objects/objects.cc",
+    "deps/v8/src/snapshot/deserializer.cc",
+    "node.gyp",
+    "test/cctest/test_snapshot_dictionary_rehash.cc",
+    "test/cctest/test_source_position_collection.cc",
+    "test/cctest/test_source_positions_advanced.cc",
+    "test/cctest/test_v8_private_startup_cases.cc",
+    "test/cctest/v8_private_startup_test_fixture.h",
+    "tools/v8_gypfiles/node_startup_cctest.gyp"
+  ],
+  "renewed_forbidden_paths": []
+}

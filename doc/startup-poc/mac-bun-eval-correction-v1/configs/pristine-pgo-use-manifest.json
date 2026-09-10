@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "recorded_at_utc": "2026-09-07T04:21:26.575478+00:00",
+  "binary": "<HOME>/Documents/projects/mynode/artifacts/node-pristine-pgo-use",
+  "binary_sha256": "836ec5f8f76b35f46e8c7badd8d4a9e6a03fc6841d85155ffecf6232281f6eb8",
+  "binary_bytes": 119326280,
+  "version": "v27.0.0-pre",
+  "source": "<HOME>/Documents/projects/mynode/worktrees/upstream",
+  "head": "8af75451e9041cd6058080ad3d4a65546797b418",
+  "status": " M common.gypi\n M configure.py\n M node.gyp\n",
+  "source_patch_sha256": "bb73fd419dd90532ec860fe78762855cf7bd0fe3bb796e4846ebaa178ac8b4fb",
+  "untracked": [],
+  "config_sha256": "612eca91ac37918e878e9c5438e43c12fde73d237bc66971e974f3ae840ba9f0",
+  "build_command": "Python argv configure and CCACHE_DISABLE=1 ninja -C out/Release -j4 node cctest embedtest using the frozen named PGO profile recorded in config.gypi",
+  "notes": [
+    "Frozen matched compiler-input control: same frozen LLVM profile as the fork; explicitly not independently optimized pristine training.",
+    "Profile SHA256: 7640bd67bfd83b9a16fde46b43ac14ab0af8a8fb6a97403c175acd85439c0bb9; profile path includes a space, apostrophe, and dollar and was passed via Python argv.",
+    "Final Darwin conditions gate ThinLTO/PGO to configuring_node==1; native addon configuration does not receive private PGO flags."
+  ],
+  "node_ninja_sha256": "601a2fe9b74bbfce5b6e84e5e6bd6b7c853d3fdb07ee781392ff4c034fceba4e",
+  "build_ninja_sha256": "96f583173e03634736e3b4a01139df3e9a57800077944e5d86300bce07314d38",
+  "v8_base_ninja_sha256": "af8a0dded66c837e0ad5f1fc815f32f50d1c51594f08620b0dbb08369a2a6fae"
+}

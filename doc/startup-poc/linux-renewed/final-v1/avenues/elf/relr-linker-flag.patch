@@ -1,0 +1,10 @@
+diff --git a/common.gypi b/common.gypi
+index 3be1aee3054..202263164f9 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -216,4 +216,4 @@
+           ['OS=="linux" and clang==1 and configuring_node==1 and enable_thin_lto=="true"', {
+             'cflags': ['-flto=thin'],
+-            'ldflags': ['-flto=thin', '-fuse-ld=lld'],
++            'ldflags': ['-flto=thin', '-fuse-ld=lld', '-Wl,-z,pack-relative-relocs'],
+           }],

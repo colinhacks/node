@@ -1,12 +1,12 @@
 {
-  "schema": 1,
+  "schema": 2,
   "metric": "warm-cache process-lifetime latency in milliseconds",
   "ratio": "paired Bun/fork latency ratio; below one means Bun is faster",
   "bun_version": "1.3.14",
   "platforms": [
     {
       "platform": "macOS arm64",
-      "report": "macos-v1/evidence/current-overall-defensible-clean/report.json.gz",
+      "report": "mac-bun-eval-correction-v1/evidence/main/report.json.gz",
       "rounds": 350,
       "fork_sha256": "f7845d078891ed853f9cdc0e7d38f105bd7bec9c7ac9d16a5978f6bc7a469d42",
       "bun_sha256": "e0c90ec15d33363e6b70713d56bc3b2c7585c17f40a0fe0f8fd9305901d4e233",
@@ -26,11 +26,11 @@
           0.8743787471135005
         ],
         "eval-empty": [
-          15.485562999999999,
-          6.235875,
-          0.4019522065591811,
-          0.3990752769731056,
-          0.40423587439370023
+          14.5036665,
+          12.7445205,
+          0.8767487515173372,
+          0.8734468306040438,
+          0.8790402254919328
         ],
         "hello": [
           17.3933125,
@@ -60,44 +60,50 @@
           1.2930255113656197,
           1.309299953436833
         ]
+      },
+      "correction": {
+        "replaces": "v1 eval-empty only",
+        "reason": "Bun 1.3.14 interpreted -e '' as help output, not JavaScript",
+        "workload": "-e ';' with zero stdout and exit code zero"
       }
     },
     {
       "platform": "Linux x64",
-      "report": "linux-final-v1/evidence/release-references/report.json.gz",
+      "report": "linux-renewed/final-v1/release-references/report.json.gz",
       "rounds": 200,
-      "fork_sha256": "acac36a74dac6b0cf9b15397c879499b53d23b3e0dcc7f57ae7c44ca556687ea",
+      "fork_sha256": "ffa49c64dc7ecc307c58252a4c38b5159b9a68c9d0c60247af609ca0c53b0ed0",
       "bun_sha256": "9fd36f87e4b90b07632b987a2e4ec81ca15a62c81bf983190cea6d715be2ad74",
       "workloads": {
         "empty-cjs": [
-          18.7249915,
-          11.792584999999999,
-          0.6248742251934287,
-          0.62016967979005,
-          0.6337854698463264
+          14.8082665,
+          11.09188,
+          0.751290916086786,
+          0.7456418183830403,
+          0.753868228666641
         ],
         "empty-esm": [
-          18.9191,
-          11.6822255,
-          0.6144715052403452,
-          0.6102953135361968,
-          0.6199969629830311
+          15.2347295,
+          11.0573755,
+          0.7244767325285799,
+          0.7199104398916625,
+          0.7323842803877415
         ],
         "noop-eval": [
-          19.0203745,
-          11.627195,
-          0.610890346060126,
-          0.6084367497083831,
-          0.6189706983811403
+          15.096225,
+          10.911537500000001,
+          0.7208559610603956,
+          0.7184333628297487,
+          0.7276229666193211
         ],
         "hello": [
-          22.885912,
-          11.511851,
-          0.5037520703484801,
-          0.5003200697968694,
-          0.5062582025692218
+          18.1352905,
+          10.9253915,
+          0.6029792605608726,
+          0.5994149784678854,
+          0.6061163352936128
         ]
-      }
+      },
+      "selected_artifact": "combined-thin-pgo"
     },
     {
       "platform": "Windows x64",
@@ -143,5 +149,10 @@
     "bun_over_fork_paired_ratio",
     "ci_low",
     "ci_high"
-  ]
+  ],
+  "sources": {
+    "mac_eval_correction": "mac-bun-eval-correction-v1/evidence/main/report.json.gz",
+    "linux_release_references": "linux-renewed/final-v1/release-references/report.json.gz",
+    "linux_v1_history": "LINUX.md"
+  }
 }

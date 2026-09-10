@@ -1,30 +1,64 @@
-# Renewed Linux experiments
+# Renewed Linux startup results
 
-The branch adds four commits after the frozen 18-patch package. Linux measurements and cross-platform CI for these additions are still in progress. The earlier [Linux result](LINUX.md) and [Bun comparisons](BUN-COMPARISON.md) describe their original artifacts, not this newer branch. No new 2× or Bun-parity result is established.
+The selected Linux build starts **1.52–1.55× faster** on empty entries than the normal pristine build. This is the combined source, PGO and ThinLTO recipe, not a same-configuration source-only result; 2× and Bun parity remain unmet.
 
-## Changes and measured margins
+| Direct paired comparison | Empty CJS | Empty ESM | Empty eval |
+| --- | ---: | ---: | ---: |
+| New source / pristine, both normal builds | 1.3894× | 1.3813× | 1.3954× |
+| Source fork PGO / pristine PGO | 1.3998× | 1.3871× | 1.4535× |
+| Source + PGO + ThinLTO / normal pristine | 1.5274× | 1.5195× | 1.5482× |
+| Three new V8 changes / frozen source, both normal | 1.0541× | 1.0538× | 1.0579× |
+| PGO / normal, same combined source | 1.0926× | 1.0903× | 1.0933× |
+| ThinLTO PGO / PGO, same source and profile | 1.0089× | 1.0042× | 1.0059× |
 
-A quiet 220-round Linux x64 screen compared actual binaries against the freshly rebuilt source-fork control. Ratios below are paired control/candidate process-lifetime ratios; higher means faster. The [scalar evidence](linux-renewed/screen-scalars-v1.json) retains confidence intervals and hashes of the full raw reports. These margins cannot be multiplied into a combined result.
+Each row is measured directly. The margins must not be multiplied. PGO controls use the same training recipe with separately generated profiles. No pristine ThinLTO PGO artifact was measured.
 
-| Commit | Change | Screening evidence | Costs and remaining checks |
-| --- | --- | --- | --- |
-| [19 — Linux LLVM PGO](https://github.com/colinhacks/node/commit/e22d4673456e6dd59f2e246e9b2abd0e38151d5c) | Adds opt-in Clang profile generation/use with explicit profile input, without requiring LTO. | Earlier balanced-recipe binary: CJS 1.0849×, ESM 1.0836×, eval 1.0839×, worker 1.1077×. | Training and extra builds are required. The older build emitted profile-CFG mismatch warnings; those timings are observations, not a provenance-clean PGO result. Exact-source retraining, the full throughput matrix and a pristine PGO control remain pending. |
-| [20 — Script-based source positions](https://github.com/colinhacks/node/commit/99d932a15875728562a62d65a2c0499af0d3953b) | Enumerates published scripts and their function lists instead of scanning every heap object when collecting detailed source positions. Retains eligible functions strongly and deduplicates LiveEdit entries. | CJS 1.0277×, ESM 1.0266×, eval 1.0172×, worker 1.0205×. | Must cover streaming, code cache, snapshots and retained old LiveEdit functions. Four focused cases pass with both original and replacement collectors; a deliberate no-op collector fails the three earlier cases. Adds a bundled-static private V8 test target. |
-| [21 — Dictionary rehash scratch](https://github.com/colinhacks/node/commit/7efdf3f40841ab7b6ff8dcad2fc8f9ce7c8d42d6) | Copies and reinserts complete snapshot dictionary entries for capacities 32–2048, avoiding repeated in-place displacement. Other capacities retain the original algorithm. | CJS 1.0167×, ESM 1.0138×, eval 1.0254×, worker 1.0216×. Together with commit 20: about 1.039–1.044×. | Up to 64 KiB dynamic scratch plus 1 KiB inline on 64-bit builds. Tests cover counts, holes, values, property metadata and boundaries. The combined decoder screen was about 1% slower; full throughput assessment remains pending. Test integration depends on commit 20. |
-| [22 — Deserializer reservation](https://github.com/colinhacks/node/commit/e0ecad7bc3c17754a8f1f522fb089e686e00ad33) | Estimates initial back-reference vector capacity from snapshot payload size, bounded to 2048–32768 entries. Does not alter the snapshot format. | Roughly 0.5–1% startup improvement, with the eval confidence interval including no change in the latest screen. | Extra transient native allocation. The 50-round worker RSS screen measured +0.647%, 95% interval +0.439–0.837%. Full combined throughput and memory checks remain pending. |
+## Full measurements
 
-## Compatibility evidence
+The [generated tables](linux-renewed/final-v1/TABLES.md) contain all six variants, all workloads and 95% bootstrap intervals. The [machine-readable results](linux-renewed/final-v1/RESULTS.json) retain source-report hashes and raw-sample validation.
 
-The normal, non-PGO combined-source Linux x64 binary passed:
+- Startup: 12 workloads, 350 paired rounds and 10 warmups; 25,920 process launches.
+- Throughput: 14 official Node benchmark configurations, 30 paired rounds and three warmups; 2,772 launches.
+- References: all six variants, Node 26.7.0 and Bun 1.3.14; four common workloads, 200 rounds and 10 warmups.
+- First JavaScript: 350 rounds of CJS, ESM and eval, plus a same-binary control and a deliberate 25 ms busy-wait control. Selected full-recipe speedups were 1.5587×, 1.5457× and 1.5449× versus pristine normal. These timestamped fixtures are separate from canonical empty scripts.
+- Peak RSS: GNU time, four workloads, 50 rounds and a same-binary control; 1,400 launches.
 
-- 238 native C++ tests, zero failures or disabled tests.
-- A 6,144-case release-suite plan: 387 skips, 10 TODO annotations, zero unexpected failures.
-- Addon, Node-API, FFI, embedding and SQLite fixture builds, documentation build and the selected documentation tests.
+## Linux Bun comparison
 
-The [gate result](linux-renewed/source-gates-v1.json) records the exact commands and selection. The [artifact identity](linux-renewed/source-artifact-v1.json) pins the executable SHA-256. These are finite release-mode checks, not all upstream configurations or an ecosystem guarantee.
+This separate reference phase uses `-e ';'` with verified empty stdout. Bun's empty-string help path is not timed as JavaScript.
 
-The prior [fork CI run](https://github.com/colinhacks/node/actions/runs/34394590195) completed with all six Linux/macOS jobs green. Windows baseline and candidate passed native tests but failed the same four JavaScript tests: an inaccessible WindowsApps bash alias and three binary-addon loading cases. The shared failures remain disclosed; the run is not green. That run predates these four additions.
+| Workload | Pristine normal, ms | Selected fork, ms | Release Node, ms | Bun, ms |
+| --- | ---: | ---: | ---: | ---: |
+| Empty CJS | 22.619 | 14.808 | 21.617 | 11.092 |
+| Empty ESM | 23.009 | 15.235 | 22.185 | 11.057 |
+| No-op eval | 23.188 | 15.096 | 22.657 | 10.912 |
+| Hello | 27.231 | 18.135 | 26.061 | 10.925 |
 
-## Status
+Bun remains faster on these four Linux workloads. Release Node is a different revision/build, not the source-attribution control. These Linux results do not update the frozen macOS or Windows artifacts.
 
-Current-source cross-platform CI, complete combined timing/throughput measurements, the PGO control comparison and final retention decisions remain in progress. No upstream PR, merge or release has been made.
+## Regression assessment
+
+No selected ThinLTO PGO-versus-normal-pristine throughput interval was wholly below one in this selection. The selected build improved small SHA-256 by 33.4%, random bytes by 39.7%, HTTP parsing by 76.6%, URL parsing by 26.9%, file stat by 12.5% and Windows-1252 decoding by 3.7%; bulk SHA-256 was effectively unchanged.
+
+The baseline matters. Against separately trained pristine PGO, non-LTO fork PGO was slower in file read (0.9905×), file stat (0.9805×) and uncached modules (0.9879×), with intervals excluding one. These roughly 1–2% losses are retained and disclosed. The earlier combined-source decoder loss did not reproduce: its final source increment was 1.0081× [1.0048, 1.0108].
+
+Selected peak RSS medians were 46,158 KiB for CJS, 47,934 KiB for ESM, 46,608 KiB for eval and 59,080 KiB for a worker. Pristine-normal medians were 62,720, 63,554, 59,492 and 70,644 KiB. Transient dictionary and back-reference allocations still cost memory even though the final compiler recipe lowers measured peak RSS.
+
+These are finite workload measurements, not a universal no-regression guarantee. The [independent raw-data audit](linux-renewed/final-v1/audits/raw-review.json) recomputed key confidence intervals and checked sample coverage, artifact identity, positive controls and same-binary controls.
+
+## Compatibility
+
+Combined normal, combined PGO and combined ThinLTO PGO each passed the 6,144-case Linux release-suite plan: 387 skips, 10 TODO annotations and zero unexpected failures, plus 238 native C++ tests. Pristine PGO passed its 6,142-case plan with the same skip/TODO counts and zero unexpected failures, plus 226 native tests.
+
+Gates covered addon, Node-API, FFI, SQLite and embedding fixtures, documentation build and selected documentation tests. Artifact hashes remained unchanged. The [completed fork CI](CI.md) passed all six Linux/macOS jobs, while both Windows jobs failed the same four JavaScript tests; these local Linux passes do not make the whole fork CI green.
+
+## Evidence and reproduction
+
+- [Retention and rejection decisions](linux-renewed/final-v1/DECISIONS.md): measured value, costs and the closed investigated queue.
+- [22-patch source package](linux-renewed/final-v1/source-package/README.md): original 18 patch files unchanged; complete replay and 64 source-file identities verified.
+- [Package audit](linux-renewed/final-v1/audits/package-review.md): caught and rechecked the corrected series-file delimiter defect; subset application is not subset runtime validation.
+- [Reproduction guide](linux-renewed/final-v1/REPRODUCE.md) and [artifact manifest](linux-renewed/final-v1/ARTIFACTS.json): source bundles, profiles, configurations and actual executable identities.
+- [Final inventory](linux-renewed/final-v1/inventory-coverage.json): all 2,898 evidence files preserved, representing 12,609,624,953 uncompressed bytes across verified archives.
+- [Owned resource cleanup](linux-renewed/final-v1/cleanup.json): VM, auto-delete disk, firewall, subnet and network removed after retrieval; unrelated resources untouched.
+
+The host was Intel Ice Lake on GCE n2-standard-16, Ubuntu 24.04, Clang/LLD 20.1.8, Rust 1.89 and Python 3.12.3. Own builds and tests were idle during timing. Production source/build files match the public branch; newer test-only formatting and ICU dependency fixes were checked separately.

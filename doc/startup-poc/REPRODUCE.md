@@ -1,5 +1,7 @@
 # Native reproduction
 
+This guide reproduces the frozen 18-patch platform series. Use the [renewed Linux guide](linux-renewed/final-v1/REPRODUCE.md) for the current 22-patch source package and balanced PGO recipe.
+
 Build the same pinned source and toolchain for the control and fork. Keep the executables at separate immutable paths; the measurement scripts refuse an existing output directory and verify executable hashes before and after each run.
 
 ## Source reconstruction

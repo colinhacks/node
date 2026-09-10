@@ -1,0 +1,1198 @@
+{
+  "head": "f788616cf1515e30a8cce13513dbe8b30e567904",
+  "checks": {
+    "constants": {
+      "pass": true,
+      "observed": [
+        "8af75451e9041cd6058080ad3d4a65546797b418",
+        "3166f9876aa2586b4008f7c722ba406e8258d44a",
+        "f788616cf1515e30a8cce13513dbe8b30e567904",
+        "f788616cf1515e30a8cce13513dbe8b30e567904"
+      ]
+    },
+    "frozen_bytes": {
+      "pass": true,
+      "patches": [
+        {
+          "file": "01-build-darwin-thinlto-pgo.patch",
+          "original": "3757141678773e23a85c865c70e63e0bc1c43ba7eac0f0e3061a60c75e493f64",
+          "package": "3757141678773e23a85c865c70e63e0bc1c43ba7eac0f0e3061a60c75e493f64",
+          "manifest": "3757141678773e23a85c865c70e63e0bc1c43ba7eac0f0e3061a60c75e493f64"
+        },
+        {
+          "file": "02-build-darwin-private-symbols.patch",
+          "original": "12147c4bb8e7aa2895f601444522a7921f9b4ea3a62211b53fd7f0c448cde939",
+          "package": "12147c4bb8e7aa2895f601444522a7921f9b4ea3a62211b53fd7f0c448cde939",
+          "manifest": "12147c4bb8e7aa2895f601444522a7921f9b4ea3a62211b53fd7f0c448cde939"
+        },
+        {
+          "file": "03-deps-rapidhash-native128.patch",
+          "original": "bfa8e3cd4e8ab7dec6933dfb622bea18656678bf22c91c9933937a3a60d30ed3",
+          "package": "bfa8e3cd4e8ab7dec6933dfb622bea18656678bf22c91c9933937a3a60d30ed3",
+          "manifest": "bfa8e3cd4e8ab7dec6933dfb622bea18656678bf22c91c9933937a3a60d30ed3"
+        },
+        {
+          "file": "04-src-option-help-views.patch",
+          "original": "290355ca3e9abbf713fb4f33f427429f5325f541748e37563157839ecfc75182",
+          "package": "290355ca3e9abbf713fb4f33f427429f5325f541748e37563157839ecfc75182",
+          "manifest": "290355ca3e9abbf713fb4f33f427429f5325f541748e37563157839ecfc75182"
+        },
+        {
+          "file": "05-src-earlier-abseil-policy.patch",
+          "original": "205417225d66d2023ea832060b6f172d9128cd1eb324888d4b5b0a94f1e7799f",
+          "package": "205417225d66d2023ea832060b6f172d9128cd1eb324888d4b5b0a94f1e7799f",
+          "manifest": "205417225d66d2023ea832060b6f172d9128cd1eb324888d4b5b0a94f1e7799f"
+        },
+        {
+          "file": "06-deps-v8-fixed-raw-dispatch.patch",
+          "original": "07986e064170d67a3257ee61cb2764a81f52a582311e92fcee1ba9409b369463",
+          "package": "07986e064170d67a3257ee61cb2764a81f52a582311e92fcee1ba9409b369463",
+          "manifest": "07986e064170d67a3257ee61cb2764a81f52a582311e92fcee1ba9409b369463"
+        },
+        {
+          "file": "07-deps-cctz-lazy-corefoundation.patch",
+          "original": "826693e594e95a86f038d492843160b4cf83342a5f7b4b6468a8a9a4ff555942",
+          "package": "826693e594e95a86f038d492843160b4cf83342a5f7b4b6468a8a9a4ff555942",
+          "manifest": "826693e594e95a86f038d492843160b4cf83342a5f7b4b6468a8a9a4ff555942"
+        },
+        {
+          "file": "08-crypto-lazy-darwin-frameworks.patch",
+          "original": "9b36d38ce193e7f611f6b5b4f1070d96c27aa9940ef69749218ce75956d41812",
+          "package": "9b36d38ce193e7f611f6b5b4f1070d96c27aa9940ef69749218ce75956d41812",
+          "manifest": "9b36d38ce193e7f611f6b5b4f1070d96c27aa9940ef69749218ce75956d41812"
+        },
+        {
+          "file": "09-build-private-bundled-icu.patch",
+          "original": "893d640881a7b260afec86fff4089aebf0d11f3540e1d2bb3eb4b428d9e6f49e",
+          "package": "893d640881a7b260afec86fff4089aebf0d11f3540e1d2bb3eb4b428d9e6f49e",
+          "manifest": "893d640881a7b260afec86fff4089aebf0d11f3540e1d2bb3eb4b428d9e6f49e"
+        },
+        {
+          "file": "10-lib-compact-encoding-tables.patch",
+          "original": "2cebdd5ceff066a3090369ebaf50d5f2652fbf05f08478bd1b0ec8b3886d8947",
+          "package": "2cebdd5ceff066a3090369ebaf50d5f2652fbf05f08478bd1b0ec8b3886d8947",
+          "manifest": "2cebdd5ceff066a3090369ebaf50d5f2652fbf05f08478bd1b0ec8b3886d8947"
+        },
+        {
+          "file": "11-crypto-darwin-exit-registration.patch",
+          "original": "7cf5152215b127deb712aa52f0ba00505319d2d273b061698ad9227b6dc19df8",
+          "package": "7cf5152215b127deb712aa52f0ba00505319d2d273b061698ad9227b6dc19df8",
+          "manifest": "7cf5152215b127deb712aa52f0ba00505319d2d273b061698ad9227b6dc19df8"
+        },
+        {
+          "file": "12-deps-rapidhash-small-factor-screen.patch",
+          "original": "f43f965bad950f75d9aa3ec058721bc2b4378d8c55bb2f56eb40fe5815f369d1",
+          "package": "f43f965bad950f75d9aa3ec058721bc2b4378d8c55bb2f56eb40fe5815f369d1",
+          "manifest": "f43f965bad950f75d9aa3ec058721bc2b4378d8c55bb2f56eb40fe5815f369d1"
+        },
+        {
+          "file": "13-deps-rapidhash-montgomery.patch",
+          "original": "310a9a10cc947539706d3a0fd523d820004f1b21b2381b202d21998c2b039d92",
+          "package": "310a9a10cc947539706d3a0fd523d820004f1b21b2381b202d21998c2b039d92",
+          "manifest": "310a9a10cc947539706d3a0fd523d820004f1b21b2381b202d21998c2b039d92"
+        },
+        {
+          "file": "14-build-darwin-trained-order.patch",
+          "original": "b8c63ce94ad9d7f1061951ddc3c3db322a414482d0beb03deea2325336bfe71f",
+          "package": "b8c63ce94ad9d7f1061951ddc3c3db322a414482d0beb03deea2325336bfe71f",
+          "manifest": "b8c63ce94ad9d7f1061951ddc3c3db322a414482d0beb03deea2325336bfe71f"
+        },
+        {
+          "file": "15-build-bounded-whole-program-vtables.patch",
+          "original": "eedfccecdcdced202d6a98ce54b5b4c9a4af30d52c25984a0d9d08ee40e124d1",
+          "package": "eedfccecdcdced202d6a98ce54b5b4c9a4af30d52c25984a0d9d08ee40e124d1",
+          "manifest": "eedfccecdcdced202d6a98ce54b5b4c9a4af30d52c25984a0d9d08ee40e124d1"
+        },
+        {
+          "file": "16-src-os-startup-entropy.patch",
+          "original": "ce97626879ad9bdb17f9ecd4b36e053988b15a5ed05dacebd513397f4480643a",
+          "package": "ce97626879ad9bdb17f9ecd4b36e053988b15a5ed05dacebd513397f4480643a",
+          "manifest": "ce97626879ad9bdb17f9ecd4b36e053988b15a5ed05dacebd513397f4480643a"
+        },
+        {
+          "file": "17-build-windows-addon-lto-isolation.patch",
+          "original": "df507fe5e2b7df1bbce5cf406fdb0019126d1c6f51f5e3212e3a53f84410fb6f",
+          "package": "df507fe5e2b7df1bbce5cf406fdb0019126d1c6f51f5e3212e3a53f84410fb6f",
+          "manifest": "df507fe5e2b7df1bbce5cf406fdb0019126d1c6f51f5e3212e3a53f84410fb6f"
+        },
+        {
+          "file": "18-build-linux-clang-thinlto.patch",
+          "original": "eb5d1e0448222f41e8c74a8e8d82e9ec96b88ba97fa74674a5b475b71552e3b6",
+          "package": "eb5d1e0448222f41e8c74a8e8d82e9ec96b88ba97fa74674a5b475b71552e3b6",
+          "manifest": "eb5d1e0448222f41e8c74a8e8d82e9ec96b88ba97fa74674a5b475b71552e3b6"
+        }
+      ]
+    },
+    "series": {
+      "pass": false,
+      "expected": [
+        "01-build-darwin-thinlto-pgo.patch",
+        "02-build-darwin-private-symbols.patch",
+        "03-deps-rapidhash-native128.patch",
+        "04-src-option-help-views.patch",
+        "05-src-earlier-abseil-policy.patch",
+        "06-deps-v8-fixed-raw-dispatch.patch",
+        "07-deps-cctz-lazy-corefoundation.patch",
+        "08-crypto-lazy-darwin-frameworks.patch",
+        "09-build-private-bundled-icu.patch",
+        "10-lib-compact-encoding-tables.patch",
+        "11-crypto-darwin-exit-registration.patch",
+        "12-deps-rapidhash-small-factor-screen.patch",
+        "13-deps-rapidhash-montgomery.patch",
+        "14-build-darwin-trained-order.patch",
+        "15-build-bounded-whole-program-vtables.patch",
+        "16-src-os-startup-entropy.patch",
+        "17-build-windows-addon-lto-isolation.patch",
+        "18-build-linux-clang-thinlto.patch",
+        "19-build-linux-llvm-pgo.patch",
+        "20-v8-collect-source-positions.patch",
+        "21-v8-bound-dictionary-rehash.patch",
+        "22-v8-size-deserializer-backrefs.patch"
+      ],
+      "observed_repr": "'01-build-darwin-thinlto-pgo.patch\\\\n02-build-darwin-private-symbols.patch\\\\n03-deps-rapidhash-native128.patch\\\\n04-src-option-help-views.patch\\\\n05-src-earlier-abseil-policy.patch\\\\n06-deps-v8-fixed-raw-dispatch.patch\\\\n07-deps-cctz-lazy-corefoundation.patch\\\\n08-crypto-lazy-darwin-frameworks.patch\\\\n09-build-private-bundled-icu.patch\\\\n10-lib-compact-encoding-tables.patch\\\\n11-crypto-darwin-exit-registration.patch\\\\n12-deps-rapidhash-small-factor-screen.patch\\\\n13-deps-rapidhash-montgomery.patch\\\\n14-build-darwin-trained-order.patch\\\\n15-build-bounded-whole-program-vtables.patch\\\\n16-src-os-startup-entropy.patch\\\\n17-build-windows-addon-lto-isolation.patch\\\\n18-build-linux-clang-thinlto.patch\\\\n19-build-linux-llvm-pgo.patch\\\\n20-v8-collect-source-positions.patch\\\\n21-v8-bound-dictionary-rehash.patch\\\\n22-v8-size-deserializer-backrefs.patch\\\\n'"
+    },
+    "full_replay": {
+      "pass": true,
+      "tree": "9526a6758f0d6a11b779afc556a7eb0a86da84f9",
+      "error": ""
+    },
+    "frozen_replay": {
+      "pass": true,
+      "tree": "3166f9876aa2586b4008f7c722ba406e8258d44a",
+      "error": ""
+    },
+    "transitions": {
+      "pass": true,
+      "observed": [
+        {
+          "file": "01-build-darwin-thinlto-pgo.patch",
+          "from": "2c347a0a1c243e0157f4cd918c5213215b406488",
+          "to": "1e0a2a550b5a3ed5e3960a84dac7b3a60ce227a4"
+        },
+        {
+          "file": "02-build-darwin-private-symbols.patch",
+          "from": "1e0a2a550b5a3ed5e3960a84dac7b3a60ce227a4",
+          "to": "e5ab6348aecbce33c0a91e3f154f5d0a841a4122"
+        },
+        {
+          "file": "03-deps-rapidhash-native128.patch",
+          "from": "e5ab6348aecbce33c0a91e3f154f5d0a841a4122",
+          "to": "e228b384af55bed1ba5cc78f755e5e0f3be779e5"
+        },
+        {
+          "file": "04-src-option-help-views.patch",
+          "from": "e228b384af55bed1ba5cc78f755e5e0f3be779e5",
+          "to": "f6c7a08a05323ee90f5355719468e295f37d75cf"
+        },
+        {
+          "file": "05-src-earlier-abseil-policy.patch",
+          "from": "f6c7a08a05323ee90f5355719468e295f37d75cf",
+          "to": "7c42bdc14caa2f0d2e24d572523e502146610f11"
+        },
+        {
+          "file": "06-deps-v8-fixed-raw-dispatch.patch",
+          "from": "7c42bdc14caa2f0d2e24d572523e502146610f11",
+          "to": "4108909f40432d9b982a338670bfa7246b33d575"
+        },
+        {
+          "file": "07-deps-cctz-lazy-corefoundation.patch",
+          "from": "4108909f40432d9b982a338670bfa7246b33d575",
+          "to": "614f76ffc1c51e7047b5dfeec044491abe064ea6"
+        },
+        {
+          "file": "08-crypto-lazy-darwin-frameworks.patch",
+          "from": "614f76ffc1c51e7047b5dfeec044491abe064ea6",
+          "to": "b82772654192855bfbec0f42b40fa875e0782327"
+        },
+        {
+          "file": "09-build-private-bundled-icu.patch",
+          "from": "b82772654192855bfbec0f42b40fa875e0782327",
+          "to": "e5d0fce0cc41ead7e73bf0804b26336be74fdf0e"
+        },
+        {
+          "file": "10-lib-compact-encoding-tables.patch",
+          "from": "e5d0fce0cc41ead7e73bf0804b26336be74fdf0e",
+          "to": "70ef3c415cb768851b0f2dc799146017f1fd4339"
+        },
+        {
+          "file": "11-crypto-darwin-exit-registration.patch",
+          "from": "70ef3c415cb768851b0f2dc799146017f1fd4339",
+          "to": "56e86a0804f7808cf8e28f3ce649043612c918a7"
+        },
+        {
+          "file": "12-deps-rapidhash-small-factor-screen.patch",
+          "from": "56e86a0804f7808cf8e28f3ce649043612c918a7",
+          "to": "18a261d8f6e037eb2696fdc966241a687a675319"
+        },
+        {
+          "file": "13-deps-rapidhash-montgomery.patch",
+          "from": "18a261d8f6e037eb2696fdc966241a687a675319",
+          "to": "afd1ba169e821ef5237d13ee1a0318f4e2298058"
+        },
+        {
+          "file": "14-build-darwin-trained-order.patch",
+          "from": "afd1ba169e821ef5237d13ee1a0318f4e2298058",
+          "to": "64d1338f925bea24df17ad2683bb2bb27cecae0a"
+        },
+        {
+          "file": "15-build-bounded-whole-program-vtables.patch",
+          "from": "64d1338f925bea24df17ad2683bb2bb27cecae0a",
+          "to": "3caaff2173e0fde07da451409d5979ed17a62dbb"
+        },
+        {
+          "file": "16-src-os-startup-entropy.patch",
+          "from": "3caaff2173e0fde07da451409d5979ed17a62dbb",
+          "to": "e0767e171553b030c1e75786b19ceb2eca2c2090"
+        },
+        {
+          "file": "17-build-windows-addon-lto-isolation.patch",
+          "from": "e0767e171553b030c1e75786b19ceb2eca2c2090",
+          "to": "b9bb28e698b750d06a834968325f4084a14cdf07"
+        },
+        {
+          "file": "18-build-linux-clang-thinlto.patch",
+          "from": "b9bb28e698b750d06a834968325f4084a14cdf07",
+          "to": "3166f9876aa2586b4008f7c722ba406e8258d44a"
+        },
+        {
+          "file": "19-build-linux-llvm-pgo.patch",
+          "from": "3166f9876aa2586b4008f7c722ba406e8258d44a",
+          "to": "608bd7b2a874057b9f70422f99f3b0b8c6198c19"
+        },
+        {
+          "file": "20-v8-collect-source-positions.patch",
+          "from": "608bd7b2a874057b9f70422f99f3b0b8c6198c19",
+          "to": "3735480a349f6016bbb36cfa37f7a3e3afc5f37a"
+        },
+        {
+          "file": "21-v8-bound-dictionary-rehash.patch",
+          "from": "3735480a349f6016bbb36cfa37f7a3e3afc5f37a",
+          "to": "3f290b987e91daf84d656e6bbcd13af9ed2fbd46"
+        },
+        {
+          "file": "22-v8-size-deserializer-backrefs.patch",
+          "from": "3f290b987e91daf84d656e6bbcd13af9ed2fbd46",
+          "to": "9526a6758f0d6a11b779afc556a7eb0a86da84f9"
+        }
+      ]
+    },
+    "source_mapping": {
+      "pass": true,
+      "changed_count": 64,
+      "manifest_count": 64,
+      "files": [
+        {
+          "path": "common.gypi",
+          "sha256": "6e950ddfd1a01ca45d77d3d59d6de49c29d516cd0442431831bb893dacf6dae8",
+          "public_matches": true
+        },
+        {
+          "path": "configure.py",
+          "sha256": "3002026b160cbe6648d9aab1268167af2b69e34e6f8af6db9afe31cb94941841",
+          "public_matches": true
+        },
+        {
+          "path": "deps/ada/ada.gyp",
+          "sha256": "e4e56dd1ff783ebb76fa4e75c40e4dcd0f4f6e134d0f5af6c4cc9600e1a34f46",
+          "public_matches": true
+        },
+        {
+          "path": "deps/openssl/openssl/crypto/init.c",
+          "sha256": "9c5666dee6e138d2c59f869d287f07b23e8aeaad6ed0a49a19145aee0589b3ed",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/cppgc/custom-space.h",
+          "sha256": "66288e6532c1e7bd57c522156c938e1b435463700be6dcb6e8873564573f638a",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/cppgc/garbage-collected.h",
+          "sha256": "08a6a1d8578d4c8192ab44f84fd80c0ff8ef5211f14e108268c6c7ebae89167e",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/cppgc/heap.h",
+          "sha256": "a83918e007d85a42b5eb5ea28d9d7552f83ff9fde82a8431e31764b9e2dc6011",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/cppgc/name-provider.h",
+          "sha256": "f5b4adb585959c11597ed38cd650aa8c1ead400091ba8f3c1742f0b89b7ff245",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/cppgc/platform.h",
+          "sha256": "4fee8fcf505d43d2cc1b8e51174a7f101ab2cdf965d104f8c04a83afed3d9791",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/cppgc/visitor.h",
+          "sha256": "51ae85a2f286c28a0a4be9600fa895ebd99c286b4fc3abf5acc08132b88f7813",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/libplatform/v8-tracing.h",
+          "sha256": "67183cca579c5b0ce688e3e79149def20a14ec8071c65b0bd081c1cb3a6ffc94",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-array-buffer.h",
+          "sha256": "aed0e7a6c8d08b491cc9c7c02392c8830d7e4bbd6c6ca9473c30980b88f5faa7",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-context.h",
+          "sha256": "61397446686966d59d6234ba171ac06a85276f5e86f35ff0f0fea911591b4845",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-cppgc.h",
+          "sha256": "423b42f69906a68ae752a0f23c9ee4b7c9f056ef9e586570a6e9ba3c2824e656",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-embedder-heap.h",
+          "sha256": "fe5edda29dda9c26c3da4f72d1300d41ac67ce07b1907d9d61de47aa895eb88e",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-extension.h",
+          "sha256": "6a124de5374e8c0e26a38e6bb406f6c4ee3bd516a1e8e5da86111c315dc30e26",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-inspector.h",
+          "sha256": "f007c39917c967f24dfeba5054f67c9eae4786f5c5ef7e9c4703abbf123caaa2",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-metrics.h",
+          "sha256": "c2d91779f393602a4fbc19720a345193979bcfe0ef62dabe20bbaf6d7e95debe",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-microtask-queue.h",
+          "sha256": "90c5b1acacab7029d5fb806c7dedc2fe17c479458b97c1980fc059dd74db2f59",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-object.h",
+          "sha256": "5faa2eae6ac25615d33ef72563c5f1c3520242706589338748e958c449235712",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-persistent-handle.h",
+          "sha256": "dcbdbec12a985bd8cb4213ec6521865e4e5b198cc0f76f8106aef3ddf074c0b5",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-platform.h",
+          "sha256": "ce4145d6009ad0fc968ed50f865b3d2d0131d2a4679a87907272f165d1418dbb",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-primitive.h",
+          "sha256": "b0bf38dda7d695aa86f5a66fbc923bc456e3885afe43ddac70efa5b4c6292cad",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-profiler.h",
+          "sha256": "4947dfae798a10326941967a9493dd0cbb27f6f6a2f83a0daee070edea9799ed",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-script.h",
+          "sha256": "cf5c554d2c77f6c9496ef2e8e1693faaee814244ee241836af8b7c1b4ab73bbc",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-statistics.h",
+          "sha256": "d19004841feb312c1aa53d7101bbd7c1dc6806f63150dc283d7451ddd1328260",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-value-serializer.h",
+          "sha256": "5e046c1ab76a22a32f5acd944d6a5eb27ce73e439c171147a00fb4ff4befecf2",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8-wasm.h",
+          "sha256": "8eda557d23535d82f75fb67edfa0a538945cfd7fa177252d5383c3fd90dbd447",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/include/v8config.h",
+          "sha256": "d44e603e12c2e97ad4bbd70fb74411b03c74dcbf5cef622616d4a753355a1e58",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/src/execution/isolate.cc",
+          "sha256": "c567bf6ff6bd2444932aafa860d23e6be3c41739b9411bc774348447afdeb95e",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/src/objects/hash-table.h",
+          "sha256": "e9606f6dbfb43958b6f655ef9faa26cedd70914567d7ccbb3ed0b7cf9c5b8bc7",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/src/objects/objects.cc",
+          "sha256": "86f7d6ec92c1bed0f96f124bd0959539b4f6f1ef28411a9589b8dd129e689a84",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/src/snapshot/deserializer.cc",
+          "sha256": "799d785dd37f0313789775f1f95c237cc64b7b76dc258c59856505acf6ff7aa3",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/src/snapshot/deserializer.h",
+          "sha256": "02f47227eccab913b83b6b1824f8a62cfe32e64ea57ba0dcf62adc9f859485d3",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/third_party/abseil-cpp/absl/time/internal/cctz/src/time_zone_lookup.cc",
+          "sha256": "1d9d54c95b2bafa21ca022402ddc544c9064243a4c9d5164da9aae44ebcec248",
+          "public_matches": true
+        },
+        {
+          "path": "deps/v8/third_party/rapidhash-v8/secret.h",
+          "sha256": "3bfefb85a4d7c89675cb8f96eca96a4ed0f7b49be442fa1cbcd4b35da40299a7",
+          "public_matches": true
+        },
+        {
+          "path": "lib/internal/encoding/single-byte.js",
+          "sha256": "23767cd444894064724496913e1ee9803b70e46f7c31242d2570531b05afeb16",
+          "public_matches": true
+        },
+        {
+          "path": "node.gyp",
+          "sha256": "d8aef54a322cd84bca4658d52135b7eb5555bacafeca72ea3136bdcd99ec3d4c",
+          "public_matches": true
+        },
+        {
+          "path": "node.gypi",
+          "sha256": "fae2a92b9efb22d9c72f74b19476706efc9828fb2f034d9a710cf63585211d14",
+          "public_matches": true
+        },
+        {
+          "path": "src/crypto/crypto_context.cc",
+          "sha256": "cfcaf08670b10e4162ff8df1b8c6d25f9a90604bbf130506492a08704b8aaa81",
+          "public_matches": true
+        },
+        {
+          "path": "src/node.cc",
+          "sha256": "8e5de504ba4f6709384014bf68192e4e153cb42a36b72b2ef1b8b144bb40d36a",
+          "public_matches": true
+        },
+        {
+          "path": "src/node.h",
+          "sha256": "0e8e79bc565ccb0b027546316ccbe8557668f23a790fa35f2c787a24929ff10d",
+          "public_matches": true
+        },
+        {
+          "path": "src/node_darwin_frameworks.cc",
+          "sha256": "7baba99a77b292e8597aded59c1d4f2ed02020eba8a10a764adbd2ab4f062aff",
+          "public_matches": true
+        },
+        {
+          "path": "src/node_darwin_frameworks.h",
+          "sha256": "97274071576c6af6a2c1ef1451cc45421705752a10bb74cb9630cd96f7312414",
+          "public_matches": true
+        },
+        {
+          "path": "src/node_object_wrap.h",
+          "sha256": "6cfd4fb660da1150e16a9f7b23a7302b061683255fac86bc35ac709e95852442",
+          "public_matches": true
+        },
+        {
+          "path": "src/node_options.cc",
+          "sha256": "d0eff43e957a5e2741a31c8d2be9f1bc908803f7153a70225bda99fd451f15e7",
+          "public_matches": true
+        },
+        {
+          "path": "src/node_options.h",
+          "sha256": "abfd71b821ae7039dbb4c9a258147ba435831e74cbbb1278f1a65233e27e55dd",
+          "public_matches": true
+        },
+        {
+          "path": "src/node_postmortem_metadata.cc",
+          "sha256": "16a3d36088c7e335d83067ff6d0972b7addcb627af2845ff8eb8b92463c973c5",
+          "public_matches": true
+        },
+        {
+          "path": "src/node_sea_bin.cc",
+          "sha256": "8fdefcbe92f4cb770fd7bad6272a008ad73c60d8a7f8d67d7afe2ee157082c57",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_hash_montgomery.cc",
+          "sha256": "5b40e5156e6afcdc92b33ad3c4a44516c3aa3c8c89af70f7e0f860630e1435c2",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_hash_secret.cc",
+          "sha256": "5350efbceb52af51acb9f2cc96592dcf86cc40a9c64cae4c4118ca8475c970ca",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_hash_small_factors.cc",
+          "sha256": "f8820131dc963de39ade49207d8ea8f7aa5e4bbb0f3160bf35b2c94cd6d5c2fd",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_postmortem_exports.cc",
+          "sha256": "13d8b0db19b3f453719e4206fb8d84e4096afb38ed6499e8a6fd53ac912ae2df",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_snapshot_dictionary_rehash.cc",
+          "sha256": "4c57f42c05fafb980d4b03f4b519b9367cb3777128567739288a0421c77af1fa",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_source_position_collection.cc",
+          "sha256": "94fc89808e78b3b16e4e63d4e6df60e9f2f7470ad885f4e0edc78e8731716c87",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_source_positions_advanced.cc",
+          "sha256": "f56e4dc2428793b773c3471badc485fe2d407ebb62c25c8af14c6c653cee9bc1",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/test_v8_private_startup_cases.cc",
+          "sha256": "36642255e8be91988730677fb346a75c6d2b3ea6b669bf2923e3db1b9b00bbb9",
+          "public_matches": true
+        },
+        {
+          "path": "test/cctest/v8_private_startup_test_fixture.h",
+          "sha256": "0062c31cea6ca6f7278505e4e6fc64aff918e1d4153d7cfc4bc3dbf6c3df3002",
+          "public_matches": true
+        },
+        {
+          "path": "test/fixtures/openssl3-conf/random_unavailable.cnf",
+          "sha256": "fab0a7bd3c67bd9e68de9b4e2322506a98dc322e7d2b6ea7e15e6794289a1385",
+          "public_matches": true
+        },
+        {
+          "path": "test/parallel/test-crypto-startup-entropy.js",
+          "sha256": "85b7f9d84789b56907b95d449ab529bf8a9d31bd266dbfcf115bb7f4841105a2",
+          "public_matches": true
+        },
+        {
+          "path": "test/parallel/test-options-help-storage.js",
+          "sha256": "2caa20771059bcc8f2c38695c414e8a353eac17f8f823e88a80c65b92c9d065f",
+          "public_matches": true
+        },
+        {
+          "path": "tools/icu/icu-generic.gyp",
+          "sha256": "17f6f42443a5dc09f6a6c7a28aeea0a51a84ada3f44734a97036e016e098e5ca",
+          "public_matches": true
+        },
+        {
+          "path": "tools/v8_gypfiles/abseil.gyp",
+          "sha256": "e04d467d83d51d0e24f06a21442d1df972891ed34eb98046f670a0375dd6d95d",
+          "public_matches": true
+        },
+        {
+          "path": "tools/v8_gypfiles/node_startup_cctest.gyp",
+          "sha256": "d044192b96356e47ee83ad2cb3a6731d7afb7d04c04adf1555b68e1da471297f",
+          "public_matches": true
+        }
+      ],
+      "non_source_head_differences": [],
+      "all_head_differences": [
+        ".github/workflows/fork-startup-ci.yml",
+        "doc/startup-poc/BUN-COMPARISON.json",
+        "doc/startup-poc/BUN-COMPARISON.md",
+        "doc/startup-poc/COMMITS.md",
+        "doc/startup-poc/LINUX-PGO-DIAGNOSIS.md",
+        "doc/startup-poc/LINUX-RENEWED.md",
+        "doc/startup-poc/LINUX-SOURCE.md",
+        "doc/startup-poc/LINUX.md",
+        "doc/startup-poc/MACOS-ENTROPY.md",
+        "doc/startup-poc/PATCHES.md",
+        "doc/startup-poc/PUBLIC-BUNDLE-MANIFEST.json",
+        "doc/startup-poc/README.md",
+        "doc/startup-poc/REJECTED-LINUX-PGO.md",
+        "doc/startup-poc/REPRODUCE.md",
+        "doc/startup-poc/WINDOWS.md",
+        "doc/startup-poc/entropy-validation-v1/linux/fips-manifest.json.gz",
+        "doc/startup-poc/entropy-validation-v1/linux/fork-probe.json.gz",
+        "doc/startup-poc/entropy-validation-v1/linux/pristine-probe.json.gz",
+        "doc/startup-poc/entropy-validation-v1/macos/probe.json.gz",
+        "doc/startup-poc/entropy-validation-v1/manifest.json",
+        "doc/startup-poc/entropy-validation-v1/windows/build-manifest.json.gz",
+        "doc/startup-poc/entropy-validation-v1/windows/control-abort.log.gz",
+        "doc/startup-poc/entropy-validation-v1/windows/focused-tests.log.gz",
+        "doc/startup-poc/entropy-validation-v1/windows/recovery-manifest.json.gz",
+        "doc/startup-poc/entropy-validation-v1/windows/runtime-smoke.log.gz",
+        "doc/startup-poc/linux-final-v1/evidence/first-js/files/first.cjs.gz",
+        "doc/startup-poc/linux-final-v1/evidence/first-js/files/first.mjs.gz",
+        "doc/startup-poc/linux-final-v1/evidence/first-js/raw.jsonl.gz",
+        "doc/startup-poc/linux-final-v1/evidence/first-js/summary.json.gz",
+        "doc/startup-poc/linux-final-v1/evidence/identity-control/files/identity-control.json.gz",
+        "doc/startup-poc/linux-final-v1/evidence/identity-control/raw.jsonl.gz",
+        "doc/startup-poc/linux-final-v1/evidence/identity-control/report.json.gz",
+        "doc/startup-poc/linux-final-v1/evidence/release-references/raw.jsonl.gz",
+        "doc/startup-poc/linux-final-v1/evidence/release-references/report.json.gz",
+        "doc/startup-poc/linux-final-v1/evidence/startup/files/startup.json.gz",
+        "doc/startup-poc/linux-final-v1/evidence/startup/raw.jsonl.gz",
+        "doc/startup-poc/linux-final-v1/evidence/startup/report.json.gz",
+        "doc/startup-poc/linux-final-v1/evidence/throughput/files/throughput.json.gz",
+        "doc/startup-poc/linux-final-v1/evidence/throughput/raw.jsonl.gz",
+        "doc/startup-poc/linux-final-v1/evidence/throughput/report.json.gz",
+        "doc/startup-poc/linux-final-v1/manifest.json",
+        "doc/startup-poc/linux-optimized-rejected/evidence/first-js/files/first.cjs.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/first-js/files/first.mjs.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/first-js/raw.jsonl.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/first-js/summary.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/identity-control/files/identity-control.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/identity-control/raw.jsonl.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/identity-control/report.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/release-references/raw.jsonl.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/release-references/report.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/startup/files/startup.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/startup/raw.jsonl.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/startup/report.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/throughput/files/throughput.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/throughput/raw.jsonl.gz",
+        "doc/startup-poc/linux-optimized-rejected/evidence/throughput/report.json.gz",
+        "doc/startup-poc/linux-optimized-rejected/manifest.json",
+        "doc/startup-poc/linux-pgo-followup-v1/evidence/targeted-throughput/raw.jsonl.gz",
+        "doc/startup-poc/linux-pgo-followup-v1/evidence/targeted-throughput/report.json.gz",
+        "doc/startup-poc/linux-pgo-followup-v1/manifest.json",
+        "doc/startup-poc/linux-renewed/screen-scalars-v1.json",
+        "doc/startup-poc/linux-renewed/source-artifact-v1.json",
+        "doc/startup-poc/linux-renewed/source-gates-v1.json",
+        "doc/startup-poc/linux-source-v1/evidence/first-js/files/first.cjs.gz",
+        "doc/startup-poc/linux-source-v1/evidence/first-js/files/first.mjs.gz",
+        "doc/startup-poc/linux-source-v1/evidence/first-js/raw.jsonl.gz",
+        "doc/startup-poc/linux-source-v1/evidence/first-js/summary.json.gz",
+        "doc/startup-poc/linux-source-v1/evidence/identity-control/files/identity-control.json.gz",
+        "doc/startup-poc/linux-source-v1/evidence/identity-control/raw.jsonl.gz",
+        "doc/startup-poc/linux-source-v1/evidence/identity-control/report.json.gz",
+        "doc/startup-poc/linux-source-v1/evidence/release-references/raw.jsonl.gz",
+        "doc/startup-poc/linux-source-v1/evidence/release-references/report.json.gz",
+        "doc/startup-poc/linux-source-v1/evidence/startup/files/startup.json.gz",
+        "doc/startup-poc/linux-source-v1/evidence/startup/raw.jsonl.gz",
+        "doc/startup-poc/linux-source-v1/evidence/startup/report.json.gz",
+        "doc/startup-poc/linux-source-v1/evidence/throughput/files/throughput.json.gz",
+        "doc/startup-poc/linux-source-v1/evidence/throughput/raw.jsonl.gz",
+        "doc/startup-poc/linux-source-v1/evidence/throughput/report.json.gz",
+        "doc/startup-poc/linux-source-v1/manifest.json",
+        "doc/startup-poc/macos-entropy-v1/evidence/fs-read-interleaved-60/raw.jsonl.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/fs-read-interleaved-60/report.json.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/identity-100/raw.jsonl.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/identity-100/report.json.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/startup-350/raw.jsonl.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/startup-350/report.json.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/throughput-30/raw.jsonl.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/throughput-30/report.json.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/throughput-identity-30/raw.jsonl.gz",
+        "doc/startup-poc/macos-entropy-v1/evidence/throughput-identity-30/report.json.gz",
+        "doc/startup-poc/macos-entropy-v1/input-spec.json",
+        "doc/startup-poc/macos-entropy-v1/manifest.json",
+        "doc/startup-poc/macos-v1/MANIFEST.json",
+        "doc/startup-poc/macos-v1/PATCHES.md",
+        "doc/startup-poc/macos-v1/README.md",
+        "doc/startup-poc/macos-v1/REPRODUCE.md",
+        "doc/startup-poc/macos-v1/controls/pristine-pgo.patch",
+        "doc/startup-poc/macos-v1/evidence/atexit-ablation/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/atexit-ablation/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/curated-node-atexit-isolation/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/curated-node-atexit-isolation/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/current-overall-defensible-clean/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/current-overall-defensible-clean/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/deadlock-policy-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/deadlock-policy-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/deadstrip-confirmation/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/deadstrip-confirmation/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/encoding-compact-eager-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/encoding-compact-eager-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/final-config-scope.json",
+        "doc/startup-poc/macos-v1/evidence/hash-ablation/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/hash-ablation/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/hash-oracle.json",
+        "doc/startup-poc/macos-v1/evidence/icu-export-audit.json",
+        "doc/startup-poc/macos-v1/evidence/icu-no-wpd-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/icu-no-wpd-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/index.json",
+        "doc/startup-poc/macos-v1/evidence/lazy-frameworks-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/lazy-frameworks-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/local-gate.json",
+        "doc/startup-poc/macos-v1/evidence/montgomery-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/montgomery-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/option-help-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/option-help-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/pgo-use-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/pgo-use-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/private-deps-ablation/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/private-deps-ablation/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/small-factors-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/small-factors-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/snapshot-dispatch-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/snapshot-dispatch-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/temporal-layout-fork-all-repeat/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/temporal-layout-fork-all-repeat/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/thin-lto-confirm/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/thin-lto-confirm/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/whole-program-vtables-repeat/raw.jsonl.gz",
+        "doc/startup-poc/macos-v1/evidence/whole-program-vtables-repeat/report.json.gz",
+        "doc/startup-poc/macos-v1/evidence/wpd-build-policy.json",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/base.h",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/call.cc",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/control-run.txt",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/hidden-run.txt",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/main.cc",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/plugin.cc",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/public-run.txt",
+        "doc/startup-poc/macos-v1/evidence/wpd-control/result.json",
+        "doc/startup-poc/macos-v1/patches/01-build-darwin-thinlto-pgo.patch",
+        "doc/startup-poc/macos-v1/patches/02-build-darwin-private-symbols.patch",
+        "doc/startup-poc/macos-v1/patches/03-deps-rapidhash-native128.patch",
+        "doc/startup-poc/macos-v1/patches/04-src-option-help-views.patch",
+        "doc/startup-poc/macos-v1/patches/05-src-earlier-abseil-policy.patch",
+        "doc/startup-poc/macos-v1/patches/06-deps-v8-fixed-raw-dispatch.patch",
+        "doc/startup-poc/macos-v1/patches/07-deps-cctz-lazy-corefoundation.patch",
+        "doc/startup-poc/macos-v1/patches/08-crypto-lazy-darwin-frameworks.patch",
+        "doc/startup-poc/macos-v1/patches/09-build-private-bundled-icu.patch",
+        "doc/startup-poc/macos-v1/patches/10-lib-compact-encoding-tables.patch",
+        "doc/startup-poc/macos-v1/patches/11-crypto-darwin-exit-registration.patch",
+        "doc/startup-poc/macos-v1/patches/12-deps-rapidhash-small-factor-screen.patch",
+        "doc/startup-poc/macos-v1/patches/13-deps-rapidhash-montgomery.patch",
+        "doc/startup-poc/macos-v1/patches/14-build-darwin-trained-order.patch",
+        "doc/startup-poc/macos-v1/patches/15-build-bounded-whole-program-vtables.patch",
+        "doc/startup-poc/macos-v1/patches/manifest.json",
+        "doc/startup-poc/macos-v1/patches/series",
+        "doc/startup-poc/macos-v1/tools/clean_env.py",
+        "doc/startup-poc/macos-v1/tools/fixtures/builtins.cjs",
+        "doc/startup-poc/macos-v1/tools/fixtures/crypto-first-use.cjs",
+        "doc/startup-poc/macos-v1/tools/fixtures/empty.cjs",
+        "doc/startup-poc/macos-v1/tools/fixtures/empty.mjs",
+        "doc/startup-poc/macos-v1/tools/fixtures/hello.cjs",
+        "doc/startup-poc/macos-v1/tools/fixtures/http-ready.cjs",
+        "doc/startup-poc/macos-v1/tools/fixtures/ready.cjs",
+        "doc/startup-poc/macos-v1/tools/fixtures/worker.cjs",
+        "doc/startup-poc/macos-v1/tools/pgo_train.py",
+        "doc/startup-poc/macos-v1/tools/record_build.py",
+        "doc/startup-poc/macos-v1/tools/startup_lab.py",
+        "doc/startup-poc/macos-v1/tools/startup_order.py",
+        "doc/startup-poc/macos-v1/tools/temporal_order.py",
+        "doc/startup-poc/macos-v1/tools/tests/mock_child_pipe.py",
+        "doc/startup-poc/macos-v1/tools/tests/mock_invalid_marker.py",
+        "doc/startup-poc/macos-v1/tools/tests/mock_large_stdout.py",
+        "doc/startup-poc/macos-v1/tools/tests/mock_missing_marker.py",
+        "doc/startup-poc/macos-v1/tools/tests/mock_orphan_pipe.py",
+        "doc/startup-poc/macos-v1/tools/tests/mock_runtime.py",
+        "doc/startup-poc/macos-v1/tools/tests/test_pgo_train.py",
+        "doc/startup-poc/macos-v1/tools/tests/test_public_evidence.py",
+        "doc/startup-poc/macos-v1/tools/tests/test_startup_lab.py",
+        "doc/startup-poc/macos-v1/tools/tests/test_startup_order.py",
+        "doc/startup-poc/macos-v1/tools/tests/test_temporal_order.py",
+        "doc/startup-poc/macos-v1/tools/verify_evidence.py",
+        "doc/startup-poc/patches/01-build-darwin-thinlto-pgo.patch",
+        "doc/startup-poc/patches/02-build-darwin-private-symbols.patch",
+        "doc/startup-poc/patches/03-deps-rapidhash-native128.patch",
+        "doc/startup-poc/patches/04-src-option-help-views.patch",
+        "doc/startup-poc/patches/05-src-earlier-abseil-policy.patch",
+        "doc/startup-poc/patches/06-deps-v8-fixed-raw-dispatch.patch",
+        "doc/startup-poc/patches/07-deps-cctz-lazy-corefoundation.patch",
+        "doc/startup-poc/patches/08-crypto-lazy-darwin-frameworks.patch",
+        "doc/startup-poc/patches/09-build-private-bundled-icu.patch",
+        "doc/startup-poc/patches/10-lib-compact-encoding-tables.patch",
+        "doc/startup-poc/patches/11-crypto-darwin-exit-registration.patch",
+        "doc/startup-poc/patches/12-deps-rapidhash-small-factor-screen.patch",
+        "doc/startup-poc/patches/13-deps-rapidhash-montgomery.patch",
+        "doc/startup-poc/patches/14-build-darwin-trained-order.patch",
+        "doc/startup-poc/patches/15-build-bounded-whole-program-vtables.patch",
+        "doc/startup-poc/patches/16-src-os-startup-entropy.patch",
+        "doc/startup-poc/patches/17-build-windows-addon-lto-isolation.patch",
+        "doc/startup-poc/patches/18-build-linux-clang-thinlto.patch",
+        "doc/startup-poc/patches/combined.patch",
+        "doc/startup-poc/patches/manifest.json",
+        "doc/startup-poc/patches/series",
+        "doc/startup-poc/tools/entropy/configs/base-only.cnf",
+        "doc/startup-poc/tools/entropy/configs/random-unavailable.cnf",
+        "doc/startup-poc/tools/entropy/entropy-workload.cjs",
+        "doc/startup-poc/tools/entropy/fips-provider.py",
+        "doc/startup-poc/tools/entropy/probe.py",
+        "doc/startup-poc/tools/linux/classify_exports.py",
+        "doc/startup-poc/tools/linux/old-addon-v8-defaults.cc",
+        "doc/startup-poc/tools/linux/pristine-thinlto.patch",
+        "doc/startup-poc/tools/linux/run-old-addon-v8-defaults.sh",
+        "doc/startup-poc/tools/native-evidence-spec.json",
+        "doc/startup-poc/tools/native/fetch-references.py",
+        "doc/startup-poc/tools/native/first-js/first_js.py",
+        "doc/startup-poc/tools/native/make-bench-configs.py",
+        "doc/startup-poc/tools/native/measure-final.py",
+        "doc/startup-poc/tools/native/measure-native.py",
+        "doc/startup-poc/tools/native/native-gates.py",
+        "doc/startup-poc/tools/native/paired_bench.py",
+        "doc/startup-poc/tools/native/paired_bench_darwin.py",
+        "doc/startup-poc/tools/verify_bundle.py",
+        "doc/startup-poc/tools/verify_native_evidence.py",
+        "doc/startup-poc/validation-linux-final-v1/build/flag-check.json.gz",
+        "doc/startup-poc/validation-linux-final-v1/build/manifest.json.gz",
+        "doc/startup-poc/validation-linux-final-v1/build/pristine-original-manifest.json.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/source-baseline-dynamic.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/source-baseline-exports.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/source-baseline-header.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/source-baseline-segments.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-baseline-dynamic.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-baseline-exports.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-baseline-header.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-baseline-segments.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-final-dynamic.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-final-exports.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-final-header.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/elf/thinlto-final-segments.txt.gz",
+        "doc/startup-poc/validation-linux-final-v1/final/artifact.json.gz",
+        "doc/startup-poc/validation-linux-final-v1/final/cctest.log.gz",
+        "doc/startup-poc/validation-linux-final-v1/final/config.gypi.gz",
+        "doc/startup-poc/validation-linux-final-v1/final/node-tests.log.gz",
+        "doc/startup-poc/validation-linux-final-v1/final/result.json.gz",
+        "doc/startup-poc/validation-linux-final-v1/manifest.json",
+        "doc/startup-poc/validation-linux-final-v1/pristine/artifact.json.gz",
+        "doc/startup-poc/validation-linux-final-v1/pristine/cctest.log.gz",
+        "doc/startup-poc/validation-linux-final-v1/pristine/config.gypi.gz",
+        "doc/startup-poc/validation-linux-final-v1/pristine/node-tests.log.gz",
+        "doc/startup-poc/validation-linux-final-v1/pristine/result.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-source-final-shell-gates-v1/node-tests.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-source-final-shell-gates-v1/result.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-source-shell-diagnosis-v1/baseline/matched-fixtures.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-source-shell-diagnosis-v1/baseline/mismatched-fixtures.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-source-shell-diagnosis-v1/candidate/matched-fixtures.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-source-shell-diagnosis-v1/candidate/mismatched-fixtures.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-source-shell-diagnosis-v1/result.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-addons-v1/final17.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-addons-v1/fixtures-after.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-addons-v1/fixtures-before.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-addons-v1/pristine.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-addons-v1/results.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-addons-v1/source-baseline.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-napi-v1/final17.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-napi-v1/fixtures-after.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-napi-v1/fixtures-before.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-napi-v1/pristine.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-napi-v1/results.json.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/linux-thinlto-old-napi-v1/source-baseline.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/manifest.json",
+        "doc/startup-poc/validation-linux-supplement-v1/old-addon-v8-defaults.log.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/out-old-addon-v8-defaults/relocations.txt.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/out-old-addon-v8-defaults/symbols.txt.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/source-shell-fork-config.gypi.gz",
+        "doc/startup-poc/validation-linux-supplement-v1/source-shell-pristine-config.gypi.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-baseline/artifact.json.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-baseline/cctest.log.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-baseline/config.gypi.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-baseline/node-tests.log.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-baseline/result.json.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-rejected/artifact.json.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-rejected/cctest.log.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-rejected/config.gypi.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-rejected/node-tests.log.gz",
+        "doc/startup-poc/validation-v1/linux-pgo-rejected/result.json.gz",
+        "doc/startup-poc/validation-v1/macos-entropy/cctest.log.gz",
+        "doc/startup-poc/validation-v1/macos-entropy/focused-crypto-provider-secureheap.log.gz",
+        "doc/startup-poc/validation-v1/macos-entropy/frozen-original-negative.log.gz",
+        "doc/startup-poc/validation-v1/macos-entropy/parallel-entropy.log.gz",
+        "doc/startup-poc/validation-v1/macos-entropy/validation-summary.json.gz",
+        "doc/startup-poc/validation-v1/manifest.json",
+        "doc/startup-poc/validation-v1/windows-baseline/artifact.json.gz",
+        "doc/startup-poc/validation-v1/windows-baseline/cctest.log.gz",
+        "doc/startup-poc/validation-v1/windows-baseline/config.gypi.gz",
+        "doc/startup-poc/validation-v1/windows-baseline/node-tests.log.gz",
+        "doc/startup-poc/validation-v1/windows-baseline/result.json.gz",
+        "doc/startup-poc/validation-v1/windows-final/artifact.json.gz",
+        "doc/startup-poc/validation-v1/windows-final/cctest.log.gz",
+        "doc/startup-poc/validation-v1/windows-final/config.gypi.gz",
+        "doc/startup-poc/validation-v1/windows-final/node-tests.log.gz",
+        "doc/startup-poc/validation-v1/windows-final/result.json.gz",
+        "doc/startup-poc/validation-v1/windows-followup/result.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/first-js/files/first.cjs.gz",
+        "doc/startup-poc/windows-final-v1/evidence/first-js/files/first.mjs.gz",
+        "doc/startup-poc/windows-final-v1/evidence/first-js/raw.jsonl.gz",
+        "doc/startup-poc/windows-final-v1/evidence/first-js/summary.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/identity-control/files/identity-control.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/identity-control/raw.jsonl.gz",
+        "doc/startup-poc/windows-final-v1/evidence/identity-control/report.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/release-references/raw.jsonl.gz",
+        "doc/startup-poc/windows-final-v1/evidence/release-references/report.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/startup/files/startup.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/startup/raw.jsonl.gz",
+        "doc/startup-poc/windows-final-v1/evidence/startup/report.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/throughput/files/throughput.json.gz",
+        "doc/startup-poc/windows-final-v1/evidence/throughput/raw.jsonl.gz",
+        "doc/startup-poc/windows-final-v1/evidence/throughput/report.json.gz",
+        "doc/startup-poc/windows-final-v1/manifest.json"
+      ]
+    },
+    "dependency_closures": {
+      "pass": true,
+      "patches": {
+        "19-build-linux-llvm-pgo.patch": {
+          "roots": [
+            1,
+            14,
+            15,
+            17,
+            18
+          ],
+          "base_feasible_closures": [
+            [
+              1
+            ],
+            [
+              1,
+              2,
+              9,
+              14,
+              15
+            ],
+            [
+              1,
+              2,
+              9,
+              14,
+              15,
+              17
+            ],
+            [
+              1,
+              2,
+              9,
+              14,
+              15,
+              17,
+              18
+            ],
+            [
+              1,
+              2,
+              14
+            ],
+            [
+              1,
+              2,
+              14,
+              17
+            ],
+            [
+              1,
+              2,
+              14,
+              17,
+              18
+            ],
+            [
+              1,
+              17
+            ],
+            [
+              1,
+              17,
+              18
+            ]
+          ],
+          "base_minimum_closures": [
+            [
+              1
+            ]
+          ],
+          "declared_base_closure": [
+            1
+          ],
+          "base_pass": true,
+          "after_frozen_minimum_subsets": [
+            []
+          ],
+          "declared_after_frozen_subset": [],
+          "after_frozen_pass": true
+        },
+        "20-v8-collect-source-positions.patch": {
+          "roots": [
+            1,
+            2,
+            3,
+            8,
+            14,
+            15,
+            18
+          ],
+          "base_feasible_closures": [
+            [
+              1,
+              2,
+              3,
+              8,
+              9,
+              14,
+              15
+            ],
+            [
+              1,
+              2,
+              3,
+              8,
+              9,
+              14,
+              15,
+              17,
+              18
+            ],
+            [
+              1,
+              2,
+              3,
+              9,
+              14,
+              15
+            ],
+            [
+              1,
+              2,
+              3,
+              9,
+              14,
+              15,
+              17,
+              18
+            ],
+            [
+              1,
+              2,
+              8,
+              9,
+              14,
+              15
+            ],
+            [
+              1,
+              2,
+              8,
+              9,
+              14,
+              15,
+              17,
+              18
+            ],
+            [
+              1,
+              2,
+              9,
+              14,
+              15
+            ],
+            [
+              1,
+              2,
+              9,
+              14,
+              15,
+              17,
+              18
+            ]
+          ],
+          "base_minimum_closures": [
+            [
+              1,
+              2,
+              9,
+              14,
+              15
+            ]
+          ],
+          "declared_base_closure": [
+            1,
+            2,
+            9,
+            14,
+            15
+          ],
+          "base_pass": true,
+          "after_frozen_minimum_subsets": [
+            []
+          ],
+          "declared_after_frozen_subset": [],
+          "after_frozen_pass": true
+        },
+        "21-v8-bound-dictionary-rehash.patch": {
+          "roots": [
+            1,
+            14,
+            15,
+            18
+          ],
+          "base_feasible_closures": [
+            [
+              1,
+              2,
+              9,
+              14,
+              15
+            ],
+            [
+              1,
+              2,
+              9,
+              14,
+              15,
+              17,
+              18
+            ]
+          ],
+          "base_minimum_closures": [
+            [
+              1,
+              2,
+              9,
+              14,
+              15
+            ]
+          ],
+          "declared_base_closure": [
+            1,
+            2,
+            9,
+            14,
+            15
+          ],
+          "base_pass": true,
+          "after_frozen_minimum_subsets": [
+            [
+              "20-v8-collect-source-positions.patch"
+            ]
+          ],
+          "declared_after_frozen_subset": [
+            "20-v8-collect-source-positions.patch"
+          ],
+          "after_frozen_pass": true
+        },
+        "22-v8-size-deserializer-backrefs.patch": {
+          "roots": [
+            6
+          ],
+          "base_feasible_closures": [
+            [],
+            [
+              6
+            ]
+          ],
+          "base_minimum_closures": [
+            []
+          ],
+          "declared_base_closure": [],
+          "base_pass": true,
+          "after_frozen_minimum_subsets": [
+            []
+          ],
+          "declared_after_frozen_subset": [],
+          "after_frozen_pass": true
+        }
+      }
+    }
+  }
+}

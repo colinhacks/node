@@ -1,7 +1,7 @@
 {
-  "source": "/home/nub/linux-renewed/fork",
-  "artifact": "/home/nub/linux-renewed/artifacts/node-source-combined-v1",
-  "node": "/home/nub/linux-renewed/fork/out/Release/node",
+  "source": "/REDACTED_HOME/linux-renewed/fork",
+  "artifact": "/REDACTED_HOME/linux-renewed/artifacts/node-source-combined-v1",
+  "node": "/REDACTED_HOME/linux-renewed/fork/out/Release/node",
   "sha256": "21430df7fd41549437d7f834de811d2f8507961e60710fd580ed831047e3d6e6",
   "platform": "linux"
 }

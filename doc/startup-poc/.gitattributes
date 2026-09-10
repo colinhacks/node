@@ -1,0 +1,6 @@
+# Saved diff context contains significant blank-line prefixes. Source replay
+# checks the applied code separately; do not rewrite these recorded patches.
+linux-renewed/final-v1/**/*.patch -whitespace
+
+# The recorded CSV writer uses CRLF; preserve its evidence bytes.
+mac-bun-eval-correction-v1/evidence/*/raw.csv whitespace=cr-at-eol

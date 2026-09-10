@@ -1,0 +1,1089 @@
+{
+  "analysis_scope": "Read-only analysis of captured diagnostics. Timing values are instrumented diagnostics, not uninstrumented performance measurements.",
+  "cases": {
+    "default-empty": {
+      "input": {
+        "case_aggregate": {
+          "algorithm": "SHA-256 of UTF-8 sorted lines: <file SHA-256><two spaces><path relative to platform-timing-v1><LF>",
+          "byte_count": 297928,
+          "file_count": 152,
+          "value": "290ade3020ecb02052f6e63380b5f3824755c152dc133ce6ef0b0b8d2f259ad7"
+        },
+        "manifest_sha256": "dd63531b0ddcb6f0971242e47cdb670db58bd08c52b76e01940a0c355ae56583",
+        "node": "<archived-linux-artifact>",
+        "node_args": [],
+        "node_sha256_after": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "node_sha256_before": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "outcome_sha256": "037e421a78afe8bbdc6fe2628c03cf1557731ce84eb7b541b87663ac16c2cf0e",
+        "script": ""
+      },
+      "integrity": {
+        "completed_runs": 50,
+        "configured_worker_counts": [
+          4
+        ],
+        "dropped_events": [
+          0
+        ],
+        "node_sha256_matches": true,
+        "outcome_state": "complete",
+        "parsed_version_1_streams": 50,
+        "raw_event_count_range": [
+          24,
+          24
+        ],
+        "raw_record_summary_matches_strict_reparse": true,
+        "record_statuses": {
+          "complete": 50
+        },
+        "requested_runs": 50,
+        "successful_worker_counts": [
+          4
+        ]
+      },
+      "metrics": {
+        "constructor_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 489.585,
+            "min": 314.613,
+            "p05": 325.182,
+            "p25": 340.691,
+            "p50": 367.584,
+            "p75": 392.336,
+            "p95": 452.195
+          },
+          "unit": "us"
+        },
+        "delayed_ready_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 209.302,
+            "min": 149.214,
+            "p05": 156.886,
+            "p25": 166.012,
+            "p50": 174.236,
+            "p75": 188.075,
+            "p95": 198.222
+          },
+          "unit": "us"
+        },
+        "delayed_thread_create_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 73.06,
+            "min": 47.548,
+            "p05": 50.035,
+            "p25": 55.432,
+            "p50": 57.973,
+            "p75": 61.618,
+            "p95": 65.508
+          },
+          "unit": "us"
+        },
+        "first_post_after_constructor_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 12475.021,
+            "min": 10468.936,
+            "p05": 10674.114,
+            "p25": 11036.467,
+            "p50": 11368.344,
+            "p75": 11748.452,
+            "p95": 12282.369
+          },
+          "unit": "us"
+        },
+        "first_post_to_first_task_begin_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 66.114,
+            "min": 23.368,
+            "p05": 28.196,
+            "p25": 31.216,
+            "p50": 35.397,
+            "p75": 42.515,
+            "p95": 52.172
+          },
+          "unit": "us"
+        },
+        "last_ready_to_constructor_end_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 116.265,
+            "min": 1.323,
+            "p05": 3.158,
+            "p25": 14.081,
+            "p50": 20.872,
+            "p75": 26.454,
+            "p95": 42.894
+          },
+          "unit": "us"
+        },
+        "last_ready_to_first_post_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 12481.794,
+            "min": 10494.222,
+            "p05": 10677.569,
+            "p25": 11046.081,
+            "p50": 11396.263,
+            "p75": 11769.203,
+            "p95": 12301.967
+          },
+          "unit": "us"
+        },
+        "max_concurrent_worker_tasks": {
+          "n": 50,
+          "quantiles": {
+            "max": 1.0,
+            "min": 1.0,
+            "p05": 1.0,
+            "p25": 1.0,
+            "p50": 1.0,
+            "p75": 1.0,
+            "p95": 1.0
+          },
+          "unit": "count"
+        },
+        "platform_create_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 190.167,
+            "min": 96.556,
+            "p05": 100.343,
+            "p25": 106.768,
+            "p50": 112.433,
+            "p75": 121.93,
+            "p95": 149.964
+          },
+          "unit": "us"
+        },
+        "platform_ready_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 214.004,
+            "min": 117.738,
+            "p05": 120.613,
+            "p25": 129.419,
+            "p50": 138.12,
+            "p75": 151.897,
+            "p95": 187.236
+          },
+          "unit": "us"
+        },
+        "task_makespan_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 1849.625,
+            "min": 1503.334,
+            "p05": 1531.87,
+            "p25": 1610.004,
+            "p50": 1677.579,
+            "p75": 1719.723,
+            "p95": 1801.282
+          },
+          "unit": "us"
+        },
+        "task_work_sum_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 722.238,
+            "min": 553.301,
+            "p05": 561.25,
+            "p25": 583.817,
+            "p50": 613.032,
+            "p75": 636.401,
+            "p95": 690.775
+          },
+          "unit": "us"
+        },
+        "worker_task_count": {
+          "n": 50,
+          "quantiles": {
+            "max": 3.0,
+            "min": 3.0,
+            "p05": 3.0,
+            "p25": 3.0,
+            "p50": 3.0,
+            "p75": 3.0,
+            "p95": 3.0
+          },
+          "unit": "count"
+        }
+      }
+    },
+    "default-hello": {
+      "input": {
+        "case_aggregate": {
+          "algorithm": "SHA-256 of UTF-8 sorted lines: <file SHA-256><two spaces><path relative to platform-timing-v1><LF>",
+          "byte_count": 298250,
+          "file_count": 152,
+          "value": "8fc0cab6380c46b1d4a029ed0d6c52fa247011eb86670b9228104aec52001f0e"
+        },
+        "manifest_sha256": "461f146f9faff9834855511d5496ca07c9fcbabb24fddc85de3ac60142aea2ee",
+        "node": "<archived-linux-artifact>",
+        "node_args": [],
+        "node_sha256_after": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "node_sha256_before": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "outcome_sha256": "d7859258eb70330b0a3b1e68c45b23c86a545e183122edeca380da74424af58f",
+        "script": "console.log(\"hello\")"
+      },
+      "integrity": {
+        "completed_runs": 50,
+        "configured_worker_counts": [
+          4
+        ],
+        "dropped_events": [
+          0
+        ],
+        "node_sha256_matches": true,
+        "outcome_state": "complete",
+        "parsed_version_1_streams": 50,
+        "raw_event_count_range": [
+          24,
+          24
+        ],
+        "raw_record_summary_matches_strict_reparse": true,
+        "record_statuses": {
+          "complete": 50
+        },
+        "requested_runs": 50,
+        "successful_worker_counts": [
+          4
+        ]
+      },
+      "metrics": {
+        "constructor_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 533.868,
+            "min": 270.37,
+            "p05": 323.282,
+            "p25": 339.574,
+            "p50": 359.077,
+            "p75": 375.924,
+            "p95": 445.348
+          },
+          "unit": "us"
+        },
+        "delayed_ready_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 245.527,
+            "min": 131.092,
+            "p05": 153.159,
+            "p25": 162.153,
+            "p50": 173.357,
+            "p75": 187.389,
+            "p95": 202.244
+          },
+          "unit": "us"
+        },
+        "delayed_thread_create_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 76.599,
+            "min": 46.756,
+            "p05": 51.582,
+            "p25": 54.2,
+            "p50": 58.551,
+            "p75": 62.652,
+            "p95": 67.813
+          },
+          "unit": "us"
+        },
+        "first_post_after_constructor_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 12950.354,
+            "min": 10554.179,
+            "p05": 10638.811,
+            "p25": 10865.953,
+            "p50": 11124.958,
+            "p75": 11381.952,
+            "p95": 12340.564
+          },
+          "unit": "us"
+        },
+        "first_post_to_first_task_begin_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 54.184,
+            "min": 20.781,
+            "p05": 24.008,
+            "p25": 27.716,
+            "p50": 31.002,
+            "p75": 35.925,
+            "p95": 50.608
+          },
+          "unit": "us"
+        },
+        "last_ready_to_constructor_end_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 63.323,
+            "min": 1.353,
+            "p05": 7.021,
+            "p25": 12.902,
+            "p50": 15.162,
+            "p75": 22.921,
+            "p95": 40.118
+          },
+          "unit": "us"
+        },
+        "last_ready_to_first_post_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 12973.436,
+            "min": 10601.364,
+            "p05": 10649.924,
+            "p25": 10890.469,
+            "p50": 11145.653,
+            "p75": 11399.852,
+            "p95": 12354.321
+          },
+          "unit": "us"
+        },
+        "max_concurrent_worker_tasks": {
+          "n": 50,
+          "quantiles": {
+            "max": 1.0,
+            "min": 1.0,
+            "p05": 1.0,
+            "p25": 1.0,
+            "p50": 1.0,
+            "p75": 1.0,
+            "p95": 1.0
+          },
+          "unit": "count"
+        },
+        "platform_create_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 162.427,
+            "min": 95.895,
+            "p05": 103.161,
+            "p25": 107.464,
+            "p50": 112.68,
+            "p75": 121.413,
+            "p95": 144.696
+          },
+          "unit": "us"
+        },
+        "platform_ready_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 190.995,
+            "min": 120.688,
+            "p05": 122.959,
+            "p25": 131.109,
+            "p50": 137.78,
+            "p75": 147.319,
+            "p95": 170.753
+          },
+          "unit": "us"
+        },
+        "task_makespan_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 9008.591,
+            "min": 5279.739,
+            "p05": 5334.432,
+            "p25": 5512.522,
+            "p50": 5662.123,
+            "p75": 5768.161,
+            "p95": 5935.18
+          },
+          "unit": "us"
+        },
+        "task_work_sum_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 711.401,
+            "min": 542.679,
+            "p05": 572.784,
+            "p25": 602.872,
+            "p50": 626.777,
+            "p75": 656.597,
+            "p95": 694.989
+          },
+          "unit": "us"
+        },
+        "worker_task_count": {
+          "n": 50,
+          "quantiles": {
+            "max": 3.0,
+            "min": 3.0,
+            "p05": 3.0,
+            "p25": 3.0,
+            "p50": 3.0,
+            "p75": 3.0,
+            "p95": 3.0
+          },
+          "unit": "count"
+        }
+      }
+    },
+    "default-worker": {
+      "input": {
+        "case_aggregate": {
+          "algorithm": "SHA-256 of UTF-8 sorted lines: <file SHA-256><two spaces><path relative to platform-timing-v1><LF>",
+          "byte_count": 468592,
+          "file_count": 152,
+          "value": "dea8e6e77a2c8723a77c2dcbc497ef00de21cfda55e4b52e950b58ce53ae4145"
+        },
+        "manifest_sha256": "3041548285570f9ca731a6477e756649c9dfb13f4f4dad4a88acc3146e428f21",
+        "node": "<archived-linux-artifact>",
+        "node_args": [],
+        "node_sha256_after": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "node_sha256_before": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "outcome_sha256": "3aad8246883409fc34c05c514249d49df4ee481aef461c103757554d6ef5e2f1",
+        "script": "const {Worker}=require(\"node:worker_threads\"); const w=new Worker(\"require(\\\"node:worker_threads\\\").parentPort.postMessage(42)\",{eval:true}); w.once(\"message\",v=>{require(\"node:assert/strict\").equal(v,42);w.terminate()})"
+      },
+      "integrity": {
+        "completed_runs": 50,
+        "configured_worker_counts": [
+          4
+        ],
+        "dropped_events": [
+          0
+        ],
+        "node_sha256_matches": true,
+        "outcome_state": "complete",
+        "parsed_version_1_streams": 50,
+        "raw_event_count_range": [
+          38,
+          40
+        ],
+        "raw_record_summary_matches_strict_reparse": true,
+        "record_statuses": {
+          "complete": 50
+        },
+        "requested_runs": 50,
+        "successful_worker_counts": [
+          4
+        ]
+      },
+      "metrics": {
+        "constructor_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 542.192,
+            "min": 305.811,
+            "p05": 320.403,
+            "p25": 346.6,
+            "p50": 366.317,
+            "p75": 384.118,
+            "p95": 435.439
+          },
+          "unit": "us"
+        },
+        "delayed_ready_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 216.52,
+            "min": 133.776,
+            "p05": 146.424,
+            "p25": 168.782,
+            "p50": 178.879,
+            "p75": 188.21,
+            "p95": 201.595
+          },
+          "unit": "us"
+        },
+        "delayed_thread_create_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 77.768,
+            "min": 47.71,
+            "p05": 48.181,
+            "p25": 55.412,
+            "p50": 59.659,
+            "p75": 65.233,
+            "p95": 69.26
+          },
+          "unit": "us"
+        },
+        "first_post_after_constructor_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 11857.504,
+            "min": 10229.371,
+            "p05": 10395.15,
+            "p25": 10838.379,
+            "p50": 11220.818,
+            "p75": 11432.475,
+            "p95": 11751.096
+          },
+          "unit": "us"
+        },
+        "first_post_to_first_task_begin_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 76.883,
+            "min": 24.72,
+            "p05": 25.542,
+            "p25": 29.561,
+            "p50": 32.49,
+            "p75": 38.392,
+            "p95": 53.753
+          },
+          "unit": "us"
+        },
+        "last_ready_to_constructor_end_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 46.256,
+            "min": 1.622,
+            "p05": 4.473,
+            "p25": 9.117,
+            "p50": 16.211,
+            "p75": 23.595,
+            "p95": 41.304
+          },
+          "unit": "us"
+        },
+        "last_ready_to_first_post_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 11863.893,
+            "min": 10255.718,
+            "p05": 10409.567,
+            "p25": 10862.198,
+            "p50": 11236.153,
+            "p75": 11444.207,
+            "p95": 11772.557
+          },
+          "unit": "us"
+        },
+        "max_concurrent_worker_tasks": {
+          "n": 50,
+          "quantiles": {
+            "max": 1.0,
+            "min": 1.0,
+            "p05": 1.0,
+            "p25": 1.0,
+            "p50": 1.0,
+            "p75": 1.0,
+            "p95": 1.0
+          },
+          "unit": "count"
+        },
+        "platform_create_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 185.822,
+            "min": 98.37,
+            "p05": 101.162,
+            "p25": 110.72,
+            "p50": 118.093,
+            "p75": 125.641,
+            "p95": 143.183
+          },
+          "unit": "us"
+        },
+        "platform_ready_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 248.335,
+            "min": 119.047,
+            "p05": 126.552,
+            "p25": 136.417,
+            "p50": 143.649,
+            "p75": 153.732,
+            "p95": 190.275
+          },
+          "unit": "us"
+        },
+        "task_makespan_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 24452.495,
+            "min": 21351.891,
+            "p05": 21424.566,
+            "p25": 22100.975,
+            "p50": 22785.183,
+            "p75": 23622.135,
+            "p95": 24133.294
+          },
+          "unit": "us"
+        },
+        "task_work_sum_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 1781.634,
+            "min": 1357.949,
+            "p05": 1386.441,
+            "p25": 1467.386,
+            "p50": 1535.689,
+            "p75": 1604.577,
+            "p95": 1749.312
+          },
+          "unit": "us"
+        },
+        "worker_task_count": {
+          "n": 50,
+          "quantiles": {
+            "max": 11.0,
+            "min": 10.0,
+            "p05": 10.0,
+            "p25": 10.0,
+            "p50": 10.0,
+            "p75": 10.0,
+            "p95": 10.0
+          },
+          "unit": "count"
+        }
+      }
+    },
+    "eight-workers-empty": {
+      "input": {
+        "case_aggregate": {
+          "algorithm": "SHA-256 of UTF-8 sorted lines: <file SHA-256><two spaces><path relative to platform-timing-v1><LF>",
+          "byte_count": 411158,
+          "file_count": 152,
+          "value": "556f0177b4f4992c2a5bfb8a2f6e3dbb83b32001bf6332bc6fd3dfa3af895522"
+        },
+        "manifest_sha256": "6255ee0a1d24be9c9c105d2d91d14900ed29b8f4441d16266862eee8d148d39a",
+        "node": "<archived-linux-artifact>",
+        "node_args": [
+          "--v8-pool-size=8"
+        ],
+        "node_sha256_after": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "node_sha256_before": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "outcome_sha256": "1e34ec5c2e98e2228a1db7b64e21218ebdf43c0b43ff3825af37b125c8bb23e3",
+        "script": ""
+      },
+      "integrity": {
+        "completed_runs": 50,
+        "configured_worker_counts": [
+          8
+        ],
+        "dropped_events": [
+          0
+        ],
+        "node_sha256_matches": true,
+        "outcome_state": "complete",
+        "parsed_version_1_streams": 50,
+        "raw_event_count_range": [
+          36,
+          36
+        ],
+        "raw_record_summary_matches_strict_reparse": true,
+        "record_statuses": {
+          "complete": 50
+        },
+        "requested_runs": 50,
+        "successful_worker_counts": [
+          8
+        ]
+      },
+      "metrics": {
+        "constructor_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 1193.007,
+            "min": 414.073,
+            "p05": 438.012,
+            "p25": 463.592,
+            "p50": 486.099,
+            "p75": 524.324,
+            "p95": 645.061
+          },
+          "unit": "us"
+        },
+        "delayed_ready_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 219.215,
+            "min": 134.803,
+            "p05": 146.97,
+            "p25": 160.798,
+            "p50": 169.138,
+            "p75": 180.968,
+            "p95": 209.524
+          },
+          "unit": "us"
+        },
+        "delayed_thread_create_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 768.59,
+            "min": 48.162,
+            "p05": 49.024,
+            "p25": 54.301,
+            "p50": 57.2,
+            "p75": 64.188,
+            "p95": 74.95
+          },
+          "unit": "us"
+        },
+        "first_post_after_constructor_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 12510.812,
+            "min": 10507.812,
+            "p05": 10573.497,
+            "p25": 10825.709,
+            "p50": 11132.821,
+            "p75": 11495.996,
+            "p95": 12293.094
+          },
+          "unit": "us"
+        },
+        "first_post_to_first_task_begin_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 53.204,
+            "min": 21.298,
+            "p05": 22.398,
+            "p25": 27.752,
+            "p50": 31.329,
+            "p75": 36.167,
+            "p95": 51.515
+          },
+          "unit": "us"
+        },
+        "last_ready_to_constructor_end_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 129.11,
+            "min": 10.911,
+            "p05": 30.602,
+            "p25": 48.69,
+            "p50": 64.012,
+            "p75": 78.648,
+            "p95": 100.698
+          },
+          "unit": "us"
+        },
+        "last_ready_to_first_post_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 12639.922,
+            "min": 10565.098,
+            "p05": 10629.785,
+            "p25": 10893.069,
+            "p50": 11177.674,
+            "p75": 11572.985,
+            "p95": 12362.346
+          },
+          "unit": "us"
+        },
+        "max_concurrent_worker_tasks": {
+          "n": 50,
+          "quantiles": {
+            "max": 1.0,
+            "min": 1.0,
+            "p05": 1.0,
+            "p25": 1.0,
+            "p50": 1.0,
+            "p75": 1.0,
+            "p95": 1.0
+          },
+          "unit": "count"
+        },
+        "platform_create_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 274.367,
+            "min": 183.787,
+            "p05": 187.141,
+            "p25": 201.032,
+            "p50": 210.55,
+            "p75": 218.203,
+            "p95": 243.805
+          },
+          "unit": "us"
+        },
+        "platform_ready_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 300.998,
+            "min": 196.503,
+            "p05": 199.242,
+            "p25": 218.153,
+            "p50": 226.383,
+            "p75": 237.353,
+            "p95": 273.158
+          },
+          "unit": "us"
+        },
+        "task_makespan_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 1903.328,
+            "min": 1499.25,
+            "p05": 1515.991,
+            "p25": 1599.836,
+            "p50": 1635.302,
+            "p75": 1727.131,
+            "p95": 1895.107
+          },
+          "unit": "us"
+        },
+        "task_work_sum_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 797.673,
+            "min": 522.816,
+            "p05": 529.619,
+            "p25": 573.618,
+            "p50": 602.114,
+            "p75": 639.035,
+            "p95": 698.498
+          },
+          "unit": "us"
+        },
+        "worker_task_count": {
+          "n": 50,
+          "quantiles": {
+            "max": 3.0,
+            "min": 3.0,
+            "p05": 3.0,
+            "p25": 3.0,
+            "p50": 3.0,
+            "p75": 3.0,
+            "p95": 3.0
+          },
+          "unit": "count"
+        }
+      }
+    },
+    "one-worker-empty": {
+      "input": {
+        "case_aggregate": {
+          "algorithm": "SHA-256 of UTF-8 sorted lines: <file SHA-256><two spaces><path relative to platform-timing-v1><LF>",
+          "byte_count": 212940,
+          "file_count": 152,
+          "value": "b0b1255e29cc79a2b922231ad7ae5cdf95cab604bbec98256c374b11851c5426"
+        },
+        "manifest_sha256": "f9bc48512c5224783ebb28094976d707883e5fa16777e42f3b458de612df4bd5",
+        "node": "<archived-linux-artifact>",
+        "node_args": [
+          "--v8-pool-size=1"
+        ],
+        "node_sha256_after": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "node_sha256_before": "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0",
+        "outcome_sha256": "680d4c60193a58d6c7b60539b4fbdde5aa022011fe4f7b8b6ef2b6e4f12330d2",
+        "script": ""
+      },
+      "integrity": {
+        "completed_runs": 50,
+        "configured_worker_counts": [
+          1
+        ],
+        "dropped_events": [
+          0
+        ],
+        "node_sha256_matches": true,
+        "outcome_state": "complete",
+        "parsed_version_1_streams": 50,
+        "raw_event_count_range": [
+          15,
+          15
+        ],
+        "raw_record_summary_matches_strict_reparse": true,
+        "record_statuses": {
+          "complete": 50
+        },
+        "requested_runs": 50,
+        "successful_worker_counts": [
+          1
+        ]
+      },
+      "metrics": {
+        "constructor_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 382.904,
+            "min": 232.378,
+            "p05": 258.343,
+            "p25": 271.014,
+            "p50": 291.922,
+            "p75": 308.918,
+            "p95": 356.708
+          },
+          "unit": "us"
+        },
+        "delayed_ready_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 241.156,
+            "min": 142.591,
+            "p05": 151.277,
+            "p25": 174.069,
+            "p50": 184.339,
+            "p75": 201.484,
+            "p95": 214.53
+          },
+          "unit": "us"
+        },
+        "delayed_thread_create_duration_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 77.234,
+            "min": 49.598,
+            "p05": 52.169,
+            "p25": 55.55,
+            "p50": 58.666,
+            "p75": 63.662,
+            "p95": 72.608
+          },
+          "unit": "us"
+        },
+        "first_post_after_constructor_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 11989.326,
+            "min": 10453.446,
+            "p05": 10722.229,
+            "p25": 10962.644,
+            "p50": 11134.404,
+            "p75": 11289.07,
+            "p95": 11864.083
+          },
+          "unit": "us"
+        },
+        "first_post_to_first_task_begin_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 68.93,
+            "min": 23.893,
+            "p05": 28.883,
+            "p25": 32.777,
+            "p50": 39.992,
+            "p75": 52.124,
+            "p95": 62.434
+          },
+          "unit": "us"
+        },
+        "last_ready_to_constructor_end_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 41.863,
+            "min": 6.92,
+            "p05": 7.614,
+            "p25": 8.561,
+            "p50": 13.851,
+            "p75": 14.955,
+            "p95": 17.474
+          },
+          "unit": "us"
+        },
+        "last_ready_to_first_post_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 11999.112,
+            "min": 10461.791,
+            "p05": 10736.968,
+            "p25": 10976.957,
+            "p50": 11142.938,
+            "p75": 11303.241,
+            "p95": 11872.536
+          },
+          "unit": "us"
+        },
+        "max_concurrent_worker_tasks": {
+          "n": 50,
+          "quantiles": {
+            "max": 1.0,
+            "min": 1.0,
+            "p05": 1.0,
+            "p25": 1.0,
+            "p50": 1.0,
+            "p75": 1.0,
+            "p95": 1.0
+          },
+          "unit": "count"
+        },
+        "platform_create_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 67.294,
+            "min": 25.295,
+            "p05": 27.492,
+            "p25": 30.695,
+            "p50": 33.73,
+            "p75": 36.199,
+            "p95": 47.681
+          },
+          "unit": "us"
+        },
+        "platform_ready_span_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 121.965,
+            "min": 47.221,
+            "p05": 50.95,
+            "p25": 58.044,
+            "p50": 64.099,
+            "p75": 75.967,
+            "p95": 97.353
+          },
+          "unit": "us"
+        },
+        "task_makespan_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 1691.957,
+            "min": 1323.871,
+            "p05": 1408.613,
+            "p25": 1483.221,
+            "p50": 1540.377,
+            "p75": 1616.522,
+            "p95": 1679.048
+          },
+          "unit": "us"
+        },
+        "task_work_sum_us": {
+          "n": 50,
+          "quantiles": {
+            "max": 587.053,
+            "min": 323.927,
+            "p05": 363.422,
+            "p25": 397.988,
+            "p50": 461.973,
+            "p75": 497.068,
+            "p95": 532.804
+          },
+          "unit": "us"
+        },
+        "worker_task_count": {
+          "n": 50,
+          "quantiles": {
+            "max": 3.0,
+            "min": 3.0,
+            "p05": 3.0,
+            "p25": 3.0,
+            "p50": 3.0,
+            "p75": 3.0,
+            "p95": 3.0
+          },
+          "unit": "count"
+        }
+      }
+    }
+  },
+  "derived_comparisons": {
+    "default_empty_first_post_gap_p50_us": 11368.344,
+    "default_empty_minus_one_worker_constructor_p50_us": 75.662,
+    "default_empty_platform_ready_span_p50_us": 138.12,
+    "eight_workers_minus_default_empty_constructor_p50_us": 118.515
+  },
+  "input": {
+    "binary_sha256_values": [
+      "f656084f4ff5d7245d711210b8bbc2a98c8fb653b67451f9b673ed4541be92f0"
+    ],
+    "evidence_path": "<archived-platform-timing-evidence>",
+    "tree_aggregate": {
+      "algorithm": "SHA-256 of UTF-8 sorted lines: <file SHA-256><two spaces><path relative to platform-timing-v1><LF>",
+      "byte_count": 1720150,
+      "file_count": 765,
+      "value": "f5ec7d30208e6a5be4d4f1b81f9503a8d36d38060b0370febbc85a19f01058e8"
+    }
+  },
+  "quantile_method": "R-7 linear interpolation over 50 runs per case; all duration scalars are microseconds.",
+  "schema_version": 1
+}

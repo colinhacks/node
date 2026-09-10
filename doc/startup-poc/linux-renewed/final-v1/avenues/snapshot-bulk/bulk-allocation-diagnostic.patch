@@ -1,0 +1,241 @@
+diff --git a/deps/v8/src/snapshot/deserialization-allocation-diagnostics.h b/deps/v8/src/snapshot/deserialization-allocation-diagnostics.h
+new file mode 100644
+--- /dev/null
++++ b/deps/v8/src/snapshot/deserialization-allocation-diagnostics.h
+@@ -0,0 +1,59 @@
++// Copyright 2026 the V8 project authors. All rights reserved.
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++#ifndef V8_SNAPSHOT_DESERIALIZATION_ALLOCATION_DIAGNOSTICS_H_
++#define V8_SNAPSHOT_DESERIALIZATION_ALLOCATION_DIAGNOSTICS_H_
++
++#include <atomic>
++#include <cstdint>
++
++namespace v8 {
++namespace internal {
++
++// Process-global diagnostic counters for --profile-deserialization. A caller
++// records start and end snapshots because deserializers may overlap.
++class SnapshotDeserializationAllocationDiagnostics final {
++ public:
++  struct Counters {
++    uint64_t main_allocator_slow_paths;
++    uint64_t paged_space_expansions;
++    uint64_t read_only_space_growths;
++  };
++
++  static Counters Get() {
++    return {
++        main_allocator_slow_paths_.load(std::memory_order_relaxed),
++        paged_space_expansions_.load(std::memory_order_relaxed),
++        read_only_space_growths_.load(std::memory_order_relaxed),
++    };
++  }
++
++  static Counters Subtract(Counters end, Counters start) {
++    return {
++        end.main_allocator_slow_paths - start.main_allocator_slow_paths,
++        end.paged_space_expansions - start.paged_space_expansions,
++        end.read_only_space_growths - start.read_only_space_growths,
++    };
++  }
++
++  static void RecordMainAllocatorSlowPath() {
++    main_allocator_slow_paths_.fetch_add(1, std::memory_order_relaxed);
++  }
++  static void RecordPagedSpaceExpansion() {
++    paged_space_expansions_.fetch_add(1, std::memory_order_relaxed);
++  }
++  static void RecordReadOnlySpaceGrowth() {
++    read_only_space_growths_.fetch_add(1, std::memory_order_relaxed);
++  }
++
++ private:
++  inline static std::atomic<uint64_t> main_allocator_slow_paths_{0};
++  inline static std::atomic<uint64_t> paged_space_expansions_{0};
++  inline static std::atomic<uint64_t> read_only_space_growths_{0};
++};
++
++}  // namespace internal
++}  // namespace v8
++
++#endif  // V8_SNAPSHOT_DESERIALIZATION_ALLOCATION_DIAGNOSTICS_H_
+diff --git a/deps/v8/src/heap/main-allocator.cc b/deps/v8/src/heap/main-allocator.cc
+--- a/deps/v8/src/heap/main-allocator.cc
++++ b/deps/v8/src/heap/main-allocator.cc
+@@ -21,6 +21,7 @@
+ #include "src/heap/normal-page-inl.h"
+ #include "src/heap/paged-spaces.h"
+ #include "src/heap/spaces.h"
++#include "src/snapshot/deserialization-allocation-diagnostics.h"
+ 
+ namespace v8 {
+ namespace internal {
+@@ -196,6 +197,10 @@
+ AllocationResult MainAllocator::AllocateRawSlow(int size_in_bytes,
+                                                 AllocationAlignment alignment,
+                                                 AllocationOrigin origin) {
++  if (V8_UNLIKELY(v8_flags.profile_deserialization)) {
++    SnapshotDeserializationAllocationDiagnostics::RecordMainAllocatorSlowPath();
++  }
++
+   AllocationResult result =
+       alignment != kTaggedAligned
+           ? AllocateRawSlowAligned(size_in_bytes, alignment, origin)
+diff --git a/deps/v8/src/heap/paged-spaces.cc b/deps/v8/src/heap/paged-spaces.cc
+--- a/deps/v8/src/heap/paged-spaces.cc
++++ b/deps/v8/src/heap/paged-spaces.cc
+@@ -34,6 +34,7 @@
+ #include "src/heap/sweeper.h"
+ #include "src/logging/runtime-call-stats-scope.h"
+ #include "src/objects/string.h"
++#include "src/snapshot/deserialization-allocation-diagnostics.h"
+ #include "src/utils/utils.h"
+ 
+ namespace v8 {
+@@ -294,6 +295,9 @@
+   DCHECK_EQ(page->area_size(), accounted_size);
+   ConcurrentAllocationMutex guard(this);
+   AddPage(page);
++  if (V8_UNLIKELY(v8_flags.profile_deserialization)) {
++    SnapshotDeserializationAllocationDiagnostics::RecordPagedSpaceExpansion();
++  }
+   if (origin != AllocationOrigin::kGC && identity() != NEW_SPACE) {
+     heap()->NotifyOldGenerationExpansion(local_heap, identity(), page);
+   }
+diff --git a/deps/v8/src/heap/read-only-spaces.cc b/deps/v8/src/heap/read-only-spaces.cc
+--- a/deps/v8/src/heap/read-only-spaces.cc
++++ b/deps/v8/src/heap/read-only-spaces.cc
+@@ -24,6 +24,7 @@
+ #include "src/heap/read-only-heap.h"
+ #include "src/objects/heap-object.h"
+ #include "src/objects/objects-inl.h"
++#include "src/snapshot/deserialization-allocation-diagnostics.h"
+ #include "src/snapshot/snapshot-data.h"
+ #include "src/snapshot/snapshot-utils.h"
+ 
+@@ -384,6 +385,9 @@
+ 
+   accounting_stats_.IncreaseCapacity(metadata->area_size());
+   AccountCommitted(metadata->size());
++  if (V8_UNLIKELY(v8_flags.profile_deserialization)) {
++    SnapshotDeserializationAllocationDiagnostics::RecordReadOnlySpaceGrowth();
++  }
+   pages_.push_back(metadata);
+ 
+   heap()->CreateFillerObjectAt(metadata->area_start(),
+diff --git a/deps/v8/src/snapshot/deserializer.h b/deps/v8/src/snapshot/deserializer.h
+--- a/deps/v8/src/snapshot/deserializer.h
++++ b/deps/v8/src/snapshot/deserializer.h
+@@ -263,6 +263,7 @@
+ 
+   Handle<HeapObject> ReadObject(SnapshotSpace space);
+   Handle<HeapObject> ReadMetaMap(SnapshotSpace space);
++  void AddBackReference(Handle<HeapObject> object);
+ 
+   ReferenceDescriptor GetAndResetNextReferenceDescriptor();
+ 
+@@ -304,6 +305,11 @@
+ 
+   // Vector of allocated objects that can be accessed by a backref, by index.
+   std::vector<IndirectHandle<HeapObject>> back_refs_;
++  size_t back_ref_reallocations_ = 0;
++  size_t back_ref_relocated_entries_ = 0;
++  uint64_t main_allocator_slow_paths_at_start_ = 0;
++  uint64_t paged_space_expansions_at_start_ = 0;
++  uint64_t read_only_space_growths_at_start_ = 0;
+ 
+   // Vector of already allocated JSDispatchTable entries.
+   std::vector<JSDispatchHandle> js_dispatch_entries_;
+diff --git a/deps/v8/src/snapshot/deserializer.cc b/deps/v8/src/snapshot/deserializer.cc
+--- a/deps/v8/src/snapshot/deserializer.cc
++++ b/deps/v8/src/snapshot/deserializer.cc
+@@ -30,6 +30,7 @@
+ #include "src/roots/roots.h"
+ #include "src/sandbox/js-dispatch-table-inl.h"
+ #include "src/snapshot/embedded/embedded-data-inl.h"
++#include "src/snapshot/deserialization-allocation-diagnostics.h"
+ #include "src/snapshot/references.h"
+ #include "src/snapshot/serializer-deserializer.h"
+ #include "src/snapshot/shared-heap-serializer.h"
+@@ -340,6 +341,16 @@
+   DCHECK_NOT_NULL(isolate);
+   isolate->RegisterDeserializerStarted();
+ 
++  if (V8_UNLIKELY(v8_flags.profile_deserialization)) {
++    const auto allocation_counters =
++        SnapshotDeserializationAllocationDiagnostics::Get();
++    main_allocator_slow_paths_at_start_ =
++        allocation_counters.main_allocator_slow_paths;
++    paged_space_expansions_at_start_ = allocation_counters.paged_space_expansions;
++    read_only_space_growths_at_start_ =
++        allocation_counters.read_only_space_growths;
++  }
++
+   // We start the indices here at 1, so that we can distinguish between an
+   // actual index and an empty backing store (serialized as
+   // kEmptyBackingStoreRefSentinel) in a deserialized object requiring fix-up.
+@@ -374,6 +385,24 @@
+   DCHECK_EQ(num_unresolved_forward_refs_, 0);
+   DCHECK(unresolved_forward_refs_.empty());
+ #endif  // DEBUG
++  if (V8_UNLIKELY(v8_flags.profile_deserialization)) {
++    const auto allocation_counters =
++        SnapshotDeserializationAllocationDiagnostics::Subtract(
++            SnapshotDeserializationAllocationDiagnostics::Get(),
++            {main_allocator_slow_paths_at_start_,
++             paged_space_expansions_at_start_,
++             read_only_space_growths_at_start_});
++    PrintF("[SnapshotBulkAllocationStats user_code=%d payload_bytes=%d "
++           "backref_reallocations=%zu backref_relocated_entries=%zu "
++           "process_window_main_allocator_slow_paths=%" PRIu64 " "
++           "process_window_paged_space_expansions=%" PRIu64 " "
++           "process_window_read_only_space_growths=%" PRIu64 "]\n",
++           deserializing_user_code_, source_.length(), back_ref_reallocations_,
++           back_ref_relocated_entries_,
++           allocation_counters.main_allocator_slow_paths,
++           allocation_counters.paged_space_expansions,
++           allocation_counters.read_only_space_growths);
++  }
+   isolate_->RegisterDeserializerFinished();
+ }
+ 
+@@ -754,6 +783,18 @@
+ }
+ 
+ template <typename IsolateT>
++void Deserializer<IsolateT>::AddBackReference(Handle<HeapObject> object) {
++  const size_t old_size = back_refs_.size();
++  const size_t old_capacity = back_refs_.capacity();
++  back_refs_.push_back(object);
++  if (V8_UNLIKELY(v8_flags.profile_deserialization) &&
++      back_refs_.capacity() != old_capacity) {
++    ++back_ref_reallocations_;
++    back_ref_relocated_entries_ += old_size;
++  }
++}
++
++template <typename IsolateT>
+ DirectHandle<HeapObject> Deserializer<IsolateT>::ReadObject() {
+   DirectHandle<HeapObject> ret;
+   CHECK_EQ(ReadSingleBytecodeData(
+@@ -874,7 +915,7 @@
+ #endif
+ 
+   Handle<HeapObject> obj = handle(raw_obj, isolate());
+-  back_refs_.push_back(obj);
++  AddBackReference(obj);
+   if (v8_flags.trace_deserialization) {
+     PrintF("   %*s(set obj backref %u)\n", depth_, "",
+            static_cast<int>(back_refs_.size() - 1));
+@@ -913,7 +954,7 @@
+   DCHECK(raw_obj->CheckRequiredAlignment(isolate()));
+ 
+   Handle<HeapObject> obj = handle(raw_obj, isolate());
+-  back_refs_.push_back(obj);
++  AddBackReference(obj);
+   if (v8_flags.trace_deserialization) {
+     PrintF("   %*s(set obj backref %u)\n", depth_, "",
+            static_cast<int>(back_refs_.size() - 1));

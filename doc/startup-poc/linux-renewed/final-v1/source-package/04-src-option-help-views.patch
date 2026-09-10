@@ -1,0 +1,103 @@
+diff --git a/src/node_options.cc b/src/node_options.cc
+index 9077325e..faafc66f 100644
+--- a/src/node_options.cc
++++ b/src/node_options.cc
+@@ -1758,7 +1758,7 @@ MapEnvOptionsFlagInputType() {
+         item.second.env_setting == kAllowedInEnvvar) {
+       const auto mapping_details = options_parser::OptionMappingDetails{
+           item.second.type,
+-          item.second.help_text,
++          std::string(item.second.help_text),
+       };
+       type_map[item.first] = mapping_details;
+     }
+@@ -1790,7 +1790,7 @@ MapOptionsByNamespace(std::string namespace_name) {
+         item.second.namespace_id == namespace_name) {
+       const auto mapping_details = options_parser::OptionMappingDetails{
+           item.second.type,
+-          item.second.help_text,
++          std::string(item.second.help_text),
+       };
+       type_map[item.first] = mapping_details;
+     }
+@@ -2085,7 +2085,7 @@ void GetEnvOptionsInputType(const FunctionCallbackInfo<Value>& args) {
+         item.second.env_setting == kAllowedInEnvvar) {
+       const auto mapping_details = options_parser::OptionMappingDetails{
+           item.second.type,
+-          item.second.help_text,
++          std::string(item.second.help_text),
+       };
+       if (!AddOptionTypeToObject(isolate,
+                                  context,
+diff --git a/src/node_options.h b/src/node_options.h
+index ffd76d70..61ffbda3 100644
+--- a/src/node_options.h
++++ b/src/node_options.h
+@@ -5,6 +5,7 @@
+ 
+ #include <memory>
+ #include <string>
++#include <string_view>
+ #include <unordered_map>
+ #include <vector>
+ #include "node_constants.h"
+@@ -522,6 +523,7 @@ class OptionsParser {
+   // These methods add a single option to the parser. Optionally, it can be
+   // specified whether the option should be allowed from environment variable
+   // sources (i.e. NODE_OPTIONS).
++  // Help text is borrowed and must have static storage duration.
+ 
+   // default_is_true is only a hint in printing help text, it does not
+   // affect the default value of the option. Set the default value in the
+@@ -702,7 +704,7 @@ class OptionsParser {
+     OptionType type;
+     std::shared_ptr<BaseOptionField> field;
+     OptionEnvvarSettings env_setting;
+-    std::string help_text;
++    std::string_view help_text;
+     bool default_is_true = false;
+     std::string namespace_id;
+     bool strict = false;
+diff --git a/test/parallel/test-options-help-storage.js b/test/parallel/test-options-help-storage.js
+new file mode 100644
+index 00000000..f7c1d7c2
+--- /dev/null
++++ b/test/parallel/test-options-help-storage.js
+@@ -0,0 +1,37 @@
++// Flags: --expose-internals --expose-gc --no-warnings
++
++'use strict';
++require('../common');
++const assert = require('assert');
++const { internalBinding } = require('internal/test/binding');
++const {
++  getCLIOptionsInfo,
++  getEnvOptionsInputType,
++  getNamespaceOptionsInputType,
++} = internalBinding('options');
++
++const first = getCLIOptionsInfo();
++const descriptions = new Map();
++for (const [name, info] of first.options) {
++  assert.strictEqual(typeof info.helpText, 'string');
++  descriptions.set(name, info.helpText);
++  info.helpText = 'changed in JavaScript';
++}
++assert(descriptions.size > 0);
++global.gc();
++
++const second = getCLIOptionsInfo();
++for (const [name, info] of second.options) {
++  assert.strictEqual(info.helpText, descriptions.get(name));
++}
++
++function checkDescriptions(options) {
++  for (const [name, info] of Object.entries(options)) {
++    assert.strictEqual(info.description, descriptions.get(name));
++  }
++}
++
++checkDescriptions(getEnvOptionsInputType());
++for (const options of getNamespaceOptionsInputType().values()) {
++  checkDescriptions(options);
++}

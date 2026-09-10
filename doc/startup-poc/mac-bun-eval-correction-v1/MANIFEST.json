@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "compressed_files": {
+    "evidence/main/raw.jsonl.gz": {
+      "bytes": 8617,
+      "sha256": "7521f07bcb8b38bdd5d6c14a0c44bec22e812c740011e41d7ae6e32d6e49a130",
+      "uncompressed_sha256": "0610df9373c688d536b4c25486f667e3f07468f0d9b0c189b883dce465e84974"
+    },
+    "evidence/main/report.json.gz": {
+      "bytes": 10754,
+      "sha256": "5cfbe7d2769334ad8592005a62a7261c8374eac3d5075f53af230bcc274d7f0d",
+      "uncompressed_sha256": "9cb423cc2fcd805785adb2e317a1ba726b007605b2d595a40a1573498e33c6d1"
+    },
+    "evidence/identity-control/raw.jsonl.gz": {
+      "bytes": 8384,
+      "sha256": "fa7d8186250288c243245c7d9deeb7bd602bc954ee215f1013eb1c6947f78489",
+      "uncompressed_sha256": "46774a755e85562b43c87aefb44d1c9075b9fc9e3795e1f5c3c3573eea968781"
+    },
+    "evidence/identity-control/report.json.gz": {
+      "bytes": 15160,
+      "sha256": "1fa2c8fcca36c5176a84362be3889dbdce5d6c6db4b7a270966108843b15b2c2",
+      "uncompressed_sha256": "e8154b8d0ff564b87e4b6fdb3aa4f23d4ed7a4f8cb093c220b88732b7a10db24"
+    }
+  },
+  "sanitized_process_snapshots": {
+    "process-load-before.txt": {
+      "bytes": 1876,
+      "sha256": "15fcce59defbc8bcc67037bd27347506f04077efba100b89a86dd64cb30c3c6f",
+      "fields": [
+        "PID",
+        "PPID",
+        "%CPU",
+        "%MEM",
+        "STAT"
+      ]
+    },
+    "process-load-after.txt": {
+      "bytes": 1876,
+      "sha256": "271c5eed2cbbf161e5230ab6523bebac02a6d1e45fd67aa6bc19d54ace55c810",
+      "fields": [
+        "PID",
+        "PPID",
+        "%CPU",
+        "%MEM",
+        "STAT"
+      ]
+    }
+  },
+  "sanitization_ledger": "SANITIZATION.json"
+}

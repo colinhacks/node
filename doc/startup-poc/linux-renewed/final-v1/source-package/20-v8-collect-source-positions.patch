@@ -1,0 +1,863 @@
+diff --git a/configure.py b/configure.py
+index 79768b6288eac6497c0806657c02e9580e3a225e..4cf90cddd571195355eeef8d258d2fa02fa9edaf 100755
+--- a/configure.py
++++ b/configure.py
+@@ -1899,9 +1899,21 @@ def configure_node_lib_files(o):
+   o['variables']['node_library_files'] = SearchFiles('lib', 'js')
+ 
+ def configure_node_cctest_sources(o):
+-  o['variables']['node_cctest_sources'] = [] + \
+-    SearchFiles('test/cctest', 'cc') + \
+-    SearchFiles('test/cctest', 'h')
++  v8_private_cctest_sources = {
++      'test/cctest/test_source_position_collection.cc',
++      'test/cctest/test_source_positions_advanced.cc',
++  }
++  excluded_sources = v8_private_cctest_sources
++  supports_v8_private_cctests = (
++      not options.without_bundled_v8 and not options.shared)
++  if not supports_v8_private_cctests:
++    # Private V8 headers cannot safely target external V8 or libnode builds.
++    excluded_sources |= {'test/cctest/test_v8_private_startup_cases.cc'}
++  o['variables']['node_cctest_sources'] = [
++      source for source in SearchFiles('test/cctest', 'cc') +
++      SearchFiles('test/cctest', 'h')
++      if source not in excluded_sources
++  ]
+ 
+ def configure_whole_program_vtables(o):
+   variables = o['variables']
+diff --git a/deps/v8/src/execution/isolate.cc b/deps/v8/src/execution/isolate.cc
+index e86eabdbf07d4097dcc3b743ddaf3ac438ed34d7..4215bdfc1d3707b650549e110eaaf3fa83c36710 100644
+--- a/deps/v8/src/execution/isolate.cc
++++ b/deps/v8/src/execution/isolate.cc
+@@ -16,6 +16,7 @@
+ #include <sstream>
+ #include <string>
+ #include <unordered_map>
++#include <unordered_set>
+ #include <utility>
+ 
+ #include "include/v8-callbacks.h"
+@@ -108,6 +109,7 @@
+ #include "src/objects/promise-inl.h"
+ #include "src/objects/property-descriptor.h"
+ #include "src/objects/prototype.h"
++#include "src/objects/script.h"
+ #include "src/objects/slots.h"
+ #include "src/objects/smi.h"
+ #include "src/objects/source-text-module-inl.h"
+@@ -7578,21 +7580,27 @@ void Isolate::CollectSourcePositionsForAllBytecodeArrays() {
+ 
+   HandleScope scope(this);
+   std::vector<Handle<SharedFunctionInfo>> sfis;
++  std::unordered_set<Address> seen_sfis;
+   {
+-    HeapObjectIterator iterator(heap());
+-    for (Tagged<HeapObject> obj = iterator.Next(); !obj.is_null();
+-         obj = iterator.Next()) {
+-      if (!IsSharedFunctionInfo(obj)) continue;
+-      Tagged<SharedFunctionInfo> sfi = Cast<SharedFunctionInfo>(obj);
+-      // If the script is a Smi, then the SharedFunctionInfo is in
+-      // the process of being deserialized.
+-      Tagged<Object> script = sfi->raw_script(kAcquireLoad);
+-      if (IsSmi(script)) {
+-        DCHECK_EQ(script, Smi::uninitialized_deserialization_value());
+-        continue;
++    Script::Iterator script_iterator(this);
++    for (Tagged<Script> script = script_iterator.Next(); !script.is_null();
++         script = script_iterator.Next()) {
++      SharedFunctionInfo::ScriptIterator sfi_iterator(this, script);
++      for (Tagged<SharedFunctionInfo> sfi = sfi_iterator.Next();
++           !sfi.is_null(); sfi = sfi_iterator.Next()) {
++        // Preserve the existing deserialization guard. A live-edit transfer
++        // can expose one SFI through two script lists, so deduplicate before
++        // taking the strong handle used by the reparsing phase.
++        Tagged<Object> sfi_script = sfi->raw_script(kAcquireLoad);
++        if (IsSmi(sfi_script)) {
++          DCHECK_EQ(sfi_script, Smi::uninitialized_deserialization_value());
++          continue;
++        }
++        if (!sfi->CanCollectSourcePosition(this)) continue;
++        if (seen_sfis.insert(sfi.address()).second) {
++          sfis.push_back(Handle<SharedFunctionInfo>(sfi, this));
++        }
+       }
+-      if (!sfi->CanCollectSourcePosition(this)) continue;
+-      sfis.push_back(Handle<SharedFunctionInfo>(sfi, this));
+     }
+   }
+   for (auto sfi : sfis) {
+diff --git a/node.gyp b/node.gyp
+index 496ca593d7a847eef196a83316aad45b44c5e97b..dccec803d0b7ef53dd2adab60c120e8fb6fb8426 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -1384,6 +1384,11 @@
+       'sources': [ '<@(node_cctest_sources)' ],
+ 
+       'conditions': [
++        [ 'node_use_bundled_v8=="true" and node_shared=="false"', {
++          'dependencies': [
++            'tools/v8_gypfiles/node_startup_cctest.gyp:v8_private_cctest_cases',
++          ],
++        }],
+         ['OS=="mac"', {
+           'xcode_settings': {
+             # Match the executable's dynamic exports for symbol-visibility tests.
+diff --git a/test/cctest/test_source_position_collection.cc b/test/cctest/test_source_position_collection.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..340dc57efb54ad673c95a6275e6e6918e465aed4
+--- /dev/null
++++ b/test/cctest/test_source_position_collection.cc
+@@ -0,0 +1,230 @@
++#include <array>
++#include <memory>
++#include <string>
++#include "gtest/gtest.h"
++#include "src/api/api-inl.h"
++#include "src/codegen/compilation-cache.h"
++#include "src/execution/isolate.h"
++#include "src/objects/js-function-inl.h"
++#include "src/objects/shared-function-info-inl.h"
++#include "v8-profiler.h"
++#include "v8-script.h"
++#include "v8_private_startup_test_fixture.h"
++namespace {
++v8::Local<v8::String> V8String(v8::Isolate* isolate, const char* value) {
++  return v8::String::NewFromUtf8(isolate, value).ToLocalChecked();
++}
++v8::Local<v8::Function> GetGlobalFunction(v8::Isolate* isolate,
++                                          v8::Local<v8::Context> context,
++                                          const char* name) {
++  v8::Local<v8::Value> value =
++      context->Global()->Get(context, V8String(isolate, name)).ToLocalChecked();
++  CHECK(value->IsFunction());
++  return value.As<v8::Function>();
++}
++
++bool CanCollectSourcePositions(v8::Isolate* isolate,
++                               v8::Local<v8::Function> function) {
++  auto* internal_isolate = reinterpret_cast<v8::internal::Isolate*>(isolate);
++  auto internal_function = v8::internal::Cast<v8::internal::JSFunction>(
++      v8::Utils::OpenHandle(*function));
++  return internal_function->shared()->CanCollectSourcePosition(
++      internal_isolate);
++}
++
++bool HasSourcePositionTable(v8::Isolate* isolate,
++                            v8::Local<v8::Function> function) {
++  auto* internal_isolate = reinterpret_cast<v8::internal::Isolate*>(isolate);
++  auto internal_function = v8::internal::Cast<v8::internal::JSFunction>(
++      v8::Utils::OpenHandle(*function));
++  auto shared = internal_function->shared();
++  return shared->HasBytecodeArray() &&
++         shared->GetBytecodeArray(internal_isolate)->HasSourcePositionTable();
++}
++void ExpectValue(v8::Isolate* isolate,
++                 v8::Local<v8::Context> context,
++                 v8::Local<v8::Function> function,
++                 int expected) {
++  v8::Local<v8::Value> argument = v8::Integer::New(isolate, expected - 1);
++  v8::Local<v8::Value> result;
++  ASSERT_TRUE(function->Call(context, v8::Undefined(isolate), 1, &argument)
++                  .ToLocal(&result));
++  EXPECT_EQ(expected, result->Int32Value(context).FromJust());
++}
++void ExpectDetailedStack(v8::Isolate* isolate,
++                         v8::Local<v8::Context> context,
++                         v8::Local<v8::Function> function,
++                         const char* resource_name,
++                         int expected_line) {
++  v8::TryCatch try_catch(isolate);
++  v8::Local<v8::Value> argument = v8::Undefined(isolate);
++  v8::Local<v8::Value> result;
++  ASSERT_FALSE(function->Call(context, v8::Undefined(isolate), 1, &argument)
++                   .ToLocal(&result));
++  ASSERT_TRUE(try_catch.HasCaught());
++  v8::Local<v8::Message> message = try_catch.Message();
++  ASSERT_FALSE(message.IsEmpty());
++  EXPECT_EQ(expected_line, message->GetLineNumber(context).FromJust());
++  v8::String::Utf8Value actual_resource(
++      isolate, message->GetScriptOrigin().ResourceName());
++  ASSERT_NE(nullptr, *actual_resource);
++  EXPECT_EQ(resource_name, std::string(*actual_resource));
++  v8::Local<v8::Value> stack;
++  ASSERT_TRUE(try_catch.Exception()
++                  .As<v8::Object>()
++                  ->Get(context, V8String(isolate, "stack"))
++                  .ToLocal(&stack));
++  ASSERT_TRUE(stack->IsString());
++  v8::String::Utf8Value stack_text(isolate, stack);
++  ASSERT_NE(nullptr, *stack_text);
++  EXPECT_NE(std::string::npos, std::string(*stack_text).find(resource_name));
++}
++class SourcePositionCollectionTest : public V8PrivateStartupTestFixture {
++ protected:
++  void SetUp() override {
++    V8PrivateStartupTestFixture::SetUp();
++    node::IsolateSettings settings;
++    // Deliberately omit Node's default detailed-position flag. This must stay
++    // before all test-script compilation so CpuProfiler below collects the
++    // previously compiled bytecode arrays through the public one-way API.
++    settings.flags = node::MESSAGE_LISTENER_WITH_ERROR_LEVEL |
++        node::SHOULD_NOT_SET_PREPARE_STACK_TRACE_CALLBACK;
++    isolate_ = NewTestIsolate(settings);
++    ASSERT_NE(nullptr, isolate_);
++    isolate_->Enter();
++  }
++  void TearDown() override {
++    if (isolate_ != nullptr) {
++      isolate_->Exit();
++    }
++    V8PrivateStartupTestFixture::TearDown();
++  }
++};
++TEST_F(SourcePositionCollectionTest,
++       CollectsCompiledScriptEvalFunctionAndConsumedCache) {
++  v8::HandleScope handle_scope(isolate_);
++  v8::Local<v8::Context> context = v8::Context::New(isolate_);
++  v8::Context::Scope context_scope(context);
++  v8::Local<v8::Value> error_value;
++  ASSERT_TRUE(context->Global()
++                  ->Get(context, V8String(isolate_, "Error"))
++                  .ToLocal(&error_value));
++  ASSERT_TRUE(error_value.As<v8::Object>()
++                  ->Set(context, V8String(isolate_, "stackTraceLimit"),
++                        v8::Integer::New(isolate_, 10))
++                  .FromMaybe(false));
++  auto* internal_isolate = reinterpret_cast<v8::internal::Isolate*>(isolate_);
++  int stack_trace_limit;
++  ASSERT_TRUE(internal_isolate->GetStackTraceLimit(
++      internal_isolate, &stack_trace_limit));
++  ASSERT_EQ(10, stack_trace_limit);
++  const char* source =
++      "function ordinaryControl(value) {\n"
++      "  if (value === undefined) {\n"
++      "    throw new Error('ordinary sentinel');\n"
++      "  }\n"
++      "  return value + 1;\n"
++      "}\n"
++      "eval(\"globalThis.evalControl = function evalControl(value) {\\n\"\n"
++      "  + \"  if (value === undefined) {\\n\"\n"
++      "  + \"    throw new Error('eval sentinel');\\n\"\n"
++      "  + \"  }\\n\"\n"
++      "  + \"  return value + 1;\\n\"\n"
++      "  + \"}\\n//# sourceURL=cctest-source-position-eval.js\");\n"
++      "globalThis.functionControl = Function(\n"
++      "  \"return function functionControl(value) {\\n\" +\n"
++      "  \"  if (value === undefined) {\\n\" +\n"
++      "  \"    throw new Error('Function sentinel');\\n\" +\n"
++      "  \"  }\\n\" +\n"
++      "  \"  return value + 1;\\n\" +\n"
++      "  \"}\\n//# sourceURL=cctest-source-position-function.js\"\n"
++      ")();\n";
++  v8::ScriptOrigin ordinary_origin(
++      V8String(isolate_, "cctest-source-position-ordinary.js"));
++  v8::ScriptCompiler::Source ordinary_source(V8String(isolate_, source),
++                                             ordinary_origin);
++  v8::Local<v8::Script> ordinary_script =
++      v8::ScriptCompiler::Compile(
++          context, &ordinary_source, v8::ScriptCompiler::kEagerCompile)
++          .ToLocalChecked();
++  ASSERT_FALSE(ordinary_script->Run(context).IsEmpty());
++  const char* cache_source =
++      "globalThis.cachedControl = function cachedControl(value) {\n"
++      "  if (value === undefined) {\n"
++      "    throw new Error('cache sentinel');\n"
++      "  }\n"
++      "  return value + 1;\n"
++      "};\n";
++  v8::ScriptOrigin cache_origin(
++      V8String(isolate_, "cctest-source-position-cache.js"));
++  v8::ScriptCompiler::Source cache_producer_source(
++      V8String(isolate_, cache_source), cache_origin);
++  v8::Local<v8::Script> cache_producer =
++      v8::ScriptCompiler::Compile(
++          context, &cache_producer_source, v8::ScriptCompiler::kEagerCompile)
++          .ToLocalChecked();
++  ASSERT_FALSE(cache_producer->Run(context).IsEmpty());
++  std::unique_ptr<v8::ScriptCompiler::CachedData> cached_data(
++      v8::ScriptCompiler::CreateCodeCache(cache_producer->GetUnboundScript()));
++  ASSERT_NE(nullptr, cached_data);
++  // The compiler checks the in-memory cache before supplied cache data. Clear
++  // it so the consumer must deserialize the supplied bytes rather than reuse
++  // the producer's SFI.
++  reinterpret_cast<v8::internal::Isolate*>(isolate_)
++      ->compilation_cache()
++      ->Clear();
++  v8::ScriptCompiler::Source cache_consumer_source(
++      V8String(isolate_, cache_source), cache_origin, cached_data.release());
++  v8::Local<v8::Script> cache_consumer =
++      v8::ScriptCompiler::Compile(context,
++                                  &cache_consumer_source,
++                                  v8::ScriptCompiler::kConsumeCodeCache)
++          .ToLocalChecked();
++  ASSERT_NE(nullptr, cache_consumer_source.GetCachedData());
++  ASSERT_FALSE(cache_consumer_source.GetCachedData()->rejected);
++  EXPECT_EQ(
++      v8::ScriptCompiler::InMemoryCacheResult::kMiss,
++      cache_consumer_source.GetCompilationDetails().in_memory_cache_result);
++  ASSERT_FALSE(cache_consumer->Run(context).IsEmpty());
++  v8::Local<v8::Function> ordinary =
++      GetGlobalFunction(isolate_, context, "ordinaryControl");
++  v8::Local<v8::Function> evaluated =
++      GetGlobalFunction(isolate_, context, "evalControl");
++  v8::Local<v8::Function> constructed =
++      GetGlobalFunction(isolate_, context, "functionControl");
++  v8::Local<v8::Function> cached =
++      GetGlobalFunction(isolate_, context, "cachedControl");
++  ExpectValue(isolate_, context, ordinary, 1);
++  ExpectValue(isolate_, context, evaluated, 2);
++  ExpectValue(isolate_, context, constructed, 3);
++  ExpectValue(isolate_, context, cached, 4);
++  const std::array<v8::Local<v8::Function>, 4> functions = {
++      ordinary, evaluated, constructed, cached};
++  size_t eligible_before_enable = 0;
++  for (v8::Local<v8::Function> function : functions) {
++    eligible_before_enable += CanCollectSourcePositions(isolate_, function);
++  }
++  // Function-constructor bytecode can already carry positions by design, but
++  // this proves that the current collector has real pre-existing work. Merely
++  // reading Error.stack after enable cannot establish that property.
++  ASSERT_GT(eligible_before_enable, 0u);
++  // This is the same public API Node calls during isolate setup. It must
++  // collect the four compiled-and-executed bodies above rather than relying
++  // on an internal test-only toggle or on fresh compilation after enable.
++  v8::CpuProfiler::UseDetailedSourcePositionsForProfiling(isolate_);
++  for (v8::Local<v8::Function> function : functions) {
++    EXPECT_FALSE(CanCollectSourcePositions(isolate_, function));
++    EXPECT_TRUE(HasSourcePositionTable(isolate_, function));
++  }
++  ExpectDetailedStack(
++      isolate_, context, ordinary, "cctest-source-position-ordinary.js", 3);
++  ExpectDetailedStack(
++      isolate_, context, evaluated, "cctest-source-position-eval.js", 3);
++  ExpectDetailedStack(
++      isolate_, context, constructed, "cctest-source-position-function.js", 5);
++  ExpectDetailedStack(
++      isolate_, context, cached, "cctest-source-position-cache.js", 3);
++}
++}  // namespace
++
++void NodeStartupSourcePositionTestsAnchor() {}
+diff --git a/test/cctest/test_source_positions_advanced.cc b/test/cctest/test_source_positions_advanced.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..c582645feb8a66850f53f858de7e29b0f9eef60c
+--- /dev/null
++++ b/test/cctest/test_source_positions_advanced.cc
+@@ -0,0 +1,275 @@
++#include <cstring>
++#include <memory>
++
++#include "v8_private_startup_test_fixture.h"
++#include "v8-profiler.h"
++#include "v8-script.h"
++
++#include "src/api/api-inl.h"
++#include "src/debug/liveedit.h"
++#include "src/execution/isolate.h"
++#include "src/heap/factory.h"
++#include "src/objects/bytecode-array-inl.h"
++#include "src/objects/js-function-inl.h"
++#include "src/objects/objects-inl.h"
++#include "src/objects/shared-function-info-inl.h"
++
++namespace {
++
++class ChunkSourceStream final : public v8::ScriptCompiler::ExternalSourceStream {
++ public:
++  explicit ChunkSourceStream(const char* const* chunks) : chunks_(chunks) {}
++
++  size_t GetMoreData(const uint8_t** src) override {
++    const char* chunk = chunks_[index_++];
++    if (chunk == nullptr) return 0;
++    size_t size = std::strlen(chunk);
++    uint8_t* copy = new uint8_t[size];
++    std::memcpy(copy, chunk, size);
++    *src = copy;
++    return size;
++  }
++
++ private:
++  const char* const* chunks_;
++  size_t index_ = 0;
++};
++
++void RunStreamingTask(void* arg) {
++  static_cast<v8::ScriptCompiler::ScriptStreamingTask*>(arg)->Run();
++}
++
++v8::Local<v8::String> String(v8::Isolate* isolate, const char* value) {
++  return v8::String::NewFromUtf8(isolate, value).ToLocalChecked();
++}
++
++v8::internal::DirectHandle<v8::internal::SharedFunctionInfo>
++SharedInfo(v8::Local<v8::UnboundScript> script) {
++  return v8::internal::Cast<v8::internal::SharedFunctionInfo>(
++      v8::Utils::OpenDirectHandle(*script));
++}
++
++v8::internal::DirectHandle<v8::internal::SharedFunctionInfo>
++SharedInfo(v8::internal::Isolate* isolate, v8::Local<v8::Function> function) {
++  auto internal_function = v8::internal::Cast<v8::internal::JSFunction>(
++      v8::Utils::OpenDirectHandle(*function));
++  return v8::internal::DirectHandle<v8::internal::SharedFunctionInfo>(
++      internal_function->shared(), isolate);
++}
++
++bool HasSourcePositionTable(
++    v8::internal::Isolate* isolate,
++    v8::internal::DirectHandle<v8::internal::SharedFunctionInfo> shared) {
++  return shared->HasBytecodeArray() &&
++         shared->GetBytecodeArray(isolate)->HasSourcePositionTable();
++}
++
++class SourcePositionsAdvancedTest : public V8PrivateStartupTestFixture {};
++
++TEST_F(SourcePositionsAdvancedTest,
++       StreamingPublishedFunctionIsCollectedAfterForegroundCompile) {
++  v8::Isolate* isolate = NewTestIsolate();
++  ASSERT_NE(nullptr, isolate);
++  {
++    v8::Isolate::Scope isolate_scope(isolate);
++    v8::HandleScope handle_scope(isolate);
++    auto* i_isolate = reinterpret_cast<v8::internal::Isolate*>(isolate);
++    i_isolate->SetDetailedSourcePositionsForProfiling(false);
++    ASSERT_FALSE(i_isolate->detailed_source_positions_for_profiling());
++
++    v8::Local<v8::Context> context = node::NewContext(isolate);
++    ASSERT_FALSE(context.IsEmpty());
++    v8::Context::Scope context_scope(context);
++
++    // The sentinel terminates ChunkSourceStream. No V8 test-only helper is
++    // linked into Node's cctest target.
++    const char* chunks[] = {"function streamed() { return 1; }\n", nullptr};
++    v8::ScriptCompiler::StreamedSource source(
++        std::make_unique<ChunkSourceStream>(chunks),
++        v8::ScriptCompiler::StreamedSource::ONE_BYTE);
++    std::unique_ptr<v8::ScriptCompiler::ScriptStreamingTask> task(
++        v8::ScriptCompiler::StartStreaming(isolate, &source));
++    ASSERT_NE(task, nullptr);
++    uv_thread_t thread;
++    ASSERT_EQ(uv_thread_create(&thread, RunStreamingTask, task.get()), 0);
++    ASSERT_EQ(uv_thread_join(&thread), 0);
++
++    v8::ScriptOrigin origin(String(isolate, "streamed-positions.js"));
++    v8::Local<v8::Script> script =
++        v8::ScriptCompiler::Compile(
++            context, &source, String(isolate, chunks[0]), origin)
++            .ToLocalChecked();
++    ASSERT_FALSE(script->Run(context).IsEmpty());
++    v8::Local<v8::Value> streamed_value;
++    ASSERT_TRUE(context->Global()
++                    ->Get(context, String(isolate, "streamed"))
++                    .ToLocal(&streamed_value));
++    ASSERT_TRUE(streamed_value->IsFunction());
++    v8::Local<v8::Function> streamed = streamed_value.As<v8::Function>();
++    ASSERT_FALSE(streamed->Call(context, v8::Undefined(isolate), 0, nullptr)
++                     .IsEmpty());
++    auto shared = SharedInfo(i_isolate, streamed);
++    ASSERT_TRUE(shared->HasBytecodeArray());
++    ASSERT_TRUE(shared->CanCollectSourcePosition(i_isolate));
++
++    // The completed streaming script and its executed function are published
++    // on the foreground script list before detailed positions are requested.
++    // This makes the public profiler call exercise the collector rather than
++    // the finalizer's direct reparse of an unfinalized script.
++    v8::CpuProfiler::UseDetailedSourcePositionsForProfiling(isolate);
++    ASSERT_TRUE(i_isolate->detailed_source_positions_for_profiling());
++    ASSERT_FALSE(shared->CanCollectSourcePosition(i_isolate));
++    ASSERT_TRUE(HasSourcePositionTable(i_isolate, shared));
++  }
++}
++
++TEST_F(SourcePositionsAdvancedTest,
++       LiveEditRetainedFunctionKeepsDetailedSourcePositionTable) {
++  v8::Isolate* isolate = NewTestIsolate();
++  ASSERT_NE(nullptr, isolate);
++  {
++    v8::Isolate::Scope isolate_scope(isolate);
++    v8::HandleScope handle_scope(isolate);
++    auto* i_isolate = reinterpret_cast<v8::internal::Isolate*>(isolate);
++    i_isolate->SetDetailedSourcePositionsForProfiling(false);
++    ASSERT_FALSE(i_isolate->detailed_source_positions_for_profiling());
++
++    v8::Local<v8::Context> context = node::NewContext(isolate);
++    ASSERT_FALSE(context.IsEmpty());
++    v8::Context::Scope context_scope(context);
++
++    const char* old_source =
++        "function retained() { return 1; }\n"
++        "retained;\n";
++    const char* new_source =
++        "\n"
++        "\n"
++        "function retained() { return 2; }\n"
++        "retained;\n";
++    v8::ScriptOrigin origin(String(isolate, "live-edit-positions.js"));
++    v8::Local<v8::Script> script =
++        v8::Script::Compile(context, String(isolate, old_source), &origin)
++            .ToLocalChecked();
++    v8::Local<v8::Function> retained =
++        script->Run(context).ToLocalChecked().As<v8::Function>();
++    retained->Call(context, context->Global(), 0, nullptr).ToLocalChecked();
++
++    auto old_shared = SharedInfo(i_isolate, retained);
++    ASSERT_TRUE(old_shared->HasBytecodeArray());
++    ASSERT_FALSE(HasSourcePositionTable(i_isolate, old_shared));
++    const int start_position_before = old_shared->StartPosition();
++
++    v8::CpuProfiler::UseDetailedSourcePositionsForProfiling(isolate);
++    ASSERT_TRUE(i_isolate->detailed_source_positions_for_profiling());
++    ASSERT_TRUE(HasSourcePositionTable(i_isolate, old_shared));
++
++    v8::internal::Handle<v8::internal::Script> i_script(
++        v8::internal::Cast<v8::internal::Script>(old_shared->script()),
++        i_isolate);
++    v8::debug::LiveEditResult result;
++    v8::internal::LiveEdit::PatchScript(
++        i_isolate,
++        i_script,
++        i_isolate->factory()->NewStringFromAsciiChecked(new_source),
++        false,
++        false,
++        &result);
++    ASSERT_EQ(result.status, v8::debug::LiveEditResult::OK);
++    auto updated_shared = SharedInfo(i_isolate, retained);
++    ASSERT_NE(old_shared->address(), updated_shared->address());
++    EXPECT_EQ(updated_shared->StartPosition(), start_position_before + 2);
++    EXPECT_TRUE(HasSourcePositionTable(i_isolate, old_shared));
++    EXPECT_TRUE(updated_shared->HasBytecodeArray());
++    EXPECT_TRUE(HasSourcePositionTable(i_isolate, updated_shared));
++    ASSERT_EQ(retained->Call(context, context->Global(), 0, nullptr)
++                  .ToLocalChecked()
++                  ->Int32Value(context)
++                  .FromJust(),
++              2);
++  }
++}
++
++TEST_F(SourcePositionsAdvancedTest,
++       LiveEditLateCollectionCoversRetainedOldAndReplacementSfis) {
++  v8::Isolate* isolate = NewTestIsolate();
++  ASSERT_NE(nullptr, isolate);
++  {
++    v8::Isolate::Scope isolate_scope(isolate);
++    v8::HandleScope handle_scope(isolate);
++    auto* i_isolate = reinterpret_cast<v8::internal::Isolate*>(isolate);
++    i_isolate->SetDetailedSourcePositionsForProfiling(false);
++    ASSERT_FALSE(i_isolate->detailed_source_positions_for_profiling());
++
++    v8::Local<v8::Context> context = node::NewContext(isolate);
++    ASSERT_FALSE(context.IsEmpty());
++    v8::Context::Scope context_scope(context);
++
++    const char* old_source =
++        "function retainedLate() { return 1; }\n"
++        "retainedLate;\n";
++    const char* new_source =
++        "\n"
++        "\n"
++        "function retainedLate() { return 2; }\n"
++        "retainedLate;\n";
++    v8::ScriptOrigin origin(String(isolate, "live-edit-late-positions.js"));
++    v8::Local<v8::Script> script =
++        v8::Script::Compile(context, String(isolate, old_source), &origin)
++            .ToLocalChecked();
++    v8::Local<v8::Function> retained =
++        script->Run(context).ToLocalChecked().As<v8::Function>();
++    retained->Call(context, context->Global(), 0, nullptr).ToLocalChecked();
++    v8::Global<v8::Function> retained_global(isolate, retained);
++
++    // LiveEdit replaces this compiled SFI. Keep the old SFI alive across the
++    // edit while the retained closure is updated to the replacement.
++    auto old_shared = SharedInfo(i_isolate, retained);
++    ASSERT_TRUE(old_shared->HasBytecodeArray());
++    ASSERT_TRUE(old_shared->CanCollectSourcePosition(i_isolate));
++    ASSERT_FALSE(HasSourcePositionTable(i_isolate, old_shared));
++    v8::internal::Handle<v8::internal::SharedFunctionInfo>
++        retained_old_shared(*old_shared, i_isolate);
++    v8::internal::Handle<v8::internal::Script> i_script(
++        v8::internal::Cast<v8::internal::Script>(
++            retained_old_shared->script()),
++        i_isolate);
++    v8::debug::LiveEditResult result;
++    v8::internal::LiveEdit::PatchScript(
++        i_isolate,
++        i_script,
++        i_isolate->factory()->NewStringFromAsciiChecked(new_source),
++        false,
++        false,
++        &result);
++    ASSERT_EQ(result.status, v8::debug::LiveEditResult::OK);
++
++    v8::Local<v8::Function> updated = retained_global.Get(isolate);
++    auto updated_shared = SharedInfo(i_isolate, updated);
++    ASSERT_NE(retained_old_shared->address(), updated_shared->address());
++    ASSERT_TRUE(updated_shared->HasBytecodeArray());
++    ASSERT_TRUE(retained_old_shared->CanCollectSourcePosition(i_isolate));
++    ASSERT_TRUE(updated_shared->CanCollectSourcePosition(i_isolate));
++    ASSERT_FALSE(retained_old_shared->GetBytecodeArray(i_isolate)
++                     ->HasSourcePositionTable());
++    ASSERT_FALSE(HasSourcePositionTable(i_isolate, updated_shared));
++
++    // Request detailed positions only after LiveEdit has kept the old SFI and
++    // published its replacement. Both live bytecode arrays must be collected.
++    v8::CpuProfiler::UseDetailedSourcePositionsForProfiling(isolate);
++    ASSERT_TRUE(i_isolate->detailed_source_positions_for_profiling());
++    EXPECT_FALSE(retained_old_shared->CanCollectSourcePosition(i_isolate));
++    EXPECT_FALSE(updated_shared->CanCollectSourcePosition(i_isolate));
++    EXPECT_TRUE(retained_old_shared->GetBytecodeArray(i_isolate)
++                    ->HasSourcePositionTable());
++    EXPECT_TRUE(HasSourcePositionTable(i_isolate, updated_shared));
++    ASSERT_EQ(updated->Call(context, context->Global(), 0, nullptr)
++                  .ToLocalChecked()
++                  ->Int32Value(context)
++                  .FromJust(),
++              2);
++  }
++}
++
++}  // namespace
++
++void NodeStartupAdvancedSourcePositionTestsAnchor() {}
+diff --git a/test/cctest/test_v8_private_startup_cases.cc b/test/cctest/test_v8_private_startup_cases.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..f7aa702383d6bb0e79b01c82e21558a00516822f
+--- /dev/null
++++ b/test/cctest/test_v8_private_startup_cases.cc
+@@ -0,0 +1,73 @@
++#include "node_test_fixture.h"
++
++namespace {
++
++class NodeStartupBridgeFixture final : public NodeZeroIsolateTestFixture {
++ public:
++  static void SetUpPrivateCase() {
++    SetUpTestCase();
++    NodeStartupBridgeFixture fixture;
++    fixture.SetUp();
++  }
++
++  static void TearDownPrivateCase() {
++    allocator.reset();
++    TearDownTestCase();
++  }
++
++  static node::ArrayBufferAllocator* allocator_for_private_case() {
++    return allocator.get();
++  }
++
++  static uv_loop_t* loop_for_private_case() { return &current_loop; }
++
++  static node::MultiIsolatePlatform* platform_for_private_case() {
++    return platform.get();
++  }
++
++ protected:
++  // This bridge is instantiated only to reuse NodeZero's allocator setup; it
++  // is not itself registered as a gtest case.
++  void TestBody() override {}
++};
++
++}  // namespace
++
++void NodeStartupSetUpV8PrivateCase() {
++  NodeStartupBridgeFixture::SetUpPrivateCase();
++}
++
++void NodeStartupTearDownV8PrivateCase() {
++  NodeStartupBridgeFixture::TearDownPrivateCase();
++}
++
++node::ArrayBufferAllocator* NodeStartupV8PrivateAllocator() {
++  return NodeStartupBridgeFixture::allocator_for_private_case();
++}
++
++uv_loop_t* NodeStartupV8PrivateLoop() {
++  return NodeStartupBridgeFixture::loop_for_private_case();
++}
++
++node::MultiIsolatePlatform* NodeStartupV8PrivatePlatform() {
++  return NodeStartupBridgeFixture::platform_for_private_case();
++}
++
++void NodeStartupSourcePositionTestsAnchor();
++void NodeStartupAdvancedSourcePositionTestsAnchor();
++
++namespace {
++
++// These calls retain the V8-configured archive objects that own the gtest
++// registrations; a static archive would otherwise drop unreferenced tests.
++class V8PrivateCctestAnchors {
++ public:
++  V8PrivateCctestAnchors() {
++    NodeStartupSourcePositionTestsAnchor();
++    NodeStartupAdvancedSourcePositionTestsAnchor();
++  }
++};
++
++V8PrivateCctestAnchors v8_private_cctest_anchors;
++
++}  // namespace
+diff --git a/test/cctest/v8_private_startup_test_fixture.h b/test/cctest/v8_private_startup_test_fixture.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..37147a1fc90700b3547f573e02179aa6642914db
+--- /dev/null
++++ b/test/cctest/v8_private_startup_test_fixture.h
+@@ -0,0 +1,47 @@
++#ifndef TEST_CCTEST_V8_PRIVATE_STARTUP_TEST_FIXTURE_H_
++#define TEST_CCTEST_V8_PRIVATE_STARTUP_TEST_FIXTURE_H_
++
++#include "gtest/gtest.h"
++#include "node.h"
++#include "uv.h"
++#include "v8.h"
++
++// Implemented by the ordinary Node-compiled bridge TU. This keeps private V8
++// tests out of Node's internal fixture/header configuration.
++void NodeStartupSetUpV8PrivateCase();
++void NodeStartupTearDownV8PrivateCase();
++node::ArrayBufferAllocator* NodeStartupV8PrivateAllocator();
++uv_loop_t* NodeStartupV8PrivateLoop();
++node::MultiIsolatePlatform* NodeStartupV8PrivatePlatform();
++
++class V8PrivateStartupTestFixture : public ::testing::Test {
++ protected:
++  void SetUp() override { NodeStartupSetUpV8PrivateCase(); }
++
++  void TearDown() override {
++    if (isolate_ != nullptr) {
++      NodeStartupV8PrivatePlatform()->DrainTasks(isolate_);
++      NodeStartupV8PrivatePlatform()->DisposeIsolate(isolate_);
++      isolate_ = nullptr;
++    }
++    NodeStartupTearDownV8PrivateCase();
++  }
++
++  v8::Isolate* NewTestIsolate(const node::IsolateSettings& settings = {}) {
++    isolate_ = node::NewIsolate(
++        NodeStartupV8PrivateAllocator(), NodeStartupV8PrivateLoop(),
++        NodeStartupV8PrivatePlatform(), nullptr, settings);
++    return isolate_;
++  }
++
++  void DisposeTestIsolate() {
++    if (isolate_ == nullptr) return;
++    NodeStartupV8PrivatePlatform()->DrainTasks(isolate_);
++    NodeStartupV8PrivatePlatform()->DisposeIsolate(isolate_);
++    isolate_ = nullptr;
++  }
++
++  v8::Isolate* isolate_ = nullptr;
++};
++
++#endif  // TEST_CCTEST_V8_PRIVATE_STARTUP_TEST_FIXTURE_H_
+diff --git a/tools/v8_gypfiles/node_startup_cctest.gyp b/tools/v8_gypfiles/node_startup_cctest.gyp
+new file mode 100644
+index 0000000000000000000000000000000000000000..515d921e617adf2f25b2e63d869d7c28d354a67c
+--- /dev/null
++++ b/tools/v8_gypfiles/node_startup_cctest.gyp
+@@ -0,0 +1,68 @@
++{
++  'includes': [
++    'toolchain.gypi',
++    'features.gypi',
++  ],
++  'targets': [
++    {
++      'target_name': 'v8_private_cctest_cases',
++      'type': 'static_library',
++      'toolsets': ['target'],
++      # Private V8 object layouts are supported only with the bundled static
++      # Node/V8 cctest link; external V8 and shared libnode skip these cases.
++      'dependencies': [
++        'abseil.gyp:abseil',
++        'v8.gyp:v8_internal_headers',
++      ],
++      'include_dirs': [
++        '<(SHARED_INTERMEDIATE_DIR)',
++        '<(SHARED_INTERMEDIATE_DIR)/generate-bytecode-output-root',
++        '../../src',
++        '../../tools/msvs/genfiles',
++        '../../deps/v8/include',
++        '../../deps/v8',
++        '../../test/cctest',
++        '../../deps/uv/include',
++      ],
++      'sources': [
++        '../../test/cctest/test_source_position_collection.cc',
++        '../../test/cctest/test_source_positions_advanced.cc',
++      ],
++      'conditions': [
++        [ 'OS!="aix" and OS!="os400"', {
++          'defines': [
++            'BUILDING_V8_SHARED',
++            'BUILDING_V8_PLATFORM_SHARED',
++          ],
++        }],
++        [ 'OS=="mac"', {
++          'xcode_settings': {
++            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
++            'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
++          },
++        }, '(OS!="aix" and OS!="os400") and (OS!="win" or clang==1)', {
++          'cflags': [
++            '-fvisibility=hidden',
++            '-fvisibility-inlines-hidden',
++          ],
++        }],
++        [ 'node_shared_gtest=="false"', {
++          'dependencies': [
++            '../../deps/googletest/googletest.gyp:gtest',
++          ],
++        }],
++        [ 'node_use_bundled_v8!="true" or node_shared=="true"', {
++          'type': 'none',
++          'dependencies!': [
++            'v8.gyp:v8_internal_headers',
++            '../../deps/googletest/googletest.gyp:gtest',
++          ],
++          'sources!': [
++            '../../test/cctest/test_source_position_collection.cc',
++            '../../test/cctest/test_source_positions_advanced.cc',
++          ],
++        }],
++      ],
++    },
++  ],
++}
+diff --git a/test/cctest/test_source_positions_advanced.cc b/test/cctest/test_source_positions_advanced.cc
+index c582645feb8a66850f53f858de7e29b0f9eef60c..c32af8b7ce3faeb17b72b78d4ba80d9c7154ef21 100644
+--- a/test/cctest/test_source_positions_advanced.cc
++++ b/test/cctest/test_source_positions_advanced.cc
+@@ -16,7 +16,8 @@
+ 
+ namespace {
+ 
+-class ChunkSourceStream final : public v8::ScriptCompiler::ExternalSourceStream {
++class ChunkSourceStream final
++    : public v8::ScriptCompiler::ExternalSourceStream {
+  public:
+   explicit ChunkSourceStream(const char* const* chunks) : chunks_(chunks) {}
+ 
+diff --git a/tools/v8_gypfiles/node_startup_cctest.gyp b/tools/v8_gypfiles/node_startup_cctest.gyp
+index 3897ef5a8cb4fde84456e98f504bf6051180f84e..87af9aaf510813cbdd2f5d3578492104727bec06 100644
+--- a/tools/v8_gypfiles/node_startup_cctest.gyp
++++ b/tools/v8_gypfiles/node_startup_cctest.gyp
+@@ -13,6 +13,7 @@
+       'dependencies': [
+         'abseil.gyp:abseil',
+         'v8.gyp:v8_internal_headers',
++        'v8.gyp:v8_maybe_icu',
+       ],
+       'include_dirs': [
+         '<(SHARED_INTERMEDIATE_DIR)',
+@@ -56,6 +57,7 @@
+           'type': 'none',
+           'dependencies!': [
+             'v8.gyp:v8_internal_headers',
++            'v8.gyp:v8_maybe_icu',
+             '../../deps/googletest/googletest.gyp:gtest',
+           ],
+           'sources!': [

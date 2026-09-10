@@ -1,0 +1,245 @@
+{
+  "passed": true,
+  "artifact_unchanged": true,
+  "plan": 6144,
+  "failures": [],
+  "skips": 387,
+  "todos": 10,
+  "events": [
+    {
+      "label": "identity",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release/node",
+        "-p",
+        "JSON.stringify({platform:process.platform,arch:process.arch,versions:process.versions,config:process.config})"
+      ],
+      "started": 1789004304.0286078,
+      "seconds": 0.03199505805969238,
+      "exit": 0
+    },
+    {
+      "label": "source-status",
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "started": 1789004304.0608327,
+      "seconds": 0.11422014236450195,
+      "exit": 0
+    },
+    {
+      "label": "source-diff",
+      "command": [
+        "git",
+        "diff",
+        "--binary",
+        "HEAD"
+      ],
+      "started": 1789004304.1752625,
+      "seconds": 0.03190255165100098,
+      "exit": 0
+    },
+    {
+      "label": "source-base",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "started": 1789004304.2073221,
+      "seconds": 0.0015053749084472656,
+      "exit": 0
+    },
+    {
+      "label": "doc-dependencies",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release/node",
+        "deps/npm/bin/npm-cli.js",
+        "ci",
+        "--prefix",
+        "tools/doc"
+      ],
+      "started": 1789004304.209087,
+      "seconds": 3.171398401260376,
+      "exit": 0
+    },
+    {
+      "label": "addon-doc-fixtures",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release/node",
+        "tools/doc/addon-verify.mjs",
+        "--input",
+        "/REDACTED_HOME/linux-renewed/pgo/doc/api/addons.md",
+        "--output",
+        "/REDACTED_HOME/linux-renewed/pgo/test/addons"
+      ],
+      "started": 1789004307.3808036,
+      "seconds": 0.0639033317565918,
+      "exit": 0
+    },
+    {
+      "label": "build-test-addons",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/addons",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789004307.4448843,
+      "seconds": 11.302120447158813,
+      "exit": 0
+    },
+    {
+      "label": "build-test-js-native-api",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/js-native-api",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789004318.7472064,
+      "seconds": 2.0761163234710693,
+      "exit": 0
+    },
+    {
+      "label": "build-test-node-api",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/node-api",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789004320.8235118,
+      "seconds": 2.1780264377593994,
+      "exit": 0
+    },
+    {
+      "label": "build-test-sqlite",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/sqlite",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789004323.001713,
+      "seconds": 0.9158952236175537,
+      "exit": 0
+    },
+    {
+      "label": "build-test-ffi",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "test/ffi",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789004323.9177778,
+      "seconds": 0.9658212661743164,
+      "exit": 0
+    },
+    {
+      "label": "build-benchmark-napi",
+      "command": [
+        "/usr/bin/python3",
+        "tools/build_addons.py",
+        "benchmark/napi",
+        "--out-dir",
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release",
+        "--config",
+        "Release",
+        "--loglevel",
+        "info"
+      ],
+      "started": 1789004324.8837743,
+      "seconds": 2.3692750930786133,
+      "exit": 0
+    },
+    {
+      "label": "build-embedding",
+      "command": [
+        "ninja",
+        "-C",
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release",
+        "-j4",
+        "embedtest"
+      ],
+      "started": 1789004327.2532802,
+      "seconds": 102.31019425392151,
+      "exit": 0
+    },
+    {
+      "label": "documentation",
+      "command": [
+        "make",
+        "doc-only",
+        "JOBS=4"
+      ],
+      "started": 1789004429.5636525,
+      "seconds": 17.513965606689453,
+      "exit": 0
+    },
+    {
+      "label": "cctest",
+      "command": [
+        "/REDACTED_HOME/linux-renewed/pgo/out/Release/cctest",
+        "--gtest_output=xml:/REDACTED_HOME/linux-renewed/evidence/combined-thin-pgo-gates-v1/cctest.xml"
+      ],
+      "started": 1789004447.255039,
+      "seconds": 3.9727280139923096,
+      "exit": 0
+    },
+    {
+      "label": "node-tests",
+      "command": [
+        "/usr/bin/python3",
+        "tools/test.py",
+        "--mode=release",
+        "--progress=tap",
+        "--flaky-tests=run",
+        "-j4",
+        "--temp-dir",
+        "/REDACTED_HOME/cthin-tmp",
+        "default",
+        "pummel",
+        "addons",
+        "ffi",
+        "js-native-api",
+        "node-api",
+        "embedding",
+        "benchmark",
+        "sqlite",
+        "doctool"
+      ],
+      "started": 1789004451.228058,
+      "seconds": 1123.0264899730682,
+      "exit": 0
+    }
+  ],
+  "scope": "Native release suite selection; not all upstream configurations"
+}

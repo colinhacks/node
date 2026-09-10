@@ -1,0 +1,126 @@
+{
+  "archive": "artifacts/cloud-20260909-linux/frozen-pgo-controls-v5.tar.gz",
+  "archive_sha256": "60dbfb7e61934f048b60a66434b9dee071c537f1d271e042903dd8ef32aa0380",
+  "recorded_archive_sha256": "60dbfb7e61934f048b60a66434b9dee071c537f1d271e042903dd8ef32aa0380",
+  "archive_hash_matches_verification": true,
+  "archive_verified_payload_files": 212,
+  "members": [
+    {
+      "archive_member": "evidence/combined-pgo-gates-v3/result.json",
+      "recommended_public_path": "gates/combined-pgo-gate-results-v1.json",
+      "original_bytes": 5706,
+      "original_sha256": "fce758b4a8dee11e52183c8ced807b5664c0014d219f5afbad541d9953602d1b",
+      "original_manifest_bytes": 5706,
+      "original_manifest_sha256": "fce758b4a8dee11e52183c8ced807b5664c0014d219f5afbad541d9953602d1b",
+      "original_manifest_match": true,
+      "sanitized_uncompressed_bytes": 5781,
+      "sanitized_uncompressed_sha256": "8e7d7c12383fd2b8d033a9455819ac5a9674df5e45688c3f7ce9495adf88c3b0",
+      "replaced_home_prefixes": 15,
+      "remaining_home_nub": false,
+      "secret_pattern_match_counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "archive_member": "evidence/combined-pgo-gates-v3/events.jsonl",
+      "recommended_public_path": "gates/combined-pgo-gate-events-v1.jsonl",
+      "original_bytes": 3862,
+      "original_sha256": "7a8fe3424d8cb73f9abe5db3215efcef38912cbdb3cdcdb374681c6519377f44",
+      "original_manifest_bytes": 3862,
+      "original_manifest_sha256": "7a8fe3424d8cb73f9abe5db3215efcef38912cbdb3cdcdb374681c6519377f44",
+      "original_manifest_match": true,
+      "sanitized_uncompressed_bytes": 3937,
+      "sanitized_uncompressed_sha256": "44db50c6a7593188c1561aec3dccd4595e007bc2065b975d15ba0d70e5093cfb",
+      "replaced_home_prefixes": 15,
+      "remaining_home_nub": false,
+      "secret_pattern_match_counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "archive_member": "evidence/combined-pgo-gates-v3/node-tests.log",
+      "recommended_public_path": "gates/combined-pgo-gate-node-tests-v1.log.gz",
+      "original_bytes": 531975,
+      "original_sha256": "c0f99dc4985b2051caab4c0a5a1b703ced0f5f85e29f5d133c898df4756d8880",
+      "original_manifest_bytes": 531975,
+      "original_manifest_sha256": "c0f99dc4985b2051caab4c0a5a1b703ced0f5f85e29f5d133c898df4756d8880",
+      "original_manifest_match": true,
+      "sanitized_uncompressed_bytes": 531980,
+      "sanitized_uncompressed_sha256": "53a426e572289bc81e9346559a6d8287a12d9b114760e9dda7a266caeb5a1107",
+      "replaced_home_prefixes": 1,
+      "remaining_home_nub": false,
+      "secret_pattern_match_counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "archive_member": "evidence/combined-pgo-gates-v3/cctest.log",
+      "recommended_public_path": "gates/combined-pgo-gate-cctest-v1.log.gz",
+      "original_bytes": 30898,
+      "original_sha256": "a3d1ffa95783ab1b804613a513a55be204003cb0c0b201314a0b5b634edf39eb",
+      "original_manifest_bytes": 30898,
+      "original_manifest_sha256": "a3d1ffa95783ab1b804613a513a55be204003cb0c0b201314a0b5b634edf39eb",
+      "original_manifest_match": true,
+      "sanitized_uncompressed_bytes": 30898,
+      "sanitized_uncompressed_sha256": "a3d1ffa95783ab1b804613a513a55be204003cb0c0b201314a0b5b634edf39eb",
+      "replaced_home_prefixes": 0,
+      "remaining_home_nub": false,
+      "secret_pattern_match_counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "archive_member": "evidence/combined-pgo-gates-v3/cctest.xml",
+      "recommended_public_path": "gates/combined-pgo-gate-cctest-v1.xml.gz",
+      "original_bytes": 56902,
+      "original_sha256": "8960d860fbb8cc884480aeaf9eaa10f2ef0b4333cf17ae78422093b0a4060030",
+      "original_manifest_bytes": 56902,
+      "original_manifest_sha256": "8960d860fbb8cc884480aeaf9eaa10f2ef0b4333cf17ae78422093b0a4060030",
+      "original_manifest_match": true,
+      "sanitized_uncompressed_bytes": 56902,
+      "sanitized_uncompressed_sha256": "8960d860fbb8cc884480aeaf9eaa10f2ef0b4333cf17ae78422093b0a4060030",
+      "replaced_home_prefixes": 0,
+      "remaining_home_nub": false,
+      "secret_pattern_match_counts": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "result_summary": {
+    "passed": true,
+    "artifact_unchanged": true,
+    "plan": 6144,
+    "failures": [],
+    "skips": 387,
+    "todos": 10,
+    "scope": "Native release suite selection; not all upstream configurations"
+  },
+  "event_labels": [
+    "identity",
+    "source-status",
+    "source-diff",
+    "source-base",
+    "doc-dependencies",
+    "addon-doc-fixtures",
+    "build-test-addons",
+    "build-test-js-native-api",
+    "build-test-node-api",
+    "build-test-sqlite",
+    "build-test-ffi",
+    "build-benchmark-napi",
+    "build-embedding",
+    "documentation",
+    "cctest",
+    "node-tests"
+  ]
+}

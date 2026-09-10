@@ -1,0 +1,35 @@
+{
+  "covered_files": 2898,
+  "covered_bytes": 12609624953,
+  "uncovered_files": {},
+  "archives": {
+    "early-frozen-artifacts-v1": {
+      "payload_files": 180,
+      "verification": "artifacts/cloud-20260909-linux/early-frozen-artifacts-v1.verification.json"
+    },
+    "candidate-artifacts-v2": {
+      "payload_files": 1238,
+      "verification": "artifacts/cloud-20260909-linux/candidate-artifacts-v2.verification.json"
+    },
+    "frozen-combined-phase-v4": {
+      "payload_files": 990,
+      "verification": "artifacts/cloud-20260909-linux/frozen-combined-phase-v4.verification.json"
+    },
+    "frozen-pgo-controls-v5": {
+      "payload_files": 212,
+      "verification": "artifacts/cloud-20260909-linux/frozen-pgo-controls-v5.verification.json"
+    },
+    "frozen-final-linux-v6": {
+      "payload_files": 267,
+      "verification": "artifacts/cloud-20260909-linux/frozen-final-linux-v6.verification.json"
+    },
+    "frozen-inventory-delta-v7": {
+      "payload_files": 15,
+      "verification": "artifacts/cloud-20260909-linux/frozen-inventory-delta-v7.verification.json"
+    }
+  },
+  "symlinks": {
+    "evidence/old-loader-v1/old-libc/lib64/ld-linux-x86-64.so.2": "/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+  },
+  "symlink_note": "The old-loader absolute symlink is recorded here and in candidate-v2 link metadata; its file contents were archived by the validated dereferencing package, not followed during extraction."
+}

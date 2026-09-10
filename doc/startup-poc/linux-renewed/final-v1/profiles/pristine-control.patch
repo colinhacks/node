@@ -1,0 +1,129 @@
+diff --git a/configure.py b/configure.py
+index 99ce932..3f0f66a 100755
+--- a/configure.py
++++ b/configure.py
+@@ -207,15 +207,18 @@ parser.add_argument("--enable-pgo-generate",
+     action="store_true",
+     dest="enable_pgo_generate",
+     default=None,
+-    help="Enable profiling with pgo of a binary. This feature is only available "
+-         "on linux with gcc and g++ 5.4.1 or newer and on windows.")
++    help="Enable profiling with PGO. Linux requires GCC 5.4.1+ or Clang 20.1.0+; "
++         "the Clang mode also requires Ninja.")
+ 
+ parser.add_argument("--enable-pgo-use",
+     action="store_true",
+     dest="enable_pgo_use",
+     default=None,
+-    help="Enable use of the profile generated with --enable-pgo-generate. This "
+-         "feature is only available on linux with gcc and g++ 5.4.1 or newer and on windows.")
++    help="Enable PGO profile use. Linux requires GCC 5.4.1+ or Clang 20.1.0+; "
++         "the Clang mode also requires Ninja and --pgo-profile.")
++
++parser.add_argument("--pgo-profile",
++    help="Path to the merged LLVM profile for Linux Clang --enable-pgo-use.")
+ 
+ parser.add_argument("--enable-lto",
+     action="store_true",
+@@ -1860,6 +1863,17 @@ def gcc_version_ge(version_checked):
+       return False
+   return True
+ 
++def linux_clang_20_or_newer():
++  version_checked = (20, 1, 0)
++  for compiler, language in ((CC, 'c'), (CXX, 'c++')):
++    available, is_clang, clang_version, _1, _2 = (
++      try_check_compiler(compiler, language)
++    )
++    if not available or not is_clang or clang_version < version_checked:
++      return False
++  return True
++
++
+ def configure_node_lib_files(o):
+   o['variables']['node_library_files'] = SearchFiles('lib', 'js')
+ 
+@@ -1978,8 +1992,23 @@ def configure_node(o):
+     raise Exception(
+       'The pgo option is supported only on linux and windows.')
+ 
+-  if flavor == 'linux':
+-    if options.enable_pgo_generate or options.enable_pgo_use:
++  linux_pgo_requested = (options.enable_pgo_generate or options.enable_pgo_use or
++                         options.pgo_profile)
++  linux_uses_clang = flavor == 'linux' and linux_pgo_requested and all(
++    try_check_compiler(compiler, language)[1]
++    for compiler, language in ((CC, 'c'), (CXX, 'c++')))
++
++  if options.pgo_profile and not (flavor == 'linux' and linux_uses_clang and
++                                  options.enable_pgo_use):
++    raise Exception('--pgo-profile requires Linux Clang --enable-pgo-use.')
++
++  if flavor == 'linux' and (options.enable_pgo_generate or options.enable_pgo_use):
++    if linux_uses_clang:
++      if not options.use_ninja:
++        raise Exception('Linux LLVM PGO requires --ninja.')
++      if not linux_clang_20_or_newer():
++        raise Exception('Linux LLVM PGO requires Clang 20.1.0 or newer for both CC and CXX.')
++    else:
+       version_checked = (5, 4, 1)
+       if not gcc_version_ge(version_checked):
+         version_checked_str = ".".join(map(str, version_checked))
+@@ -1987,6 +2016,18 @@ def configure_node(o):
+           'The options --enable-pgo-generate and --enable-pgo-use '
+           f'are supported for gcc and gxx {version_checked_str} or newer only.')
+ 
++  o['variables']['node_pgo_profile'] = ''
++  if flavor == 'linux' and linux_uses_clang and options.enable_pgo_use:
++    if not options.pgo_profile:
++      raise Exception('Linux LLVM PGO use requires --pgo-profile=<merged-profile>.')
++    profile = Path(options.pgo_profile).resolve()
++    if not profile.is_file():
++      raise Exception(f'PGO profile not found: {profile}')
++    if '\n' in str(profile) or '\r' in str(profile):
++      raise Exception('PGO profile paths must not contain newlines.')
++    # Ninja expands dollar signs before the shell parses compiler flags.
++    o['variables']['node_pgo_profile'] = shlex.quote(str(profile)).replace('$', '$$')
++
+   if options.enable_pgo_generate and options.enable_pgo_use:
+     raise Exception(
+       'Only one of the --enable-pgo-generate or --enable-pgo-use options '
+diff --git a/common.gypi b/common.gypi
+index 47c1d0c..b7c52fe 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -12,6 +12,7 @@
+     'msvs_multi_core_compile': '0',   # we do enable multicore compiles, but not using the V8 way
+     'enable_pgo_generate%': '0',
+     'enable_pgo_use%': '0',
++    'node_pgo_profile%': '',
+     'clang_profile_lib%': '',
+     'python%': 'python',
+     'emulator%': [],
+@@ -208,6 +209,17 @@
+               'LLVM_LTO': 'YES',
+             },
+           }],
++          ['OS=="linux" and clang==1 and configuring_node==1 and enable_pgo_generate=="true"', {
++            'cflags': ['-fprofile-generate', '-fprofile-update=atomic'],
++            'target_conditions': [
++              ['_type!="static_library"', {
++                'ldflags': ['-fprofile-generate'],
++              }],
++            ],
++          }],
++          ['OS=="linux" and clang==1 and configuring_node==1 and enable_pgo_use=="true"', {
++            'cflags': ['-fprofile-use=<(node_pgo_profile)'],
++          }],
+           ['OS=="linux" or OS=="openharmony"', {
+             'conditions': [
+               ['node_section_ordering_info!=""', {
+@@ -236,7 +248,7 @@
+             # frames otherwise, even with --call-graph dwarf.
+             'cflags': [ '-fno-omit-frame-pointer' ],
+           }],
+-          ['OS=="linux" or OS=="openharmony"', {
++          ['(OS=="linux" and clang!=1) or OS=="openharmony"', {
+             'conditions': [
+               ['enable_pgo_generate=="true"', {
+                 'cflags': ['<(pgo_generate)'],

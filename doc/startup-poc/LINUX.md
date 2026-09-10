@@ -1,5 +1,7 @@
 # Linux final results
 
+This is the frozen 18-patch result. The [renewed 22-patch Linux report](LINUX-RENEWED.md) contains the later source, PGO and ThinLTO comparisons; the measurements below remain unchanged.
+
 The source-only fork reached 1.294–1.302× faster empty startup in the final four-artifact run. Optional ThinLTO reached 1.281–1.296×: it did not improve startup, but improved several throughput workloads without the large regressions of the rejected PGO recipe.
 
 | Artifact | Compiler configuration | SHA-256 |

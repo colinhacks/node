@@ -1,0 +1,12 @@
+{
+  "source-artifact-v1.json": {
+    "original_sha256": "d0903e1a056afa14861c4c4211791bc7e79fd129727dc3a3565a3122626ce595",
+    "public_sha256": "406129ec4ca37ca03a03e7d682a438f2d26172df5ed3b16f306c7a0ee7479ee3",
+    "transformation": "home prefix replaced; original value hashes preserved"
+  },
+  "source-gates-v1.json": {
+    "original_sha256": "3c6f9b48c1dc338e16d987bbf8d8597762f9a877e76bdd2ad65ff754051c00d8",
+    "public_sha256": "3ea296126cd30bffacd927c604396cc0e5564494cf97083e647b61dfcadee539",
+    "transformation": "home prefix replaced; original value hashes preserved"
+  }
+}

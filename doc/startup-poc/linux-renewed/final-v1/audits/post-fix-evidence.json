@@ -1,0 +1,10 @@
+{
+  "checks": {
+    "series_is_exact_22_line_manifest_order": true,
+    "series_line_count": 22,
+    "series_matches_manifest_order": true,
+    "all_22_patch_digests_match_manifest": true,
+    "readme_row21_states_complete_base_closure": true
+  },
+  "observed_row21": "| `21-v8-bound-dictionary-rehash.patch` | `7efdf3f40841ab7b6ff8dcad2fc8f9ce7c8d42d6`, dictionary formatting from `1769a845456079ffea5bee4dc3503a55ba7f5a73` | patches 1, 2, 9, 14, 15, and 20 | patch 20 |"
+}

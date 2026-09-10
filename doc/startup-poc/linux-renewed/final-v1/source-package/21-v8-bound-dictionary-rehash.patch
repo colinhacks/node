@@ -1,0 +1,331 @@
+diff --git a/configure.py b/configure.py
+index 4cf90cddd571195355eeef8d258d2fa02fa9edaf..f1544697f2818543295df8d02a2e361b4cd442cd 100755
+--- a/configure.py
++++ b/configure.py
+@@ -1900,6 +1900,7 @@ def configure_node_lib_files(o):
+ 
+ def configure_node_cctest_sources(o):
+   v8_private_cctest_sources = {
++      'test/cctest/test_snapshot_dictionary_rehash.cc',
+       'test/cctest/test_source_position_collection.cc',
+       'test/cctest/test_source_positions_advanced.cc',
+   }
+diff --git a/deps/v8/src/objects/hash-table.h b/deps/v8/src/objects/hash-table.h
+index 846094f7f982f6f1cdcc74f770d9ebd543b0efc2..3438fdb9615470db259003c784654aa2ff5ee7d9 100644
+--- a/deps/v8/src/objects/hash-table.h
++++ b/deps/v8/src/objects/hash-table.h
+@@ -177,6 +177,9 @@ class EXPORT_TEMPLATE_DECLARE(V8_EXPORT_PRIVATE) HashTable
+   // Rehashes the table in-place.
+   void Rehash(PtrComprCageBase cage_base);
+ 
++  // Rehashes snapshot-restored dictionary tables with bounded native scratch.
++  void RehashForSnapshotWithBoundedScratch(PtrComprCageBase cage_base);
++
+   // Returns whether k is a real key.  The hole and undefined are not allowed as
+   // keys and can be used to indicate missing or deleted elements.
+   static inline bool IsKey(ReadOnlyRoots roots, Tagged<Object> k);
+diff --git a/deps/v8/src/objects/objects.cc b/deps/v8/src/objects/objects.cc
+index 779a8506f7afef74f8544f2b225d44f81bd53ff9..fea583f381ea08eace91076fff452124c2e5e175 100644
+--- a/deps/v8/src/objects/objects.cc
++++ b/deps/v8/src/objects/objects.cc
+@@ -16,6 +16,7 @@
+ #include "src/base/bits.h"
+ #include "src/base/logging.h"
+ #include "src/base/overflowing-math.h"
++#include "src/base/small-vector.h"
+ #include "src/builtins/accessors.h"
+ #include "src/builtins/builtins.h"
+ #include "src/codegen/source-position-table.h"
+@@ -2252,10 +2253,10 @@ void HeapObject::RehashBasedOnMap(IsolateT* isolate) {
+       Cast<ObjectHashTable>(*this)->Rehash(isolate);
+       break;
+     case NAME_DICTIONARY_TYPE:
+-      Cast<NameDictionary>(*this)->Rehash(isolate);
++      Cast<NameDictionary>(*this)->RehashForSnapshotWithBoundedScratch(isolate);
+       break;
+     case NAME_TO_INDEX_HASH_TABLE_TYPE:
+-      Cast<NameToIndexHashTable>(*this)->Rehash(isolate);
++      Cast<NameToIndexHashTable>(*this)->RehashForSnapshotWithBoundedScratch(isolate);
+       break;
+     case REGISTERED_SYMBOL_TABLE_TYPE:
+       Cast<RegisteredSymbolTable>(*this)->Rehash(isolate);
+@@ -5138,6 +5139,61 @@ void HashTable<Derived, Shape>::Rehash(PtrComprCageBase cage_base) {
+   SetNumberOfDeletedElements(0);
+ }
+ 
++template <typename Derived, typename Shape>
++void HashTable<Derived, Shape>::RehashForSnapshotWithBoundedScratch(
++    PtrComprCageBase cage_base) {
++  constexpr uint32_t kMinimumScratchCapacity = 32;
++  constexpr uint32_t kMaximumScratchCapacity = 2048;
++  constexpr size_t kInlineScratchSlots = 128;
++  const uint32_t capacity = Capacity();
++  if (capacity < kMinimumScratchCapacity || capacity > kMaximumScratchCapacity) {
++    return Rehash(cage_base);
++  }
++
++  DisallowGarbageCollection no_gc;
++  // SmallVector rounds capacity up: at most 64 KiB for three-slot entries
++  // on 64-bit builds. Reserve while the table is protected from GC moves.
++  base::SmallVector<Tagged<Object>, kInlineScratchSlots> scratch;
++  scratch.reserve(static_cast<size_t>(capacity) * kEntrySize);
++  WriteBarrierModeScope mode = GetWriteBarrierMode(no_gc);
++  EarlyReadOnlyRoots roots = EarlyGetReadOnlyRoots();
++  uint32_t entries = 0;
++  for (InternalIndex current : InternalIndex::Range(capacity)) {
++    const uint32_t from_index = EntryToIndex(current);
++    Tagged<Object> key = get(from_index);
++    if (!IsKey(roots, key)) continue;
++    for (int field = 0; field < kEntrySize; ++field) {
++      scratch.push_back(get(from_index + field));
++    }
++    ++entries;
++  }
++  DCHECK_EQ(entries, NumberOfElements());
++
++  Tagged<HeapObject> undefined = roots.undefined_value();
++  Derived* self = static_cast<Derived*>(this);
++  for (InternalIndex current : InternalIndex::Range(capacity)) {
++    const uint32_t index = EntryToIndex(current);
++    self->set_key(index + kEntryKeyIndex, undefined, SKIP_WRITE_BARRIER);
++    for (int field = 1; field < kEntrySize; ++field) {
++      self->set(index + field, undefined, SKIP_WRITE_BARRIER);
++    }
++  }
++
++  for (uint32_t entry = 0; entry < entries; ++entry) {
++    const uint32_t scratch_index = entry * kEntrySize;
++    Tagged<Object> key = scratch[scratch_index + kEntryKeyIndex];
++    const uint32_t hash = TodoShape::HashForObject(roots, key);
++    const uint32_t insertion_index =
++        EntryToIndex(FindInsertionEntry(cage_base, roots, hash));
++    self->set_key(insertion_index + kEntryKeyIndex, key, *mode);
++    for (int field = 1; field < kEntrySize; ++field) {
++      self->set(insertion_index + field, scratch[scratch_index + field], *mode);
++    }
++  }
++  SetNumberOfElements(entries);
++  SetNumberOfDeletedElements(0);
++}
++
+ template <typename Derived, typename Shape>
+ template <typename IsolateT, template <typename> typename HandleType>
+   requires(std::is_convertible_v<HandleType<Derived>, DirectHandle<Derived>>)
+diff --git a/test/cctest/test_snapshot_dictionary_rehash.cc b/test/cctest/test_snapshot_dictionary_rehash.cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..5a1bb0572b5aed0dffc28fde58aff9d8f4ae8bd3
+--- /dev/null
++++ b/test/cctest/test_snapshot_dictionary_rehash.cc
+@@ -0,0 +1,158 @@
++#include "src/handles/handles.h"
++#include "src/heap/factory.h"
++#include "src/objects/dictionary-inl.h"
++#include "src/objects/hash-table-inl.h"
++#include "src/objects/property-details.h"
++#include "src/roots/roots-inl.h"
++
++#include <cstdio>
++#include <vector>
++
++#include "gtest/gtest.h"
++#include "v8_private_startup_test_fixture.h"
++
++namespace i = v8::internal;
++
++class SnapshotDictionaryRehashTest : public V8PrivateStartupTestFixture {};
++
++namespace {
++
++constexpr uint32_t kCapacities[] = {16, 32, 64, 128, 256, 512, 2048, 4096};
++
++template <typename Table, int kEntrySize>
++void ScrambleWholeEntries(i::Tagged<Table> table) {
++  std::vector<i::Tagged<i::Object>> entries(table->Capacity() * kEntrySize);
++  i::DisallowGarbageCollection no_gc;
++  for (uint32_t entry = 0; entry < table->Capacity(); ++entry) {
++    const int index = Table::EntryToIndex(i::InternalIndex(entry));
++    for (int field = 0; field < kEntrySize; ++field) {
++      entries[entry * kEntrySize + field] = table->get(index + field);
++    }
++  }
++  for (uint32_t entry = 0; entry < table->Capacity(); ++entry) {
++    const uint32_t source = (entry + 1) % table->Capacity();
++    const int index = Table::EntryToIndex(i::InternalIndex(entry));
++    for (int field = 0; field < kEntrySize; ++field) {
++      table->set(index + field, entries[source * kEntrySize + field]);
++    }
++  }
++}
++
++template <typename Table, int kEntrySize>
++void ExpectEmptyEntriesCleared(i::Isolate* isolate, i::Tagged<Table> table) {
++  i::ReadOnlyRoots roots(isolate);
++  for (uint32_t entry = 0; entry < table->Capacity(); ++entry) {
++    const i::InternalIndex index(entry);
++    if (Table::IsKey(roots, table->KeyAt(index))) continue;
++    for (int field = 1; field < kEntrySize; ++field) {
++      EXPECT_EQ(roots.undefined_value(),
++                table->get(Table::EntryToIndex(index) + field));
++    }
++  }
++}
++
++struct NameDictionaryEntry {
++  i::DirectHandle<i::Name> key;
++  i::DirectHandle<i::Object> value;
++  i::Tagged<i::Smi> details;
++};
++
++void TestNameDictionary(i::Isolate* isolate, uint32_t capacity) {
++  i::HandleScope scope(isolate);
++  auto table = i::NameDictionary::New(
++      isolate, capacity, i::AllocationType::kOld,
++      i::USE_CUSTOM_MINIMUM_CAPACITY);
++  ASSERT_EQ(capacity, table->Capacity());
++  std::vector<NameDictionaryEntry> entries;
++  for (uint32_t entry = 0; entry < capacity / 2; ++entry) {
++    char name[64];
++    std::snprintf(name, sizeof(name), "snapshot-name-%u-%u", capacity, entry);
++    i::DirectHandle<i::Name> key =
++        isolate->factory()->InternalizeUtf8String(name);
++    i::DirectHandle<i::Object> value =
++        isolate->factory()->NewFixedArray(static_cast<int>(entry + 1));
++    table = i::NameDictionary::Add(isolate, table, key, value,
++                                   i::PropertyDetails::Empty())
++                .ToHandleChecked();
++    const i::InternalIndex found = table->FindEntry(isolate, key);
++    ASSERT_TRUE(found.is_found());
++    entries.push_back({key, value, table->DetailsAt(found).AsSmi()});
++  }
++
++  const i::InternalIndex deleted = table->FindEntry(isolate, entries.back().key);
++  ASSERT_TRUE(deleted.is_found());
++  table = i::NameDictionary::DeleteEntry(isolate, table, deleted);
++  entries.pop_back();
++  const int hash = table->Hash();
++  const int next_enumeration_index = table->next_enumeration_index();
++  const int flags = i::Smi::ToInt(table->get(i::NameDictionary::kFlagsIndex));
++
++  ScrambleWholeEntries<i::NameDictionary, i::NameDictionaryShape::kEntrySize>(
++      *table);
++  table->RehashForSnapshotWithBoundedScratch(isolate);
++  EXPECT_EQ(capacity, table->Capacity());
++  EXPECT_EQ(entries.size(), table->NumberOfElements());
++  EXPECT_EQ(0u, table->NumberOfDeletedElements());
++  EXPECT_EQ(hash, table->Hash());
++  EXPECT_EQ(next_enumeration_index, table->next_enumeration_index());
++  EXPECT_EQ(flags, i::Smi::ToInt(table->get(i::NameDictionary::kFlagsIndex)));
++  for (const NameDictionaryEntry& expected : entries) {
++    const i::InternalIndex found = table->FindEntry(isolate, expected.key);
++    ASSERT_TRUE(found.is_found());
++    EXPECT_EQ(*expected.value, table->ValueAt(found));
++    EXPECT_EQ(expected.details, table->DetailsAt(found).AsSmi());
++  }
++  if (capacity >= 32 && capacity <= 2048) {
++    ExpectEmptyEntriesCleared<i::NameDictionary,
++                              i::NameDictionaryShape::kEntrySize>(isolate,
++                                                                   *table);
++  }
++}
++
++void TestNameToIndexHashTable(i::Isolate* isolate, uint32_t capacity) {
++  i::HandleScope scope(isolate);
++  auto table = i::NameToIndexHashTable::New(
++      isolate, capacity, i::AllocationType::kOld,
++      i::USE_CUSTOM_MINIMUM_CAPACITY);
++  ASSERT_EQ(capacity, table->Capacity());
++  std::vector<i::DirectHandle<i::Name>> keys;
++  for (uint32_t entry = 0; entry < capacity / 2; ++entry) {
++    char name[64];
++    std::snprintf(name, sizeof(name), "snapshot-index-%u-%u", capacity, entry);
++    i::DirectHandle<i::Name> key =
++        isolate->factory()->InternalizeUtf8String(name);
++    table = i::NameToIndexHashTable::Add(isolate, table, key, entry + 100);
++    keys.push_back(key);
++  }
++  ScrambleWholeEntries<i::NameToIndexHashTable,
++                       i::NameToIndexShape::kEntrySize>(*table);
++  table->RehashForSnapshotWithBoundedScratch(isolate);
++  EXPECT_EQ(capacity, table->Capacity());
++  EXPECT_EQ(keys.size(), table->NumberOfElements());
++  EXPECT_EQ(0u, table->NumberOfDeletedElements());
++  for (uint32_t entry = 0; entry < keys.size(); ++entry) {
++    const i::InternalIndex found = table->FindEntry(isolate, *keys[entry]);
++    ASSERT_TRUE(found.is_found());
++    EXPECT_EQ(static_cast<int>(entry + 100), table->IndexAt(found));
++  }
++  if (capacity >= 32 && capacity <= 2048) {
++    ExpectEmptyEntriesCleared<i::NameToIndexHashTable,
++                              i::NameToIndexShape::kEntrySize>(isolate,
++                                                                *table);
++  }
++}
++
++}  // namespace
++
++TEST_F(SnapshotDictionaryRehashTest, RehashForSnapshotPreservesEntries) {
++  v8::Isolate* public_isolate = NewTestIsolate();
++  v8::Isolate::Scope isolate_scope(public_isolate);
++  v8::HandleScope handle_scope(public_isolate);
++  i::Isolate* isolate = reinterpret_cast<i::Isolate*>(public_isolate);
++  for (uint32_t capacity : kCapacities) {
++    TestNameDictionary(isolate, capacity);
++    TestNameToIndexHashTable(isolate, capacity);
++  }
++}
++
++void NodeStartupDictionaryRehashTestsAnchor() {}
+diff --git a/test/cctest/test_v8_private_startup_cases.cc b/test/cctest/test_v8_private_startup_cases.cc
+index f7aa702383d6bb0e79b01c82e21558a00516822f..35107c3edc6d598746b8ec00fb9c25c17f89ed75 100644
+--- a/test/cctest/test_v8_private_startup_cases.cc
++++ b/test/cctest/test_v8_private_startup_cases.cc
+@@ -55,6 +55,7 @@ node::MultiIsolatePlatform* NodeStartupV8PrivatePlatform() {
+ 
+ void NodeStartupSourcePositionTestsAnchor();
+ void NodeStartupAdvancedSourcePositionTestsAnchor();
++void NodeStartupDictionaryRehashTestsAnchor();
+ 
+ namespace {
+ 
+@@ -65,6 +66,7 @@ class V8PrivateCctestAnchors {
+   V8PrivateCctestAnchors() {
+     NodeStartupSourcePositionTestsAnchor();
+     NodeStartupAdvancedSourcePositionTestsAnchor();
++    NodeStartupDictionaryRehashTestsAnchor();
+   }
+ };
+ 
+diff --git a/tools/v8_gypfiles/node_startup_cctest.gyp b/tools/v8_gypfiles/node_startup_cctest.gyp
+index 515d921e617adf2f25b2e63d869d7c28d354a67c..3897ef5a8cb4fde84456e98f504bf6051180f84e 100644
+--- a/tools/v8_gypfiles/node_startup_cctest.gyp
++++ b/tools/v8_gypfiles/node_startup_cctest.gyp
+@@ -25,6 +25,7 @@
+         '../../deps/uv/include',
+       ],
+       'sources': [
++        '../../test/cctest/test_snapshot_dictionary_rehash.cc',
+         '../../test/cctest/test_source_position_collection.cc',
+         '../../test/cctest/test_source_positions_advanced.cc',
+       ],
+@@ -58,6 +59,7 @@
+             '../../deps/googletest/googletest.gyp:gtest',
+           ],
+           'sources!': [
++            '../../test/cctest/test_snapshot_dictionary_rehash.cc',
+             '../../test/cctest/test_source_position_collection.cc',
+             '../../test/cctest/test_source_positions_advanced.cc',
+           ],
+diff --git a/test/cctest/test_snapshot_dictionary_rehash.cc b/test/cctest/test_snapshot_dictionary_rehash.cc
+index 5a1bb0572b5aed0dffc28fde58aff9d8f4ae8bd3..552723ed95d9b97abde8ca057df3f8af85d06207 100644
+--- a/test/cctest/test_snapshot_dictionary_rehash.cc
++++ b/test/cctest/test_snapshot_dictionary_rehash.cc
+@@ -79,7 +79,8 @@ void TestNameDictionary(i::Isolate* isolate, uint32_t capacity) {
+     entries.push_back({key, value, table->DetailsAt(found).AsSmi()});
+   }
+ 
+-  const i::InternalIndex deleted = table->FindEntry(isolate, entries.back().key);
++  const i::InternalIndex deleted =
++      table->FindEntry(isolate, entries.back().key);
+   ASSERT_TRUE(deleted.is_found());
+   table = i::NameDictionary::DeleteEntry(isolate, table, deleted);
+   entries.pop_back();
